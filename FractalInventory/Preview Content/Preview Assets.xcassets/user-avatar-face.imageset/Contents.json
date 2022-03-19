@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "user-avatar-face.jpeg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
