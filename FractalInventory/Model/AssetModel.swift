@@ -133,7 +133,7 @@ class ApiAssets {
         var urlComponent = URLComponents(string: "\(apiHost)/api/v1/\(apiDB)/assets/")!
         urlComponent.queryItems = [
             URLQueryItem(name: "fields", value: "{\"name\":1,\"brand\":1,\"model\":1,\"serial\":1,\"EPC\":1,\"location\":1}"),
-            URLQueryItem(name: "query", value: "{\"location\":\"\(location)\"}")
+            URLQueryItem(name: "query", value: "{\"location\":\"\(location)\",\"status\":{\"$ne\":\"decommissioned\"}}")
         ]
         var request = URLRequest(url: urlComponent.url!)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -150,7 +150,7 @@ class ApiAssets {
         var urlComponent = URLComponents(string: "\(apiHost)/api/v1/\(apiDB)/assets/")!
         urlComponent.queryItems = [
             URLQueryItem(name: "fields", value: "{\"name\":1,\"brand\":1,\"model\":1,\"serial\":1,\"EPC\":1,\"fileExt\":1,\"locationPath\":1}}}"),
-            URLQueryItem(name: "query", value: "{\"location\":\"\(location)\"}")
+            URLQueryItem(name: "query", value: "{\"location\":\"\(location)\",\"status\":{\"$ne\":\"decommissioned\"}}")
         ]
         var request = URLRequest(url: urlComponent.url!)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -185,7 +185,7 @@ class ApiAssets {
         var urlComponent = URLComponents(string: "\(apiHost)/api/v1/\(apiDB)/assets/")!
         urlComponent.queryItems = [
             URLQueryItem(name: "fields", value: "{\"name\":1,\"brand\":1,\"model\":1,\"serial\":1,\"EPC\":1,\"location\":1,\"locationPath\":1}"),
-            URLQueryItem(name: "query", value: "{\"EPC\":\"\(EPC)\"}")
+            URLQueryItem(name: "query", value: "{\"EPC\":\"\(EPC)\",\"status\":{\"$ne\":\"decommissioned\"}}")
         ]
         var request = URLRequest(url: urlComponent.url!)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
