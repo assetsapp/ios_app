@@ -20,10 +20,10 @@ struct EmployeeView: View {
     @Binding var selectedEmployee: EmployeeModel
     @State var selectedAsset: RealAssetModelWithLocation = RealAssetModelWithLocation(_id: "", brand: "", model: "", name: "", EPC: "", serial: "")
     @State var showAddEmployee: Bool = false
+    let workModeManager = WorkModeManager()
     
     var body: some View {
         VStack {
-            
             if isModal {
                 VStack {
                     HStack {
@@ -44,7 +44,7 @@ struct EmployeeView: View {
             
             EmployeeSearchBox(searchText: $searchText, isSearching: $isSearching)
                 .padding(.top, isModal ? 0 : 20)
-
+            
             ScrollView(.vertical, showsIndicators: false) {
                 
                 // MARK: Assets
@@ -80,13 +80,13 @@ struct EmployeeView: View {
             .navigationBarTitle("Employees (\(getFilteredEmployees().count))")
             .navigationBarItems(trailing:
                                     HStack {
-                                        Button("Add") {
-                                            showAddEmployee.toggle()
-                                        }
-                                        .sheet(isPresented: $showAddEmployee) {
-                                            NewEmployee(cslvalues: cslvalues, showModal: $showAddEmployee)
-                                        }
-                                    }
+                Button("Add") {
+                    showAddEmployee.toggle()
+                }
+                .sheet(isPresented: $showAddEmployee) {
+                    NewEmployee(cslvalues: cslvalues, showModal: $showAddEmployee)
+                }
+            }
             )
         }
         .onChange(of: isAssetListPresent) { value in
@@ -120,9 +120,22 @@ struct EmployeeView: View {
     
     func onAppearLoad() {
         cslvalues.isLoading = true
-        ApiEmployees().getEmployees { employees in
-            self.apiEmployees = employees
-            cslvalues.isLoading = false
+        switch workModeManager.workMode {
+        case .online:
+            ApiEmployees().getEmployees { employees in
+                self.apiEmployees = employees
+                cslvalues.isLoading = false
+            }
+        case .offline:
+            workModeManager.getEmployees { result in
+                switch result {
+                case .success(let employees):
+                    self.apiEmployees = employees
+                case .failure(_ ):
+                    self.apiEmployees = []
+                }
+                cslvalues.isLoading = false
+            }
         }
     }
 }
@@ -153,12 +166,12 @@ struct EmployeeSearchBox: View {
                     Spacer()
                     
                 }
-                .padding(.horizontal, 30)
-                .foregroundColor(.gray)
+                    .padding(.horizontal, 30)
+                    .foregroundColor(.gray)
             )
             .transition(.move(edge: .trailing))
             .animation(.spring())
-        
+            
             if (isSearching) {
                 Button(action: {
                     isSearching = false

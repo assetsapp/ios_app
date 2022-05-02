@@ -35,6 +35,32 @@ struct LocationModel2: Codable, Hashable {
     var parent: String
     var assetsCount: Int
     var childrenCount: Int
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        self._id = try container.decode(String.self, forKey: ._id)
+        self.name = try container.decode(String.self, forKey: .name)
+        self.profileName = try container.decode(String.self, forKey: .profileName)
+        self.parent = try container.decode(String.self, forKey: .parent)
+        self.assetsCount = try container.decodeIfPresent(Int.self, forKey: .assetsCount) ?? 0
+        self.childrenCount = try container.decodeIfPresent(Int.self, forKey: .childrenCount) ?? 0
+        do {
+            self.profileLevel = try String(container.decode(Int.self, forKey: .profileLevel))
+        } catch DecodingError.typeMismatch {
+            self.profileLevel = try container.decode(String.self, forKey: .profileLevel)
+        }
+    }
+    
+    init(from location: Location) {
+        self._id = location.id ?? ""
+        self.name = location.name ?? ""
+        self.profileName = location.profileName ?? ""
+        self.profileLevel = location.profileLevel ?? ""
+        self.parent = location.parent ?? ""
+        self.assetsCount = Int(location.assetsCount)
+        self.childrenCount = Int(location.childrenCount)
+    }
 }
 
 struct LocationApiModel: Codable {
@@ -56,11 +82,27 @@ class ApiLocations {
         let urlComponent = URLComponents(string: "\(apiHost)/api/v1/app/\(apiDB)/locationsReal/\(id)/\(level)/locations")!
         var request = URLRequest(url: urlComponent.url!)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        
         URLSession.shared.dataTask(with: request) { data, response, error in
             let locations = try! JSONDecoder().decode(LocationApiModel.self, from: data!)
             DispatchQueue.main.async {
                 completion(locations.response)
+            }
+        }.resume()
+    }
+    
+    func getLocations(completion: @escaping(Result<[LocationModel2],Error>) -> ()) {
+        let urlComponent = URLComponents(string: "\(apiHost)/api/v1/app/\(apiDB)/locationsReal/allLocationsCount/children/assets")!
+        var request = URLRequest(url: urlComponent.url!)
+        request.timeoutInterval = 160
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            do {
+                let locations = try JSONDecoder().decode(LocationApiModel.self, from: data!)
+                DispatchQueue.main.async {
+                    completion(.success(locations.response))
+                }
+            } catch {
+                completion(.failure(error))
             }
         }.resume()
     }

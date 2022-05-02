@@ -21,12 +21,14 @@ struct SettingsView: View {
     @ObservedObject var cslvalues: CSLValues
     @Binding var isUserLoggedOut: Bool
     
+    
     var body: some View {
-            VStack {
-                SettingsViewContent(cslvalues: cslvalues, isUserLoggedOut: $isUserLoggedOut)
-            }
-            .navigationBarTitle("Settings", displayMode: .inline)
-            .navigationViewStyle(StackNavigationViewStyle())
+        VStack {
+            let workMode = WorkModeManager().workMode
+            SettingsViewContent(cslvalues: cslvalues, workingModeIsOffline: workMode.isOffline, isUserLoggedOut: $isUserLoggedOut, workingMode: workMode)
+        }
+        .navigationBarTitle("Settings", displayMode: .inline)
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 
@@ -43,10 +45,22 @@ struct SettingsViewContent: View {
     @State var batteryLevel: String = ""
     @State var deviceSerialNumber: String = ""
     @State var disconnectDevice: Bool = false
+    @State var presentSuccessOfflineAlert = false
+    @State var presentSuccessOnlineAlert = false
+    @State var workingModeIsOffline: Bool
+    @State var assetsSaved: Int = 0
+    @State var error: WMError?
     @Binding var isUserLoggedOut: Bool
-
+    @State var workingMode: WorkMode {
+        didSet {
+            workingModeIsOffline = workingMode == .offline
+        }
+    }
+    
+    
     let timer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
     let devName = "CS108ReaderF76D81"
+    let workModeManager = WorkModeManager()
     
     var body: some View {
         VStack {
@@ -116,7 +130,7 @@ struct SettingsViewContent: View {
                             }
                         }
                     }
-                    .alert(isPresented: $disconnectDevice ) {
+                    .alert(isPresented: $disconnectDevice) {
                         Alert(
                             title: Text("Disconnect from reader"),
                             message: Text("You'll disconnect from \(connectedDeviceName) "),
@@ -129,8 +143,59 @@ struct SettingsViewContent: View {
                         )
                     }
                 }
+                
+                // Work mode section
+                Section(header: Text("working mode")) {
+                    Toggle(isOn: $workingModeIsOffline) {
+                        Text(workingModeIsOffline ? "Offline" : "Online")
+                            .foregroundColor(workingModeIsOffline ? .red : .green)
+                        
+                    }
+                    .onChange(of: workingModeIsOffline, perform: { loadData in
+                        if loadData {
+                            startOfflineWorkingMode()
+                        } else {
+                            endOfflineWorkingMode()
+                        }
+                    })
+                    if workingModeIsOffline {
+                        Text("Last update:  \(workModeManager.offlineStartDateFormatted)")
+                        Text("Saved assets:  \(assetsSaved)")
+                        
+                    }
+                }.alert(isPresented: $presentSuccessOfflineAlert) {
+                    Alert(
+                        title: Text("success"),
+                        message: Text("Offline mode enabled successfully"),
+                        dismissButton: .default(Text("Ok"), action: {
+                            
+                        })
+                    )
+                }
+                .alert(isPresented: $presentSuccessOnlineAlert) {
+                    Alert(
+                        title: Text("success"),
+                        message: Text("Online mode enabled successfully,\n\(assetsSaved) items have been synchronized."),
+                        dismissButton: .default(Text("Ok"), action: {
+                            assetsSaved = 0
+                        })
+                    )
+                }
+                // Termina seccion de modo offline
             }
-        }
+        }.alert(item: $error, content: { error in
+            Alert(
+                title: Text(error.title),
+                message: Text(error.description),
+                primaryButton: .default(Text("Ok"), action: {
+                        
+                    }),
+                    secondaryButton: .default(Text("Retry"), action: {
+                        self.endOfflineWorkingMode()
+                    })
+                
+            )
+        })
         .onAppear {
             isDeviceConnected = CSLHelper.isDeviceConnected()
         }
@@ -139,6 +204,7 @@ struct SettingsViewContent: View {
         }
         .onReceive(timer) { _ in
             getDeviceInfo()
+            getAssetsCount()
         }
     }
     
@@ -154,6 +220,49 @@ struct SettingsViewContent: View {
             connectedDeviceName = ""
             deviceSerialNumber = ""
             batteryLevel = ""
+        }
+    }
+    
+    private func getAssetsCount() {
+        if workModeManager.workMode == .offline {
+            workModeManager.getAssets { result in
+                switch result {
+                case .success(let assets):
+                    self.assetsSaved = assets.count
+                case .failure(_ ):
+                    break
+                }
+            }
+        }
+    }
+    
+    private func startOfflineWorkingMode() {
+        cslvalues.isLoading = true
+        workModeManager.startOfflineMode { result in
+            cslvalues.isLoading = false
+            switch result {
+            case .success(let workMode):
+                presentSuccessOfflineAlert = true
+                workingMode = workMode
+            case .failure(let error):
+                workingMode = .online
+                self.error = error
+            }
+        }
+    }
+    
+    private func endOfflineWorkingMode() {
+        cslvalues.isLoading = true
+        workModeManager.startOnlineMode { result in
+            cslvalues.isLoading = false
+            switch result {
+            case .success(let data):
+                presentSuccessOnlineAlert = true
+                workingMode = data.workMode
+            case .failure(let error):
+                workingMode = .offline
+                self.error = error
+            }
         }
     }
 }

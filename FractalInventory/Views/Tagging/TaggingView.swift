@@ -30,24 +30,26 @@ struct TaggingView: View {
     @State var isSavedAssetsPresent: Bool = false
     @State var isTryingSaveEmptyPresent: Bool = false
     @State var savedAssetsCount: Int = 0
-
+    let workModeManager = WorkModeManager()
+    
     @State var imageSelected: UIImage = UIImage(systemName: "photo")!
     @State var isNewImageSelected: Bool = false
     
     @State var assignedEmployee: EmployeeModel = EmployeeModel(_id: "", name: "", lastName: "", email: "", employee_id: "")
-
+    
     var body: some View {
-        
-            VStack {
-                ScrollView(.vertical, showsIndicators: false) {
-                    CardView(cslvalues: cslvalues, reference: $reference, location: $location, isSingle: $isSingle, inventoryButton: $inventoryButton, isInventoryStarted: $isInventoryStarted, barcodeMode: $barcodeMode, customFields: $customFields, _onInvetory: onInventory, validateEPC: validateEPC, customFieldsValues: $customFieldsValues, serialNumber: $serialNumber, locationPath: $locationPath, isRemoveExistingModalResult: $isRemoveExistingModalResult, removedExistingCount: $removedExistingCount, isSavedAssetsPresent: $isSavedAssetsPresent, savedAssetsCount: $savedAssetsCount, imageSelected: $imageSelected, isNewImageSelected: $isNewImageSelected, assignedEmployee: $assignedEmployee)
-                }
+        VStack {
+            ScrollView(.vertical, showsIndicators: false) {
+                CardView(cslvalues: cslvalues, reference: $reference, location: $location, isSingle: $isSingle, inventoryButton: $inventoryButton, isInventoryStarted: $isInventoryStarted, barcodeMode: $barcodeMode, customFields: $customFields, _onInvetory: onInventory, validateEPC: validateEPC, customFieldsValues: $customFieldsValues, serialNumber: $serialNumber, locationPath: $locationPath, isRemoveExistingModalResult: $isRemoveExistingModalResult, removedExistingCount: $removedExistingCount, isSavedAssetsPresent: $isSavedAssetsPresent, savedAssetsCount: $savedAssetsCount, imageSelected: $imageSelected, isNewImageSelected: $isNewImageSelected, assignedEmployee: $assignedEmployee)
             }
-            .onAppear {
-                if CSLHelper.isDeviceConnected() {
-                    CSLHelper.onLoadInventory()
-                    CSLHelper.onClear(cslvalues: cslvalues)
-                }
+        }
+        .onAppear {
+            if CSLHelper.isDeviceConnected() {
+                CSLHelper.onLoadInventory()
+                CSLHelper.onClear(cslvalues: cslvalues)
+            }
+            switch workModeManager.workMode {
+            case .online:
                 ApiReferences().getCustomFields(id: reference._id, collection: "references") { customField in
                     self.customFields = customField
                     
@@ -55,39 +57,42 @@ struct TaggingView: View {
                         customFieldsValues.append(field.initialValue)
                     }
                 }
+            case .offline:
+                break
             }
-            .onDisappear {
-                CSLHelper.onExitInventory()
+        }
+        .onDisappear {
+            CSLHelper.onExitInventory()
+        }
+        .onChange(of: cslvalues.isTriggerApplied) { isTriggerApplied in
+            print("TRIGGER IN TAGGIN!!!!! \(String(isTriggerApplied))")
+            if (!isInventoryStarted) {
+                onInventory()
             }
-            .onChange(of: cslvalues.isTriggerApplied) { isTriggerApplied in
-                print("TRIGGER IN TAGGIN!!!!! \(String(isTriggerApplied))")
-                if (!isInventoryStarted) {
-                    onInventory()
+        }
+        .navigationBarTitle("Tagging")
+        .navigationViewStyle(StackNavigationViewStyle())
+        .navigationBarItems(trailing:
+                                HStack {
+            Button("Save") { isSaveModalPresent = true }
+            .padding(.leading, 10)
+            .alert(isPresented: $isSaveModalPresent, content: {
+                if cslvalues.readings.count > 0 {
+                    return Alert(
+                        title: Text("Save Asset"),
+                        message: Text("Do you want to proceed?"),
+                        primaryButton: .default(Text("OK"), action: { onSave(epcsarray: cslvalues.readings) }),
+                        secondaryButton: .cancel(Text("Cancel"))
+                    )
+                } else {
+                    return Alert(
+                        title: Text("First read at least one EPC"),
+                        dismissButton: .cancel(Text("OK"), action: { })
+                    )
                 }
-            }
-            .navigationBarTitle("Tagging")
-            .navigationViewStyle(StackNavigationViewStyle())
-            .navigationBarItems(trailing:
-                                    HStack {
-                                        Button("Save") { isSaveModalPresent = true }
-                                        .padding(.leading, 10)
-                                        .alert(isPresented: $isSaveModalPresent, content: {
-                                            if cslvalues.readings.count > 0 {
-                                                return Alert(
-                                                    title: Text("Save Asset"),
-                                                    message: Text("Do you want to proceed?"),
-                                                    primaryButton: .default(Text("OK"), action: { onSave(epcsarray: cslvalues.readings) }),
-                                                    secondaryButton: .cancel(Text("Cancel"))
-                                                )
-                                            } else {
-                                                return Alert(
-                                                    title: Text("First read at least one EPC"),
-                                                    dismissButton: .cancel(Text("OK"), action: { })
-                                                )
-                                            }
-                                        })
-                                    }
-            )
+            })
+        }
+        )
     }
     
     func onInventory() {
@@ -121,7 +126,15 @@ struct TaggingView: View {
     @AppStorage(Settings.userIdKey) var userId = "app"
     
     func onSave(epcsarray: [EpcModel]) {
-        
+        switch workModeManager.workMode {
+        case .online:
+            onlineTagging(epcsarray)
+        case .offline:
+            offlineTagging(epcsarray)
+        }
+    }
+    
+    private func onlineTagging(_ epcsarray: [EpcModel]) {
         if (cslvalues.readings.count == 0) {
             isTryingSaveEmptyPresent = true
             return
@@ -166,9 +179,14 @@ struct TaggingView: View {
             
             cslvalues.isLoading = true
             if !isNewImageSelected {
-                ApiReferences().postAssets(params: params) { savedAssets in
-                    savedAssetsCount = savedAssets.count
-                    isSavedAssetsPresent = true
+                ApiReferences().postAssets(params: params) { result in
+                    switch result {
+                    case .success(let savedAssets):
+                        savedAssetsCount = savedAssets.count
+                        isSavedAssetsPresent = true
+                    case .failure(_ ):
+                        break
+                    }
                     cslvalues.isLoading = false
                 }
             } else {
@@ -178,22 +196,48 @@ struct TaggingView: View {
                         "path": uploadFile.path
                     ]
                     let fileassetsparams = params.merging(fileparams) { (_, new) in new }
-                    ApiReferences().postAssets(params: fileassetsparams) { savedAssets in
-                        savedAssetsCount = savedAssets.count
-                        isSavedAssetsPresent = true
+                    ApiReferences().postAssets(params: fileassetsparams) { result in
+                        switch result {
+                        case .success(let savedAssets):
+                            savedAssetsCount = savedAssets.count
+                            isSavedAssetsPresent = true
+                        case .failure(_ ):
+                            break
+                        }
+                        cslvalues.isLoading = false
                     }
-                    cslvalues.isLoading = false
                 }
+                // in case of error this never close loader
             }
-            
-            
         }
     }
-
+    
+    private func offlineTagging(_ epcsarray: [EpcModel]) {
+        workModeManager.tag(asset: reference,
+                            location: location,
+                            locationPath: filterOutLocationPath(),
+                            epc: getEpcs(),
+                            userId: userId,
+                            serialNumber: serialNumber,
+                            tabs: getTabsJson(),
+                            customFields: getCustomFieldsJson(),
+                            customFieldsValues: customFieldsValues,
+                            employee: assignedEmployee,
+                            image: isNewImageSelected ? (imageSelected.jpegData(compressionQuality: 0.2)) : nil) { result in
+            switch result {
+            case .success(_ ):
+                savedAssetsCount = 1
+                isSavedAssetsPresent = true
+                cslvalues.isLoading = false
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
+    }
+    
     func filterOutLocationPath() -> String {
         let locArray = locationPath.components(separatedBy: " / ")
         let locStr = locArray.joined(separator: "/")
-
         return locStr.count > 0 ? String(locStr.suffix(locStr.count - 1)) : ""
     }
     
@@ -286,12 +330,10 @@ struct CardView: View {
     @Binding var removedExistingCount: Int
     @Binding var isSavedAssetsPresent: Bool
     @Binding var savedAssetsCount: Int
-
     @Binding var imageSelected: UIImage
     @Binding var isNewImageSelected: Bool
     @State var customFieldsImages: [AssetPhoto] = []
     @State var customFieldsImagesData: [ImageCustomField] = []
-    
     @Binding var assignedEmployee: EmployeeModel
     
     var body: some View {
@@ -345,7 +387,7 @@ struct MainView: View {
     var validateEPC: ([EpcModel]) -> Void
     @Binding var assignedEmployee: EmployeeModel
     @State var showEmployeesModal: Bool = false
-
+    
     var body: some View {
         VStack {
             
@@ -558,7 +600,6 @@ struct MainView: View {
 
 struct GeneralInformation: View {
     @Binding var reference: ReferenceModel
-
     var body: some View {
         HStack {
             Spacer()

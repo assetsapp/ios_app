@@ -17,6 +17,16 @@ struct EmployeeModel: Codable, Hashable {
     var assetsAssigned: [AssetsAssigned]? = []
 }
 
+extension EmployeeModel {
+    init(from employee: Employee) {
+        self._id = employee.id ?? ""
+        self.name = employee.name ?? ""
+        self.lastName = employee.lastName ?? ""
+        self.email = employee.email ?? ""
+        self.assetsAssigned = []
+    }
+}
+
 struct AssetsAssigned: Codable, Hashable {
     var id: String? = ""
     var name: String? = ""
@@ -73,6 +83,16 @@ class ApiEmployees {
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         URLSession.shared.dataTask(with: request) { data, response, error in
+            
+            if let json = try? JSONSerialization.jsonObject(with: data!, options: .mutableContainers),
+                           let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
+                            print(String(decoding: jsonData, as: UTF8.self))
+                        } else {
+                            print("json data malformed")
+                        }
+            
+            
+            
             let employees = try! JSONDecoder().decode(EmployeesApiModel.self, from: data!)
             DispatchQueue.main.async {
                 completion(employees.response)

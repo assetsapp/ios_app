@@ -16,6 +16,16 @@ struct ReferenceModel: Codable, Hashable {
     var fileExt: String?
 }
 
+extension ReferenceModel {
+    init(from reference:Reference) {
+        self._id = reference.id ?? ""
+        self.brand = reference.brand ?? ""
+        self.model = reference.model ?? ""
+        self.name = reference.name ?? ""
+        self.fileExt = reference.fileExt ?? ""
+    }
+}
+
 struct ReferenceApiModel: Codable {
     var platform: NSObject?
     var request: NSObject?
@@ -33,7 +43,6 @@ struct tab: Codable, Hashable {
 }
 
 struct customField: Codable {
-    
     var columnPosition: String
     var content: String
     var fieldId: String
@@ -95,7 +104,7 @@ class ApiReferences {
     @AppStorage(Settings.apiHostKey) var apiHost = "http://159.203.41.87:3001"
     @AppStorage(Settings.apiDBKey) var apiDB = "notes-db-app"
     @AppStorage(Settings.userTokenKey) var token = ""
-
+    
     func getReferences(completion: @escaping([ReferenceModel]) -> ()) {
         var urlComponent = URLComponents(string: "\(apiHost)/api/v1/\(apiDB)/references")!
         urlComponent.queryItems = [
@@ -103,7 +112,7 @@ class ApiReferences {
         ]
         var request = URLRequest(url: urlComponent.url!)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        
+        request.timeoutInterval = 120
         URLSession.shared.dataTask(with: request) { data, response, error in
             let references = try! JSONDecoder().decode(ReferenceApiModel.self, from: data!)
             DispatchQueue.main.async {
@@ -142,7 +151,7 @@ class ApiReferences {
         }.resume()
     }
     
-    func postAssets(params: [String: Any], completion: @escaping([SavedAsset]) -> ()) {
+    func postAssets(params: [String: Any], completion: @escaping(Result<[SavedAsset],Error>) -> Void) {
         let urlComponent = URLComponents(string: "\(apiHost)/api/v1/app/\(apiDB)/assets/save-from-app")!
         let jsonData = try? JSONSerialization.data(withJSONObject: params)
         var request = URLRequest(url: urlComponent.url!)
@@ -153,14 +162,15 @@ class ApiReferences {
         request.httpBody = jsonData
         
         URLSession.shared.dataTask(with: request) { data, response, error in
-            let deserializedValues = try! JSONSerialization.jsonObject(with: data!)
-            print("=================================")
-            print(deserializedValues)
-            print("=================================")
-            let savedAssets = try! JSONDecoder().decode(SavedAssetApiModel.self, from: data!)
-            print(savedAssets)
-            DispatchQueue.main.async {
-                completion(savedAssets.response)
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                do {
+                    let savedAssets = try JSONDecoder().decode(SavedAssetApiModel.self, from: data!)
+                    completion(.success(savedAssets.response))
+                } catch {
+                    completion(.failure(error))
+                }
             }
         }.resume()
     }

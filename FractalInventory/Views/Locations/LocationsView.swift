@@ -13,10 +13,8 @@ struct LocationsView: View {
     @State var profileLevel = "0"
     @State var locations: [LocationModel2] = []
     @State var locationPath: String = ""
-    
+    let workModeManager = WorkModeManager()
     var body: some View {
-        
-        
         VStack {
             if id != "root" {
                 HStack {
@@ -50,15 +48,26 @@ struct LocationsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarTitle("Locations")
             .onAppear {
-                cslvalues.isLoading = true
-                ApiLocations().getLocations(id: id, level: profileLevel) { locations in
-                    self.locations = locations
-                    cslvalues.isLoading = false
+                switch workModeManager.workMode {
+                case .online:
+                    cslvalues.isLoading = true
+                    ApiLocations().getLocations(id: id, level: profileLevel) { locations in
+                        self.locations = locations
+                        cslvalues.isLoading = false
+                    }
+                case .offline:
+                    workModeManager.getLocations(by: id, and: profileLevel) { result in
+                        switch result {
+                        case .success(let locations):
+                            self.locations = locations
+                        case .failure(_ ):
+                            self.locations = []
+                        }
+                        cslvalues.isLoading = false
+                    }
                 }
         }
-        
     }
-
 }
 
 struct LocationsView_Previews: PreviewProvider {

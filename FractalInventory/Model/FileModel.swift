@@ -63,9 +63,7 @@ class ApiFile {
         URLSession.shared.dataTask(with: request) { data, response, error in
             let uploadedFile = try! JSONDecoder().decode(FileUploadApiModel.self, from: data!)
             print(uploadedFile)
-            DispatchQueue.main.async {
-                completion(uploadedFile.response)
-            }
+            completion(uploadedFile.response)
         }.resume()
     }
 }

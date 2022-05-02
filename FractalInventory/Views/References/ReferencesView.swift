@@ -14,9 +14,9 @@ struct ReferencesView: View {
     @State var isSearching = false
     @State var location: LocationModel
     @State var locationPath: String = ""
+    let workModeManager = WorkModeManager()
     
     var body: some View {
-        
             VStack {
                 SearchBox(searchText: $searchText, isSearching: $isSearching)
                     .padding(.top, 20)
@@ -42,11 +42,26 @@ struct ReferencesView: View {
                 .navigationBarTitle("References (\(apiReferences.count))")
             }
             .onAppear {
-                print("OnAppear List!")
                 cslvalues.isLoading = true
-                ApiReferences().getReferences { references in
-                    self.apiReferences = references
-                    cslvalues.isLoading = false
+                switch workModeManager.workMode {
+                case .online:
+                    ApiReferences().getReferences { references in
+                        self.apiReferences = references
+                        cslvalues.isLoading = false
+                    }
+                case .offline:
+                    workModeManager.getReferences { result in
+                        switch result {
+                        case .success(let references):
+                            print("Trajo las referencias en modo Offline!!")
+                            self.apiReferences = references
+                        case .failure(let error):
+                            print("Error al obtener las referencias \(error.localizedDescription)")
+                            self.apiReferences = []
+                        }
+                        cslvalues.isLoading = false
+                    }
+                    break
                 }
             }
         

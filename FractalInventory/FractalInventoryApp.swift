@@ -9,9 +9,11 @@ import SwiftUI
 
   @main
 struct FractalInventoryApp: App {
+    @StateObject private var dataManager = DataManager()
     var body: some Scene {
         WindowGroup {
             HomeView()
+                .environment(\.managedObjectContext, dataManager.container.viewContext)
         }
     }
 }

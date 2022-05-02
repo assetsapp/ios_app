@@ -20,8 +20,17 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>This app uses Blutooth to transfter RFID data from the BLE-enable reader to iOS device</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app uses the camera at the user's request to take a photo.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This allows the app to access the photo library to import or save a photo at the user's request.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -48,14 +57,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>NSCameraUsageDescription</key>
-	<string>This app uses the camera at the user&apos;s request to take a photo.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This allows the app to access the photo library to import or save a photo at the user&apos;s request.</string>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
-	</dict>
 </dict>
 </plist>
