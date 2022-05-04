@@ -105,7 +105,7 @@ class ApiReferences {
     @AppStorage(Settings.apiDBKey) var apiDB = "notes-db-app"
     @AppStorage(Settings.userTokenKey) var token = ""
     
-    func getReferences(completion: @escaping([ReferenceModel]) -> ()) {
+    func getReferences(completion: @escaping(Result<[ReferenceModel], WMError>) -> ()) {
         var urlComponent = URLComponents(string: "\(apiHost)/api/v1/\(apiDB)/references")!
         urlComponent.queryItems = [
             URLQueryItem(name: "fields", value: "{\"name\":1,\"brand\":1,\"model\":1,\"categoryPic\":1,\"fileExt\":1}")
@@ -114,9 +114,14 @@ class ApiReferences {
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.timeoutInterval = 120
         URLSession.shared.dataTask(with: request) { data, response, error in
-            let references = try! JSONDecoder().decode(ReferenceApiModel.self, from: data!)
+            guard let data = data else {
+                completion(.failure(WMError.referencesCouldNotBeDownloaded))
+                return
+            }
+
+            let references = try! JSONDecoder().decode(ReferenceApiModel.self, from: data)
             DispatchQueue.main.async {
-                completion(references.response)
+                completion(.success(references.response))
             }
         }.resume()
     }

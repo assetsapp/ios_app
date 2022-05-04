@@ -64,7 +64,6 @@ class WorkModeManager {
     }
     
     func startOnlineMode(completion: @escaping(Result<(workMode: WorkMode, savedAssets: [Asset]), WMError>) -> Void) {
-        deleteAllData()
         DataManager().getAssets { result in
             switch result {
             case .success(let assets):
@@ -95,19 +94,19 @@ class WorkModeManager {
         DataManager().getLocations(by: id, and: level, completion: completion)
     }
     
-    func getReferences(completion:  @escaping(Result<[ReferenceModel],Error>) -> Void) {
+    func getReferences(completion:  @escaping(Result<[ReferenceModel], Error>) -> Void) {
         DataManager().getReferences(completion: completion)
     }
     
-    func getEmployees(completion:  @escaping(Result<[EmployeeModel],Error>) -> Void) {
+    func getEmployees(completion:  @escaping(Result<[EmployeeModel], Error>) -> Void) {
         DataManager().getEmployees(completion: completion)
     }
     
-    func getAssets(completion:  @escaping(Result<[Asset],Error>) -> Void) {
+    func getAssets(completion:  @escaping(Result<[Asset], Error>) -> Void) {
         DataManager().getAssets(completion: completion)
     }
     
-    func tag(asset reference: ReferenceModel, location: LocationModel, locationPath: String, epc: [String], userId: String, serialNumber: String, tabs: [[String: Any]], customFields: [[String: Any]], customFieldsValues: [String], employee: EmployeeModel, image: Data?, completion: @escaping(Result<Asset,Error>) -> Void) {
+    func tag(asset reference: ReferenceModel, location: LocationModel, locationPath: String, epc: [String], userId: String, serialNumber: String, tabs: [[String: Any]], customFields: [[String: Any]], customFieldsValues: [String], employee: EmployeeModel, image: Data?, completion: @escaping(Result<Asset, Error>) -> Void) {
         DataManager().tag(asset: reference,
                           location: location,
                           locationPath: locationPath,
@@ -137,14 +136,25 @@ extension WorkModeManager {
     }
     
     private func fetchEmployees(completion: @escaping(Result<[EmployeeModel],Error>) -> Void) {
-        ApiEmployees().getEmployees { employees in
-            DataManager().save(employees: employees, completion: completion)
+        ApiEmployees().getEmployees { result in
+            switch result {
+            case .success(let employees):
+                DataManager().save(employees: employees, completion: completion)
+            case .failure(let error):
+                completion(.failure(error))
+            }
         }
     }
     
-    private func fetchReferences(completion: @escaping(Result<[ReferenceModel],Error>) -> Void) {
-        ApiReferences().getReferences { references in
-            DataManager().save(references: references, completion: completion)
+    private func fetchReferences(completion: @escaping(Result<[ReferenceModel], Error>) -> Void) {
+        ApiReferences().getReferences { result in
+            switch result {
+            case .success(let references):
+                DataManager().save(references: references, completion: completion)
+            case .failure(let error):
+                completion(.failure(error))
+            }
+            
         }
     }
     

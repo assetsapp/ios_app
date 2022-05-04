@@ -163,26 +163,7 @@ struct SettingsViewContent: View {
                         Text("Saved assets:  \(assetsSaved)")
                         
                     }
-                }.alert(isPresented: $presentSuccessOfflineAlert) {
-                    Alert(
-                        title: Text("success"),
-                        message: Text("Offline mode enabled successfully"),
-                        dismissButton: .default(Text("Ok"), action: {
-                            
-                        })
-                    )
-                }
-                .alert(isPresented: $presentSuccessOnlineAlert) {
-                    Alert(
-                        title: Text("success"),
-                        message: Text("Online mode enabled successfully,\n\(assetsSaved) items have been synchronized."),
-                        dismissButton: .default(Text("Ok"), action: {
-                            assetsSaved = 0
-                        })
-                    )
-                }
-                // Termina seccion de modo offline
-            }
+                }            }
         }.alert(item: $error, content: { error in
             Alert(
                 title: Text(error.title),
@@ -191,11 +172,35 @@ struct SettingsViewContent: View {
                         
                     }),
                     secondaryButton: .default(Text("Retry"), action: {
-                        self.endOfflineWorkingMode()
+                        switch workingMode {
+                        case .online:
+                            self.startOfflineWorkingMode()
+                        case .offline:
+                            self.endOfflineWorkingMode()
+                        }
                     })
-                
             )
         })
+        Text("")
+            .alert(isPresented: $presentSuccessOfflineAlert) {
+            Alert(
+                title: Text("success"),
+                message: Text("Offline mode enabled successfully"),
+                dismissButton: .default(Text("Ok"), action: {
+                    
+                })
+            )
+        }
+        Text("")
+        .alert(isPresented: $presentSuccessOnlineAlert) {
+            Alert(
+                title: Text("success"),
+                message: Text("Online mode enabled successfully,\n\(assetsSaved) items have been synchronized."),
+                dismissButton: .default(Text("Ok"), action: {
+                    assetsSaved = 0
+                })
+            )
+        }
         .onAppear {
             isDeviceConnected = CSLHelper.isDeviceConnected()
         }
@@ -242,6 +247,7 @@ struct SettingsViewContent: View {
             cslvalues.isLoading = false
             switch result {
             case .success(let workMode):
+                presentSuccessOfflineAlert = false
                 presentSuccessOfflineAlert = true
                 workingMode = workMode
             case .failure(let error):

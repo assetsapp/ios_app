@@ -96,8 +96,12 @@ class ApiLocations {
         request.timeoutInterval = 160
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let data = data else {
+                completion(.failure(WMError.locationsCouldNotBeDownloaded))
+                return
+            }
             do {
-                let locations = try JSONDecoder().decode(LocationApiModel.self, from: data!)
+                let locations = try JSONDecoder().decode(LocationApiModel.self, from: data)
                 DispatchQueue.main.async {
                     completion(.success(locations.response))
                 }

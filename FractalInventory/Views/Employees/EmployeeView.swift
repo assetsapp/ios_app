@@ -122,8 +122,13 @@ struct EmployeeView: View {
         cslvalues.isLoading = true
         switch workModeManager.workMode {
         case .online:
-            ApiEmployees().getEmployees { employees in
-                self.apiEmployees = employees
+            ApiEmployees().getEmployees { result in
+                switch result {
+                case .success(let employees):
+                    self.apiEmployees = employees
+                case .failure(_ ):
+                    self.apiEmployees = []
+                }
                 cslvalues.isLoading = false
             }
         case .offline:

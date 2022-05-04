@@ -45,8 +45,13 @@ struct ReferencesView: View {
                 cslvalues.isLoading = true
                 switch workModeManager.workMode {
                 case .online:
-                    ApiReferences().getReferences { references in
-                        self.apiReferences = references
+                    ApiReferences().getReferences { result in
+                        switch result {
+                        case .success(let references):
+                            self.apiReferences = references
+                        case .failure(_ ):
+                            break
+                        }
                         cslvalues.isLoading = false
                     }
                 case .offline:

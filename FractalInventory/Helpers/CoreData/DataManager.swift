@@ -92,7 +92,7 @@ class DataManager: ObservableObject {
         }
     }
     
-    func getReferences(completion:  @escaping(Result<[ReferenceModel],Error>) -> Void) {
+    func getReferences(completion:  @escaping(Result<[ReferenceModel], Error>) -> Void) {
         let request = Reference.fetchRequest()
         request.returnsObjectsAsFaults = false
         do {

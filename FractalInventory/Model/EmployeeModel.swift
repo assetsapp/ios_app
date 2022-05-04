@@ -74,7 +74,7 @@ class ApiEmployees {
     @AppStorage(Settings.userTokenKey) var token = ""
     
     
-    func getEmployees(completion: @escaping([EmployeeModel]) -> ()) {
+    func getEmployees(completion: @escaping(Result<[EmployeeModel], Error>) -> ()) {
         var urlComponent = URLComponents(string: "\(apiHost)/api/v1/\(apiDB)/employees")!
         urlComponent.queryItems = [
             URLQueryItem(name: "fields", value: "{\"name\":1,\"lastName\":1,\"email\":1,\"employee_id\":1,\"assetsAssigned\":1}")
@@ -83,19 +83,13 @@ class ApiEmployees {
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         URLSession.shared.dataTask(with: request) { data, response, error in
-            
-            if let json = try? JSONSerialization.jsonObject(with: data!, options: .mutableContainers),
-                           let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
-                            print(String(decoding: jsonData, as: UTF8.self))
-                        } else {
-                            print("json data malformed")
-                        }
-            
-            
-            
-            let employees = try! JSONDecoder().decode(EmployeesApiModel.self, from: data!)
+            guard let data = data else {
+                completion(.failure(WMError.employeesCouldNotBeDownloaded))
+                return
+            }
+            let employees = try! JSONDecoder().decode(EmployeesApiModel.self, from: data)
             DispatchQueue.main.async {
-                completion(employees.response)
+                completion(.success(employees.response))
             }
         }.resume()
     }
