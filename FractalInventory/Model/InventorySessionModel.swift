@@ -58,8 +58,10 @@ class ApiInventorySessions {
         var urlComponent = URLComponents(string: "\(apiHost)/api/v1/\(apiDB)/inventorySessions/")!
         urlComponent.queryItems = [
             URLQueryItem(name: "fields", value: "{\"_id\":1,\"name\":1,\"sessionId\":1,\"locationId\":1,\"locationName\":1,\"status\":1,\"creation\":1}"),
-            URLQueryItem(name: "query", value: "{\"locationId\":\"\(location)\"}")
         ]
+        if !location.isEmpty {
+            urlComponent.queryItems?.append(URLQueryItem(name: "query", value: "{\"locationId\":\"\(location)\"}"))
+        }
         var request = URLRequest(url: urlComponent.url!)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         

@@ -47,9 +47,11 @@ struct SettingsViewContent: View {
     @State var disconnectDevice: Bool = false
     @State var presentSuccessOfflineAlert = false
     @State var presentSuccessOnlineAlert = false
+    @State var presentstartOfflineAlert = false
     @State var workingModeIsOffline: Bool
     @State var assetsSaved: Int = 0
     @State var error: WMError?
+    @State var isToggleForAError = false
     @Binding var isUserLoggedOut: Bool
     @State var workingMode: WorkMode {
         didSet {
@@ -152,9 +154,14 @@ struct SettingsViewContent: View {
                         
                     }
                     .onChange(of: workingModeIsOffline, perform: { loadData in
-                        if loadData {
-                            startOfflineWorkingMode()
-                        } else {
+                        if isToggleForAError {
+                            isToggleForAError = false
+                            return
+                        }
+                        switch workModeManager.workMode {
+                        case .online:
+                            presentstartOfflineAlert = true
+                        case .offline:
                             endOfflineWorkingMode()
                         }
                     })
@@ -169,48 +176,58 @@ struct SettingsViewContent: View {
                 title: Text(error.title),
                 message: Text(error.description),
                 primaryButton: .default(Text("Ok"), action: {
-                        
-                    }),
-                    secondaryButton: .default(Text("Retry"), action: {
-                        switch workingMode {
-                        case .online:
-                            self.startOfflineWorkingMode()
-                        case .offline:
-                            self.endOfflineWorkingMode()
-                        }
-                    })
+                    isToggleForAError = false
+                }),
+                secondaryButton: .default(Text("Retry"), action: {
+                    switch workingMode {
+                    case .online:
+                        self.startOfflineWorkingMode()
+                    case .offline:
+                        self.endOfflineWorkingMode()
+                    }
+                })
             )
         })
         Text("")
             .alert(isPresented: $presentSuccessOfflineAlert) {
-            Alert(
-                title: Text("success"),
-                message: Text("Offline mode enabled successfully"),
-                dismissButton: .default(Text("Ok"), action: {
-                    
-                })
-            )
-        }
+                Alert(
+                    title: Text("success"),
+                    message: Text("Offline mode enabled successfully"),
+                    dismissButton: .default(Text("Ok"), action: {
+                        
+                    })
+                )
+            }
         Text("")
-        .alert(isPresented: $presentSuccessOnlineAlert) {
-            Alert(
-                title: Text("success"),
-                message: Text("Online mode enabled successfully,\n\(assetsSaved) items have been synchronized."),
-                dismissButton: .default(Text("Ok"), action: {
-                    assetsSaved = 0
-                })
-            )
-        }
-        .onAppear {
-            isDeviceConnected = CSLHelper.isDeviceConnected()
-        }
-        .onDisappear {
-            CSLHelper.deviceScanStop()
-        }
-        .onReceive(timer) { _ in
-            getDeviceInfo()
-            getAssetsCount()
-        }
+            .alert(isPresented: $presentSuccessOnlineAlert) {
+                Alert(
+                    title: Text("success"),
+                    message: Text("Online mode enabled successfully,\n\(assetsSaved) items have been synchronized."),
+                    dismissButton: .default(Text("Ok"), action: {
+                        assetsSaved = 0
+                    })
+                )
+            }
+        Text("")
+            .alert(isPresented: $presentstartOfflineAlert) {
+                Alert(
+                    title: Text("Offline Mode"),
+                    message: Text("The download of the catalogs will begin, it is important to check that your internet connection"),
+                    dismissButton: .default(Text("Ok"), action: {
+                        startOfflineWorkingMode()
+                    })
+                )
+            }
+            .onAppear {
+                isDeviceConnected = CSLHelper.isDeviceConnected()
+            }
+            .onDisappear {
+                CSLHelper.deviceScanStop()
+            }
+            .onReceive(timer) { _ in
+                getDeviceInfo()
+                getAssetsCount()
+            }
     }
     
     func getDeviceInfo() {
@@ -251,8 +268,10 @@ struct SettingsViewContent: View {
                 presentSuccessOfflineAlert = true
                 workingMode = workMode
             case .failure(let error):
+                print("****\n-->startOfflineWorkingMode error\n**** ")
                 workingMode = .online
                 self.error = error
+                self.isToggleForAError = true
             }
         }
     }
@@ -268,6 +287,7 @@ struct SettingsViewContent: View {
             case .failure(let error):
                 workingMode = .offline
                 self.error = error
+                self.isToggleForAError = true
             }
         }
     }

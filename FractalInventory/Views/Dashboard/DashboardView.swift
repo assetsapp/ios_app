@@ -289,6 +289,12 @@ struct Menu: View {
                 .simultaneousGesture(TapGesture().onEnded{
                     isMenuOpen = false
                 })
+                NavigationLink(destination: InventorySessionSubview(cslvalues: cslvalues, isModalOpen: .constant(true), locationPath: "")) {
+                    Row(moduleActive: .constant(false), moduleIcon: "square.split.2x2", moduleName: "Inventories")
+                }
+                .simultaneousGesture(TapGesture().onEnded {
+                    isMenuOpen = false
+                })
                 NavigationLink(destination: SettingsView(cslvalues: cslvalues, isUserLoggedOut: $isUserLoggedOut)) {
                     Row(moduleActive: .constant(false), moduleIcon: "slider.horizontal.3", moduleName: "Settings")
                 }

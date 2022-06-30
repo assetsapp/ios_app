@@ -39,7 +39,7 @@ class ApiFile {
     @AppStorage(Settings.apiDBKey) var apiDB = "notes-db-app"
     @AppStorage(Settings.userTokenKey) var token = ""
     
-    func postImage(image: UIImage, _id: String = "", folder: String = "assets", completion: @escaping(FileUploadModel) -> ()) {
+    func postImage(image: UIImage, _id: String = "", folder: String = "assets", completion: @escaping(Result<FileUploadModel, Error>) -> ()) {
         let urlComponent = URLComponents(string: "\(apiHost)/api/v1/upload/\(folder)")!
         let boundary = _id != "" ? _id : UUID().uuidString
         let imageData: Data = image.jpegData(compressionQuality: 0.2) ?? Data()
@@ -61,9 +61,17 @@ class ApiFile {
         request.httpBody = data
         
         URLSession.shared.dataTask(with: request) { data, response, error in
-            let uploadedFile = try! JSONDecoder().decode(FileUploadApiModel.self, from: data!)
-            print(uploadedFile)
-            completion(uploadedFile.response)
+            guard let data = data else {
+                completion(.failure(WMError.failedToSyncImage))
+                return
+            }
+            do {
+                let uploadedFile = try JSONDecoder().decode(FileUploadApiModel.self, from: data)
+                print(uploadedFile)
+                completion(.success(uploadedFile.response))
+            } catch {
+                completion(.failure(WMError.failedToSyncImage))
+            }
         }.resume()
     }
 }

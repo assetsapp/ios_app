@@ -16,7 +16,7 @@ struct IdentifyView: View {
     @State var showFirstReadModal: Bool = false
     
     var body: some View {
-            
+        
         VStack {
             IdentifyReadings(cslvalues: cslvalues, isInventoryStarted: $isInventoryStarted, inventoryButton: $inventoryButton, barcodeMode: $barcodeMode, _onInvetory: onInventory)
             
@@ -37,22 +37,22 @@ struct IdentifyView: View {
         .navigationBarTitle("Identify", displayMode: .inline)
         .navigationBarItems(trailing:
                                 HStack {
-                                    Button("Validate") {
-                                        if cslvalues.readings.count > 0 {
-                                            navigateToValidateView.toggle()
-                                        } else {
-                                            showFirstReadModal.toggle()
-                                        }
-                                        
-                                    }
-                                    .disabled(inventoryButton == "Stop")
-                                    .alert(isPresented: $showFirstReadModal, content: {
-                                        Alert(
-                                            title: Text("First read EPCs"),
-                                            dismissButton: .cancel(Text("OK"), action: {})
-                                        )
-                                    })
-                                }
+            Button("Validate") {
+                if cslvalues.readings.count > 0 {
+                    navigateToValidateView.toggle()
+                } else {
+                    showFirstReadModal.toggle()
+                }
+                
+            }
+            .disabled(inventoryButton == "Stop")
+            .alert(isPresented: $showFirstReadModal, content: {
+                Alert(
+                    title: Text("First read EPCs"),
+                    dismissButton: .cancel(Text("OK"), action: {})
+                )
+            })
+        }
         )
         
     }

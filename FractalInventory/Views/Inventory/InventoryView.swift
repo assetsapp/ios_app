@@ -7,6 +7,11 @@
 
 import SwiftUI
 
+enum InventoryType: String {
+    case root = "0"
+    case subLevels = "1"
+}
+
 struct InventoryView: View {
     
     @ObservedObject var cslvalues: CSLValues
@@ -33,8 +38,9 @@ struct InventoryView: View {
     @State var isExistingSession: Bool = false
     @State var closeInventorySessionModal: Bool = false
     @State var showResetModal: Bool = false
+    @State var type: InventoryType = .root
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-
+    
     var body: some View {
         VStack {
             VStack {
@@ -71,11 +77,11 @@ struct InventoryView: View {
                                         }
                                         .alert(isPresented: $closeInventorySessionModal, content: {
                                             Alert(
-                                                    title: Text("Inventory Session"),
-                                                    message: Text("Do you want to close the session?"),
-                                                    primaryButton: .default(Text("OK"), action: { updateInventory(closeInventory: true) }),
-                                                    secondaryButton: .cancel(Text("Cancel"))
-                                                )
+                                                title: Text("Inventory Session"),
+                                                message: Text("Do you want to close the session?"),
+                                                primaryButton: .default(Text("OK"), action: { updateInventory(closeInventory: true) }),
+                                                secondaryButton: .cancel(Text("Cancel"))
+                                            )
                                         })
                                     }
                                 }
@@ -91,7 +97,7 @@ struct InventoryView: View {
                     .background(Color(.systemGray6))
                     .cornerRadius(10)
                 }
-
+                
                 VStack {
                     HStack {
                         VStack(alignment: .leading) {
@@ -224,7 +230,7 @@ struct InventoryView: View {
                         AssetSubview(asset: asset, locationId: location, locationPath: locationPath, assets: $assets, inventoryUpdates: $inventoryUpdates, sessionId: inventorySession)
                             .padding(.top, -7)
                     }
-                }                
+                }
                 .padding(.top)
             }
             .cornerRadius(10)
@@ -239,7 +245,7 @@ struct InventoryView: View {
                     cslvalues.isLoading = false
                 }
             } else {
-                ApiAssets().getInventoryAssets(location: location, locationName: locationName, sessionId: inventorySession, inventoryName: inventoryName) { _assets in
+                ApiAssets().getInventoryAssets(location: location, locationName: locationName, sessionId: inventorySession, inventoryName: inventoryName, type: type) { _assets in
                     self.assets = _assets
                     cslvalues.isLoading = false
                 }
@@ -263,18 +269,18 @@ struct InventoryView: View {
         .navigationViewStyle(StackNavigationViewStyle())
         .navigationBarItems(trailing:
                                 HStack {
-                                    Button("Reset") {
-                                        showResetModal.toggle()
-                                    }
-                                    .alert(isPresented: $showResetModal, content: {
-                                        Alert(
-                                            title: Text("Inventory"),
-                                            message: Text("Do you want to reset Inventory?"),
-                                            primaryButton: .default(Text("OK"), action: { resetInventory() }),
-                                            secondaryButton: .cancel(Text("Cancel"))
-                                        )
-                                    })
-                                }
+            Button("Reset") {
+                showResetModal.toggle()
+            }
+            .alert(isPresented: $showResetModal, content: {
+                Alert(
+                    title: Text("Inventory"),
+                    message: Text("Do you want to reset Inventory?"),
+                    primaryButton: .default(Text("OK"), action: { resetInventory() }),
+                    secondaryButton: .cancel(Text("Cancel"))
+                )
+            })
+        }
         )
     }
     
@@ -284,7 +290,7 @@ struct InventoryView: View {
     }
     
     func getAssetsToShow() -> [AssetModel] {
-        let filteredAssets = assets.filter { filterStatus.contains($0.status) }
+        let filteredAssets = assets.filter { filterStatus.contains($0.status ?? "") }
         if epcType == 1 {
             return filteredAssets.filter { ($0.EPC ?? "").count == 24 } // Add hex validation, not only length
         } else if epcType == 2 {

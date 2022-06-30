@@ -65,11 +65,19 @@ class ApiTesting {
     }
     
     func testToken(completion: @escaping(String) -> ()) {
+        switch WorkModeManager().workMode {
+        case .online:
+            validateOnlineToken(completion: completion)
+        case .offline:
+            validateOfflineToken(completion: completion)
+        }
+    }
+    
+    private func validateOnlineToken(completion: @escaping(String) -> ()) {
         let urlComponent = URLComponents(string: "\(apiHost)/api/v1/app/\(apiDB)/test/valid-user")!
         var request = URLRequest(url: urlComponent.url!)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         print(urlComponent.url!)
-        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let httpResponse = response as? HTTPURLResponse {
                 
@@ -89,5 +97,14 @@ class ApiTesting {
                 }
             }
         }.resume()
+    }
+    
+    private func validateOfflineToken(completion: @escaping(String) -> ()) {
+        print("Validando Token Offline")
+        if token.isEmpty {
+            completion("Error")
+        } else {
+            completion("Successful")
+        }
     }
 }

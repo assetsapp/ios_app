@@ -9,17 +9,18 @@ import SwiftUI
 
 struct InventorySessionSubview: View {
     @ObservedObject var cslvalues: CSLValues
-    @State var location: LocationModel
+    @State var location: LocationModel?
+    @Binding var isModalOpen: Bool?
     @State var isSearching = true
     @State var searchText = ""
     @State var apiInventorySessions: [inventorySessionModel] = []
-    @Binding var isModalOpen: Bool
     @State var locationPath: String = "Location Path"
     var placeholder = "Search for session id or name"
     @State var isClosedSessionsFilter: Bool = false
     @State var reopenSessionModal: Bool = false
     @State var navigateToInventory: Bool = false
  
+    
     var body: some View {
         VStack {
             
@@ -70,13 +71,23 @@ struct InventorySessionSubview: View {
             }
             
         }
+        .navigationBarTitle("Inventories", displayMode: .inline)
         .onAppear {
             cslvalues.isLoading = true
-            ApiInventorySessions().getInventorySessions(location: location._id) { inventorySessions in
-                self.apiInventorySessions = inventorySessions
-                cslvalues.isLoading = false
+            if let location = location {
+                ApiInventorySessions().getInventorySessions(location: location._id) { inventorySessions in
+                    self.apiInventorySessions = inventorySessions
+                    cslvalues.isLoading = false
+                }
+                isClosedSessionsFilter = false
+            } else {
+                print("ir por todas las sesionesde iventario")
+                ApiInventorySessions().getInventorySessions(location: "") { inventorySessions in
+                    self.apiInventorySessions = inventorySessions
+                    cslvalues.isLoading = false
+                }
+                isClosedSessionsFilter = false
             }
-            isClosedSessionsFilter = false
         }
     }
     

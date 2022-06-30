@@ -85,6 +85,7 @@ class WorkModeManager {
                     }
                 }
             case .failure(_ ):
+                self.workMode = .offline
                 completion(.failure(WMError.failedFetchAssets))
             }
         }
@@ -227,13 +228,18 @@ extension WorkModeManager {
     
     private func sync(image: UIImage, asset: Asset, completion: @escaping(Result<[SavedAsset], Error>) -> Void) {
         let params = self.convert(asset: asset)
-        ApiFile().postImage(image: image) { uploadFile in
-            let fileparams: [String: Any] = [
-                "filename": uploadFile.filename,
-                "path": uploadFile.path
-            ]
-            let fileassetsparams = params.merging(fileparams) { (_, new) in new }
-            ApiReferences().postAssets(params: fileassetsparams, completion: completion)
+        ApiFile().postImage(image: image) { result in
+            switch result {
+            case .success(let uploadFile):
+                let fileparams: [String: Any] = [
+                    "filename": uploadFile.filename,
+                    "path": uploadFile.path
+                ]
+                let fileassetsparams = params.merging(fileparams) { (_, new) in new }
+                ApiReferences().postAssets(params: fileassetsparams, completion: completion)
+            case .failure(let error):
+                completion(.failure(error))
+            }
         }
     }
     

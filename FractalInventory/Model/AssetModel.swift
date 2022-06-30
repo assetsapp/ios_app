@@ -16,7 +16,7 @@ struct AssetModel: Codable, Hashable {
     var EPC: String?
     var serial: String?
     var location: String
-    var status: String
+    var status: String?
     var locationPath: String = ""
 
     private enum CodingKeys: String, CodingKey {
@@ -108,10 +108,11 @@ class ApiAssets {
     @AppStorage(Settings.apiDBKey) var apiDB = "notes-db-app"
     @AppStorage(Settings.userTokenKey) var token = ""
 
-    func getInventoryAssets(location: String, locationName: String, sessionId: String, inventoryName: String, completion: @escaping([AssetModel]) -> ()) {
+    func getInventoryAssets(location: String, locationName: String, sessionId: String, inventoryName: String, type: InventoryType, completion: @escaping([AssetModel]) -> ()) {
         var urlComponent = URLComponents(string: "\(apiHost)/api/v1/app/\(apiDB)/assets/inventory/")!
         urlComponent.queryItems = [
             URLQueryItem(name: "location", value: location),
+            URLQueryItem(name: "children", value: type.rawValue),
             URLQueryItem(name: "locationName", value: locationName),
             URLQueryItem(name: "inventoryName", value: inventoryName),
             URLQueryItem(name: "sessionId", value: sessionId)
@@ -122,7 +123,11 @@ class ApiAssets {
         request.httpMethod = "POST"
         
         URLSession.shared.dataTask(with: request) { data, response, error in
-            let assets = try! JSONDecoder().decode(AssetsApiModel.self, from: data!)
+            guard let data = data else {
+                completion([])
+                return
+            }
+            let assets = try! JSONDecoder().decode(AssetsApiModel.self, from: data)
             DispatchQueue.main.async {
                 completion(assets.response)
             }

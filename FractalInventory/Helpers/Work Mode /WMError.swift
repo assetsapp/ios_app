@@ -15,6 +15,7 @@ enum WMError: Error {
     case failedFetchAssets
     case failedToSyncAssets(errorAssets: [Asset], savedAssets: [Asset])
     case failedToSync(asset: Asset)
+    case failedToSyncImage
 }
 
 extension WMError: Hashable, Identifiable {
@@ -45,6 +46,8 @@ extension WMError: CustomStringConvertible {
             return "Synchronization of asset failed."
         case .failedToSyncAssets(let errorAssets, let savedAssets):
             return "Synchronization assets failed.\n Failing items: \(errorAssets.count).\nSuccess items: \(savedAssets.count)"
+        case .failedToSyncImage:
+            return "Failed To Sync image"
         }
     }
     

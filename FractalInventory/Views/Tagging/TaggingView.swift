@@ -190,21 +190,26 @@ struct TaggingView: View {
                     cslvalues.isLoading = false
                 }
             } else {
-                ApiFile().postImage(image: imageSelected) { uploadFile in
-                    let fileparams: [String: Any] = [
-                        "filename": uploadFile.filename,
-                        "path": uploadFile.path
-                    ]
-                    let fileassetsparams = params.merging(fileparams) { (_, new) in new }
-                    ApiReferences().postAssets(params: fileassetsparams) { result in
-                        switch result {
-                        case .success(let savedAssets):
-                            savedAssetsCount = savedAssets.count
-                            isSavedAssetsPresent = true
-                        case .failure(_ ):
-                            break
+                ApiFile().postImage(image: imageSelected) { result in
+                    switch result {
+                    case .success(let uploadFile):
+                        let fileparams: [String: Any] = [
+                            "filename": uploadFile.filename,
+                            "path": uploadFile.path
+                        ]
+                        let fileassetsparams = params.merging(fileparams) { (_, new) in new }
+                        ApiReferences().postAssets(params: fileassetsparams) { result in
+                            switch result {
+                            case .success(let savedAssets):
+                                savedAssetsCount = savedAssets.count
+                                isSavedAssetsPresent = true
+                            case .failure(_ ):
+                                break
+                            }
+                            cslvalues.isLoading = false
                         }
-                        cslvalues.isLoading = false
+                    case .failure(_ ):
+                        print("error")
                     }
                 }
                 // in case of error this never close loader

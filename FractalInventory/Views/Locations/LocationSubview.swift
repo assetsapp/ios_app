@@ -14,9 +14,11 @@ struct LocationSubview: View {
     @State var isInventoryModalPresent: Bool = false
     @State var isAssetListModalPresent: Bool = false
     @State var isInventorySessionsModalPresent: Bool = false
+    @State var isTypeOfInventoryAlertPresented = false
     @State var navigateToInventory: Bool = false
     @State var sessionId: String = ""
     @State var inventoryName: String = ""
+    @State var inventoryType: InventoryType = .root
     @State var selectedAsset: RealAssetModelWithLocation = RealAssetModelWithLocation(_id: "", brand: "", model: "", name: "", EPC: "", serial: "")
     @State var navigateToIdentify: Bool = false
 
@@ -75,7 +77,7 @@ struct LocationSubview: View {
                 Spacer()
                 
                 // MARK: Inventory
-                NavigationLink(destination: InventoryView(cslvalues: cslvalues, assets: [], locationPath: getLocationPath(), location: location._id, locationName: location.name, inventorySession: sessionId, inventoryName: inventoryName), isActive: $navigateToInventory) {
+                NavigationLink(destination: InventoryView(cslvalues: cslvalues, assets: [], locationPath: getLocationPath(), location: location._id, locationName: location.name, inventorySession: sessionId, inventoryName: inventoryName, type: inventoryType), isActive: $navigateToInventory) {
                     EmptyView()
                 }
                 Button(action: { isInventoryModalPresent = true }) {
@@ -90,15 +92,17 @@ struct LocationSubview: View {
                                     .default(Text("Quick Inventory")) {
                                         sessionId = ""
                                         inventoryName = ""
-                                        navigateToInventory = true
+                                        DispatchQueue.main.async {
+                                            self.isTypeOfInventoryAlertPresented = true
+                                        }
                                     },
-                                    .default(Text("Create Inventory Session")) { AlertWithText() },
+                                    .default(Text("Create Inventory Session")) { alertWithText() },
                                     .default(Text("Continue Inventory Session")) { isInventorySessionsModalPresent = true },
                                     .cancel()
                                 ]
                                 )
                 }
-                NavigationLink(destination: InventorySessionSubview(cslvalues: cslvalues, location: location, isModalOpen: $isInventorySessionsModalPresent, locationPath: getLocationPath()), isActive: $isInventorySessionsModalPresent) {
+                NavigationLink(destination: InventorySessionSubview(cslvalues: cslvalues, location: location, isModalOpen: .constant(true), locationPath: getLocationPath()), isActive: $isInventorySessionsModalPresent) {
                     EmptyView()
                 }
             }
@@ -108,9 +112,23 @@ struct LocationSubview: View {
             
         })
         .padding(.horizontal, 10)
+        Divider()
+        .actionSheet(isPresented: $isTypeOfInventoryAlertPresented) {
+            ActionSheet(title: Text("Inventory Session"), message: Text(getSessionId()), buttons: [
+                ActionSheet.Button.default(Text("Only This Level")) {
+                    inventoryType = .root
+                    navigateToInventory = true
+                },
+                ActionSheet.Button.default(Text("This Level and sublevels")) {
+                    inventoryType = .subLevels
+                    navigateToInventory = true
+                },
+                .cancel() ]
+            )
+        }
     }
     
-    func AlertWithText() {
+    func alertWithText() {
         let _sessionId = getSessionId()
         let alert = UIAlertController(title: "Inventory Session", message: _sessionId, preferredStyle: .alert)
         
@@ -122,7 +140,9 @@ struct LocationSubview: View {
         let createSession = UIAlertAction(title: "Create", style: .default) { _ in
             sessionId = _sessionId
             inventoryName = alert.textFields![0].text ?? ""
-            navigateToInventory = true
+            DispatchQueue.main.async {
+                self.isTypeOfInventoryAlertPresented = true
+            }
         }
         let cancel = UIAlertAction(title: "Cancel", style: .cancel) { _ in
             sessionId = ""
