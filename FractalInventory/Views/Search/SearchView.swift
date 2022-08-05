@@ -23,7 +23,8 @@ struct SearchView: View {
     @Binding var selectedEmployee: EmployeeModel
     @State var selectedAsset: RealAssetModelWithLocation = RealAssetModelWithLocation(_id: "", brand: "", model: "", name: "")
     @State var oldEmployeeId: String = ""
-
+    let workModeManager = WorkModeManager()
+    
     var body: some View {
         VStack {
             
@@ -32,10 +33,24 @@ struct SearchView: View {
                     Spacer()
                     Button("Search") {
                         cslvalues.isLoading = true
-                        ApiAssets().getSearchAssets(searchText: searchText) { _resultAssets in
-                            self.apiAssets = _resultAssets
-                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                            cslvalues.isLoading = false
+                        switch workModeManager.workMode {
+                        case .online:
+                            ApiAssets().getSearchAssets(searchText: searchText) { _resultAssets in
+                                self.apiAssets = _resultAssets
+                                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                                cslvalues.isLoading = false
+                            }
+                        case .offline:
+                            DataManager().getAssets(searchText: searchText) { result in
+                                switch result {
+                                case .success(let _resultAssets):
+                                    self.apiAssets = _resultAssets
+                                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                                case .failure(let error):
+                                    print(error.localizedDescription)
+                                }
+                                cslvalues.isLoading = false
+                            }
                         }
                     }
                     .disabled(searchText.count < 2)
@@ -108,11 +123,26 @@ struct SearchView: View {
                                 HStack {
                                     Button("Search") {
                                         cslvalues.isLoading = true
-                                        ApiAssets().getSearchAssets(searchText: searchText) { _resultAssets in
-                                            self.apiAssets = _resultAssets
-                                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                                            cslvalues.isLoading = false
+                                        switch workModeManager.workMode {
+                                        case .online:
+                                            ApiAssets().getSearchAssets(searchText: searchText) { _resultAssets in
+                                                self.apiAssets = _resultAssets
+                                                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                                                cslvalues.isLoading = false
+                                            }
+                                        case .offline:
+                                            DataManager().getAssets(searchText: searchText) { result in
+                                                switch result {
+                                                case .success(let _resultAssets):
+                                                    self.apiAssets = _resultAssets
+                                                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                                                case .failure(let error):
+                                                    print(error.localizedDescription)
+                                                }
+                                                cslvalues.isLoading = false
+                                            }
                                         }
+
                                     }
                                     .disabled(searchText.count < 2)
                                 }

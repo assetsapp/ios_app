@@ -14,16 +14,21 @@ struct EmployeeModel: Codable, Hashable {
     var lastName: String
     var email: String
     var employee_id: String? = ""
+    var profileName: String? = ""
+    var profileId: String? = ""
     var assetsAssigned: [AssetsAssigned]? = []
 }
 
 extension EmployeeModel {
     init(from employee: Employee) {
-        self._id = employee.id ?? ""
+        self._id = employee.identifier ?? ""
+        self.employee_id = employee.identifier ?? ""
         self.name = employee.name ?? ""
         self.lastName = employee.lastName ?? ""
         self.email = employee.email ?? ""
         self.assetsAssigned = []
+        self.profileId = employee.profileId
+        self.profileName = employee.profileName
     }
 }
 
@@ -57,6 +62,13 @@ struct EmployeeProfileModel: Codable, Hashable {
     var name: String
 }
 
+extension EmployeeProfileModel {
+    init(profile: EmployeeProfile) {
+        self._id = profile.identifier ?? ""
+        self.name = profile.name ?? ""
+    }
+}
+
 struct EmployeeProfilesApiModel: Codable {
     var platform: NSObject?
     var request: NSObject?
@@ -66,7 +78,6 @@ struct EmployeeProfilesApiModel: Codable {
         case response
     }
 }
-
 
 class ApiEmployees {
     @AppStorage(Settings.apiHostKey) var apiHost = "http://159.203.41.87:3001"
@@ -87,9 +98,12 @@ class ApiEmployees {
                 completion(.failure(WMError.employeesCouldNotBeDownloaded))
                 return
             }
-            let employees = try! JSONDecoder().decode(EmployeesApiModel.self, from: data)
-            DispatchQueue.main.async {
+            
+            do {
+                let employees = try JSONDecoder().decode(EmployeesApiModel.self, from: data)
                 completion(.success(employees.response))
+            } catch {
+                completion(.failure(error))
             }
         }.resume()
     }
@@ -120,9 +134,7 @@ class ApiEmployees {
         
         URLSession.shared.dataTask(with: request) { data, response, error in
             let employees = try! JSONDecoder().decode(EmployeeProfilesApiModel.self, from: data!)
-            DispatchQueue.main.async {
-                completion(employees.response)
-            }
+            completion(employees.response)
         }.resume()
     }
     

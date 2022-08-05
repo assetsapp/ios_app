@@ -16,9 +16,11 @@ extension Employee {
         return NSFetchRequest<Employee>(entityName: "Employee")
     }
 
-    @NSManaged public var id: String?
+    @NSManaged public var identifier: String?
     @NSManaged public var name: String?
     @NSManaged public var lastName: String?
     @NSManaged public var email: String?
-
+    @NSManaged public var profileName: String?
+    @NSManaged public var profileId: String?
+    @NSManaged public var beenCreated: Bool
 }

@@ -39,6 +39,7 @@ struct InventoryView: View {
     @State var closeInventorySessionModal: Bool = false
     @State var showResetModal: Bool = false
     @State var type: InventoryType = .root
+    let workModeManager = WorkModeManager()
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
     var body: some View {
@@ -238,18 +239,7 @@ struct InventoryView: View {
         }
         .onAppear {
             resetInventory()
-            cslvalues.isLoading = true
-            if isExistingSession {
-                ApiInventorySessions().getInventorySessionAssets(sessionId: inventorySession) { _assets in
-                    self.assets = _assets
-                    cslvalues.isLoading = false
-                }
-            } else {
-                ApiAssets().getInventoryAssets(location: location, locationName: locationName, sessionId: inventorySession, inventoryName: inventoryName, type: type) { _assets in
-                    self.assets = _assets
-                    cslvalues.isLoading = false
-                }
-            }
+            fetchInitialData()
         }
         .onDisappear {
             if inventorySession != "" {
@@ -285,6 +275,67 @@ struct InventoryView: View {
     }
     
     // MARK: FUNCTIONS
+    func fetchInitialData() {
+        if isExistingSession {
+            getCompleteSession()
+        } else {
+            getLocationSession()
+        }
+    }
+    
+    private func getCompleteSession() {
+        // Continue Inventory session - This level
+        cslvalues.isLoading = true
+        switch workModeManager.workMode {
+        case .online:
+            ApiInventorySessions().getInventorySessionAssets(sessionId: inventorySession) { _assets in
+                self.assets = _assets
+                cslvalues.isLoading = false
+            }
+        case .offline:
+            DataManager().getInventorySession(by: inventorySession) { result in
+                switch result {
+                case .success(let data):
+                    if let assetsData = data.assets {
+                        self.assets = assetsData
+                    }
+                case .failure(let error):
+                    self.assets = []
+                    print("Error: ", error.localizedDescription)
+                }
+                cslvalues.isLoading = false
+            }
+        }
+        
+    }
+    
+    private func getLocationSession() {
+        // Quick Inventory - This level
+        // Quick Inventory - This level and sublevels
+        // Create Inventory session - This level
+        // Create Inventory session - This level and sublevels
+        cslvalues.isLoading = true
+        switch workModeManager.workMode {
+        case .online:
+            ApiAssets().getInventoryAssets(location: location, locationName: locationName, sessionId: inventorySession, inventoryName: inventoryName, type: type) { _assets in
+                self.assets = _assets
+                cslvalues.isLoading = false
+            }
+        case .offline:
+            DataManager().getInventoryAssets(location: location, locationName: locationName, sessionId: inventorySession, inventoryName: inventoryName, type: type) { result in
+                switch result {
+                case .success(let data):
+                    self.assets = data
+                case .failure(let error):
+                    self.assets = []
+                    print("Error: ", error.localizedDescription)
+                }
+                cslvalues.isLoading = false
+            }
+            break
+        }
+    }
+    
     func getStatusCount(type: String) -> Int {
         return assets.filter { $0.status == type }.count
     }
@@ -384,15 +435,30 @@ struct InventoryView: View {
     }
     
     func updateInventory(closeInventory: Bool = false) {
-        let params: [String: Any] = [
-            "foundEPCS": inventoryUpdates,
-            "sessionId": inventorySession,
-            "closeInventory": closeInventory
-        ]
-        
-        ApiInventorySessions().updateAssetsInInventorySession(params: params) { _ in
-            if closeInventory {
-                self.presentationMode.wrappedValue.dismiss()
+        switch workModeManager.workMode {
+        case .online:
+            let params: [String: Any] = [
+                "foundEPCS": inventoryUpdates,
+                "sessionId": inventorySession,
+                "closeInventory": closeInventory
+            ]
+            
+            ApiInventorySessions().updateAssetsInInventorySession(params: params) { _ in
+                if closeInventory {
+                    self.presentationMode.wrappedValue.dismiss()
+                }
+            }
+        case .offline:
+            DataManager().updateInventorySession(by: inventorySession, foundEPCS: inventoryUpdates, closeSession: closeInventory) { result in
+                switch result {
+                case .success(_ ):
+                    break
+                case .failure(let error):
+                    print("Error: ", error.localizedDescription)
+                }
+                if closeInventory {
+                    self.presentationMode.wrappedValue.dismiss()
+                }
             }
         }
     }

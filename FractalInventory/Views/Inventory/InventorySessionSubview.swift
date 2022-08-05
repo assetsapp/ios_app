@@ -13,13 +13,13 @@ struct InventorySessionSubview: View {
     @Binding var isModalOpen: Bool?
     @State var isSearching = true
     @State var searchText = ""
-    @State var apiInventorySessions: [inventorySessionModel] = []
+    @State var apiInventorySessions: [InventoryDataModel] = []
     @State var locationPath: String = "Location Path"
     var placeholder = "Search for session id or name"
     @State var isClosedSessionsFilter: Bool = false
     @State var reopenSessionModal: Bool = false
     @State var navigateToInventory: Bool = false
- 
+    let workModeManager = WorkModeManager()
     
     var body: some View {
         VStack {
@@ -41,6 +41,9 @@ struct InventorySessionSubview: View {
                     LazyVStack {
                         ForEach(getFilteredSessions(), id: \.self) { session in
                             if session.status == "open" {
+                                NavigationLink(destination: EmptyView()) {
+                                    EmptyView()
+                                }
                                 NavigationLink(destination: InventoryView(cslvalues: cslvalues, locationPath: locationPath, location: session.locationId, inventorySession: session.sessionId, inventoryName: session.name, isExistingSession: true)) {
                                     InventorySessionItemSubview(session: session)
                                 }
@@ -74,25 +77,34 @@ struct InventorySessionSubview: View {
         .navigationBarTitle("Inventories", displayMode: .inline)
         .onAppear {
             cslvalues.isLoading = true
-            if let location = location {
-                ApiInventorySessions().getInventorySessions(location: location._id) { inventorySessions in
-                    self.apiInventorySessions = inventorySessions
+            switch workModeManager.workMode {
+            case .online:
+                ApiInventorySessions().getInventorySessions(location: location?._id ?? "" ) { result in
+                    switch result {
+                    case .success(let inventorySessions):
+                        self.apiInventorySessions = inventorySessions
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                    }
                     cslvalues.isLoading = false
                 }
-                isClosedSessionsFilter = false
-            } else {
-                print("ir por todas las sesionesde iventario")
-                ApiInventorySessions().getInventorySessions(location: "") { inventorySessions in
-                    self.apiInventorySessions = inventorySessions
+            case .offline:
+                DataManager().getInventories { result in
+                    switch result {
+                    case .success(let inventorySessions):
+                        self.apiInventorySessions = inventorySessions
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                    }
                     cslvalues.isLoading = false
                 }
-                isClosedSessionsFilter = false
             }
+            isClosedSessionsFilter = false
         }
     }
     
-    func getFilteredSessions() -> [inventorySessionModel] {
-        var visibleSessions: [inventorySessionModel] = []
+    func getFilteredSessions() -> [InventoryDataModel] {
+        var visibleSessions: [InventoryDataModel] = []
         if (searchText != "" && apiInventorySessions.count > 0) {
             visibleSessions = apiInventorySessions.filter {
                 $0.name.range(of: searchText, options: .caseInsensitive) != nil ||
@@ -108,7 +120,14 @@ struct InventorySessionSubview: View {
     }
     
     func openInventorySession(id: String) {
-        ApiInventorySessions().updateInventorySessionStatus(id: id, status: "open")
+        switch workModeManager.workMode {
+        case .online:
+            ApiInventorySessions().updateInventorySessionStatus(id: id, status: "open")
+        case .offline:
+            DataManager().updateInventory(by: id, status: "open") { result in
+                
+            }
+        }
     }
 }
 

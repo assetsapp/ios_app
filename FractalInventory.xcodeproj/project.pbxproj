@@ -17,10 +17,14 @@
 		36188C4427FE7013008EC7CD /* Location+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36188C3E27FE7013008EC7CD /* Location+CoreDataClass.swift */; };
 		36188C4527FE7013008EC7CD /* Employee+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36188C3F27FE7013008EC7CD /* Employee+CoreDataClass.swift */; };
 		36188C4627FE7013008EC7CD /* Employee+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36188C4027FE7013008EC7CD /* Employee+CoreDataProperties.swift */; };
+		36208FDB289855C400AE795B /* InventorySession+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36208FD9289855C400AE795B /* InventorySession+CoreDataClass.swift */; };
+		36208FDC289855C400AE795B /* InventorySession+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36208FDA289855C400AE795B /* InventorySession+CoreDataProperties.swift */; };
+		362FB736289B9CFD006223FD /* EmployeeProfile+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362FB734289B9CFD006223FD /* EmployeeProfile+CoreDataClass.swift */; };
+		362FB737289B9CFD006223FD /* EmployeeProfile+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362FB735289B9CFD006223FD /* EmployeeProfile+CoreDataProperties.swift */; };
 		36548C94281709CD0065D05B /* WMError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36548C93281709CD0065D05B /* WMError.swift */; };
+		367CBFF82893BCAB002E68E1 /* Asset+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367CBFF62893BCAB002E68E1 /* Asset+CoreDataClass.swift */; };
+		367CBFF92893BCAB002E68E1 /* Asset+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367CBFF72893BCAB002E68E1 /* Asset+CoreDataProperties.swift */; };
 		36AA9E142806A66B00434A98 /* WMConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36AA9E132806A66B00434A98 /* WMConstants.swift */; };
-		36C892B42813F1890018016D /* Asset+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C892B22813F1890018016D /* Asset+CoreDataProperties.swift */; };
-		36C892B52813F1890018016D /* Asset+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C892B32813F1890018016D /* Asset+CoreDataClass.swift */; };
 		51912303D9BAD715244BA88E /* Pods_FractalInventory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6100A6A96CC0C8F133CC38C /* Pods_FractalInventory.framework */; };
 		7601038526D335E8003C39BA /* LocationSubview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7601038426D335E8003C39BA /* LocationSubview.swift */; };
 		7601038826D33BBC003C39BA /* LocationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7601038726D33BBC003C39BA /* LocationModel.swift */; };
@@ -129,10 +133,14 @@
 		36188C3E27FE7013008EC7CD /* Location+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Location+CoreDataClass.swift"; sourceTree = "<group>"; };
 		36188C3F27FE7013008EC7CD /* Employee+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Employee+CoreDataClass.swift"; sourceTree = "<group>"; };
 		36188C4027FE7013008EC7CD /* Employee+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Employee+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		36208FD9289855C400AE795B /* InventorySession+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InventorySession+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
+		36208FDA289855C400AE795B /* InventorySession+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InventorySession+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
+		362FB734289B9CFD006223FD /* EmployeeProfile+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EmployeeProfile+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
+		362FB735289B9CFD006223FD /* EmployeeProfile+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EmployeeProfile+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		36548C93281709CD0065D05B /* WMError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WMError.swift; sourceTree = "<group>"; };
+		367CBFF62893BCAB002E68E1 /* Asset+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Asset+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
+		367CBFF72893BCAB002E68E1 /* Asset+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Asset+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		36AA9E132806A66B00434A98 /* WMConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WMConstants.swift; sourceTree = "<group>"; };
-		36C892B22813F1890018016D /* Asset+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Asset+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		36C892B32813F1890018016D /* Asset+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Asset+CoreDataClass.swift"; sourceTree = "<group>"; };
 		4E471B217947CF0F7CF94590 /* Pods-FractalInventory.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FractalInventory.debug.xcconfig"; path = "Target Support Files/Pods-FractalInventory/Pods-FractalInventory.debug.xcconfig"; sourceTree = "<group>"; };
 		6A581ACFB2E21DBDE129DD82 /* Pods-FractalInventory.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FractalInventory.release.xcconfig"; path = "Target Support Files/Pods-FractalInventory/Pods-FractalInventory.release.xcconfig"; sourceTree = "<group>"; };
 		7601038426D335E8003C39BA /* LocationSubview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSubview.swift; sourceTree = "<group>"; };
@@ -299,8 +307,12 @@
 		36188C2027FE594D008EC7CD /* Entities */ = {
 			isa = PBXGroup;
 			children = (
-				36C892B32813F1890018016D /* Asset+CoreDataClass.swift */,
-				36C892B22813F1890018016D /* Asset+CoreDataProperties.swift */,
+				362FB734289B9CFD006223FD /* EmployeeProfile+CoreDataClass.swift */,
+				362FB735289B9CFD006223FD /* EmployeeProfile+CoreDataProperties.swift */,
+				36208FD9289855C400AE795B /* InventorySession+CoreDataClass.swift */,
+				36208FDA289855C400AE795B /* InventorySession+CoreDataProperties.swift */,
+				367CBFF62893BCAB002E68E1 /* Asset+CoreDataClass.swift */,
+				367CBFF72893BCAB002E68E1 /* Asset+CoreDataProperties.swift */,
 				36188C3F27FE7013008EC7CD /* Employee+CoreDataClass.swift */,
 				36188C4027FE7013008EC7CD /* Employee+CoreDataProperties.swift */,
 				36188C3E27FE7013008EC7CD /* Location+CoreDataClass.swift */,
@@ -844,15 +856,18 @@
 				76B3995F2725F0CB000A363A /* ConnectionsSubview.swift in Sources */,
 				7655821626DC808100F6C973 /* MQTTStrict.m in Sources */,
 				7655825526DE127300F6C973 /* RawRfidView.swift in Sources */,
+				367CBFF92893BCAB002E68E1 /* Asset+CoreDataProperties.swift in Sources */,
 				76190AEB2713EB2B00AD0EE0 /* InventorySessionItemSubview.swift in Sources */,
 				767F77BB276163D400FD905B /* WKView.swift in Sources */,
 				76F5AB1E26CA2242001B8B89 /* ContentView.swift in Sources */,
 				7655823426DC80C600F6C973 /* CSLBlePacket.m in Sources */,
+				36208FDC289855C400AE795B /* InventorySession+CoreDataProperties.swift in Sources */,
 				765581B926DC202A00F6C973 /* EpcsArray.swift in Sources */,
 				76838CFB26FFEE2B00B0EDF8 /* AssetSubview.swift in Sources */,
 				76190AEF2713FE9C00AD0EE0 /* AssetListSubview.swift in Sources */,
 				76546C8626DB00AF00336C10 /* ReferencesArray.swift in Sources */,
 				76BAC80E272524EC008DF3FA /* HomeView.swift in Sources */,
+				362FB737289B9CFD006223FD /* EmployeeProfile+CoreDataProperties.swift in Sources */,
 				36188C1F27FE5722008EC7CD /* Inventory.xcdatamodeld in Sources */,
 				7655820626DC808100F6C973 /* MQTTSSLSecurityPolicyTransport.m in Sources */,
 				76190AED2713EBC500AD0EE0 /* InventorySessionModel.swift in Sources */,
@@ -861,11 +876,13 @@
 				7655820E26DC808100F6C973 /* MQTTDecoder.m in Sources */,
 				76546C8B26DB3A4A00336C10 /* TaggingView.swift in Sources */,
 				7655825726DF285100F6C973 /* CSL.swift in Sources */,
-				36C892B52813F1890018016D /* Asset+CoreDataClass.swift in Sources */,
 				7655821B26DC808100F6C973 /* MQTTSessionSynchron.m in Sources */,
+				362FB736289B9CFD006223FD /* EmployeeProfile+CoreDataClass.swift in Sources */,
 				76838D0126FFF60500B0EDF8 /* InventoryView.swift in Sources */,
 				76D1EAF12771586200EE85B8 /* EmployeeView.swift in Sources */,
 				7655821126DC808100F6C973 /* MQTTSSLSecurityPolicyDecoder.m in Sources */,
+				36208FDB289855C400AE795B /* InventorySession+CoreDataClass.swift in Sources */,
+				367CBFF82893BCAB002E68E1 /* Asset+CoreDataClass.swift in Sources */,
 				36188C4427FE7013008EC7CD /* Location+CoreDataClass.swift in Sources */,
 				7655820B26DC808100F6C973 /* GCDTimer.m in Sources */,
 				36188C4127FE7013008EC7CD /* Reference+CoreDataClass.swift in Sources */,
@@ -882,7 +899,6 @@
 				764E264326DC02F400D7742B /* RemoteImage.swift in Sources */,
 				76D1EAF327715A5C00EE85B8 /* EmployeeSubview.swift in Sources */,
 				76B39962272635A4000A363A /* ImagePicker.swift in Sources */,
-				36C892B42813F1890018016D /* Asset+CoreDataProperties.swift in Sources */,
 				36188C1B27F44A84008EC7CD /* WorkModeManager.swift in Sources */,
 				7655822326DC808100F6C973 /* CSLReaderInfo.m in Sources */,
 				7655821A26DC808100F6C973 /* MQTTSessionLegacy.m in Sources */,
@@ -1056,7 +1072,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"FractalInventory/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 6SJ9C8L83A;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1068,7 +1084,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.fractalscode.FractalInventory;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moobile.FractalInventory;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "FractalInventory/Hardware/CSL/Bridge/FractalInventory-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -1084,7 +1100,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"FractalInventory/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 9JH5UXS3ZM;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1096,7 +1112,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.fractalscode.FractalInventory;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moobile.FractalInventory;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "FractalInventory/Hardware/CSL/Bridge/FractalInventory-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;

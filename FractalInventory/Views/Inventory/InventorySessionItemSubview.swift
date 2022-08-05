@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct InventorySessionItemSubview: View {
-    @State var session: inventorySessionModel
+    @State var session: InventoryDataModel
     
     var body: some View {
         VStack {
@@ -47,7 +47,7 @@ struct InventorySessionItemSubview: View {
 }
 
 struct InventorySessionItemSubview_Previews: PreviewProvider {
-    static var session: inventorySessionModel = inventorySessionModel(_id: "id", sessionId: "seid", name: "sename", locationId: "asxd", locationName: "testLN", status: "open", creation: "date")
+    static var session: InventoryDataModel = InventoryDataModel(_id: "id", sessionId: "seid", name: "sename", locationId: "asxd", locationName: "testLN", status: "open", creation: "date")
     
     static var previews: some View {
         InventorySessionItemSubview(session: session)

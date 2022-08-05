@@ -18,9 +18,26 @@ struct AssetModel: Codable, Hashable {
     var location: String
     var status: String?
     var locationPath: String = ""
-
+    
     private enum CodingKeys: String, CodingKey {
         case _id, brand, model, name, EPC, serial, location, status
+    }
+}
+
+extension AssetModel {
+    init(asset: Asset) {
+        self._id = asset.identifier ?? ""
+        self.brand = asset.brand ?? ""
+        self.model = asset.model ?? ""
+        self.name = asset.name ?? ""
+        self.EPC = asset.epc ?? ""
+        self.serial = asset.serial
+        self.locationPath = asset.locationPath ?? ""
+        self.location = asset.location ?? ""
+        self.status = "external"
+        if let rawstatus = asset.status {
+            self.status = rawstatus == "active" ? "missing" : rawstatus
+        }
     }
 }
 
@@ -37,6 +54,20 @@ struct RealAssetModel: Codable, Hashable {
     
     private enum CodingKeys: String, CodingKey {
         case _id, brand, model, name, EPC, serial, locationPath, fileExt
+    }
+}
+
+extension RealAssetModel {
+    init(asset: Asset) {
+        self._id = asset.identifier ?? ""
+        self.brand = asset.brand ?? ""
+        self.model = asset.model ?? ""
+        self.name = asset.name ?? ""
+        self.EPC = asset.epc ?? ""
+        self.serial = asset.serial
+        self.status = asset.status ?? "external"
+        self.locationPath = asset.locationPath
+        self.fileExt = asset.fileExt
     }
 }
 
@@ -57,6 +88,23 @@ struct RealAssetModelWithLocation: Codable, Hashable {
         case _id, brand, model, name, EPC, locationPath, serial, fileExt, assigned, assignedTo
     }
 }
+
+extension RealAssetModelWithLocation {
+    init(asset: Asset) {
+        self._id = asset.identifier ?? ""
+        self.brand = asset.brand ?? ""
+        self.model = asset.model ?? ""
+        self.name = asset.name ?? ""
+        self.EPC = asset.epc ?? ""
+        self.serial = asset.serial
+        self.status = asset.status ?? "external"
+        self.locationPath = asset.locationPath
+        self.fileExt = asset.fileExt
+        self.assigned = asset.assigned
+        self.assignedTo = asset.assignedTo
+    }
+}
+
 
 struct RealAssetsWithLocationApiModel: Codable {
     var platform: NSObject?
@@ -103,13 +151,57 @@ struct RepeatResultApiModel: Codable {
     }
 }
 
+struct AssetMainRespondeModel: Codable {
+    var platform: NSObject?
+    var request: NSObject?
+    var response: [AssetRespondeModel]
+    private enum CodingKeys: String, CodingKey {
+        case response
+    }
+}
+
+struct AssetRespondeModel: Codable {
+          var serial: String?
+          var location: String?
+          var status: String?
+          var creator: String?
+          var assigned: String?
+          var EPC: String?
+          var referenceId: String?
+          var locationPath: String?
+          var brand: String?
+          var _id: String?
+          var creation_date: String?
+          var updateDate: String?
+//          var category: Any?
+          var fileExt: String?
+//          var customFieldsTab: Any?
+          var name: String?
+          var parent: String?
+          var imageURL: String?
+          var quantity: Int?
+          var responsible: String?
+          var purchase_date: String?
+//          var history: Any?
+          var purchase_price: String?
+          var total_price: String?
+          var model: String?
+          var labeling_user: String?
+          var notes: String?
+          var labeling_date: String?
+          var price: String?
+}
+
 class ApiAssets {
     @AppStorage(Settings.apiHostKey) var apiHost = "http://159.203.41.87:3001"
     @AppStorage(Settings.apiDBKey) var apiDB = "notes-db-app"
     @AppStorage(Settings.userTokenKey) var token = ""
-
+    
     func getInventoryAssets(location: String, locationName: String, sessionId: String, inventoryName: String, type: InventoryType, completion: @escaping([AssetModel]) -> ()) {
         var urlComponent = URLComponents(string: "\(apiHost)/api/v1/app/\(apiDB)/assets/inventory/")!
+        
+        print("location: \(location)\nlocationName: \(locationName)\nsessionId: \(sessionId)\ninventoryName: \(inventoryName)\ntype: \(type)")
+        
         urlComponent.queryItems = [
             URLQueryItem(name: "location", value: location),
             URLQueryItem(name: "children", value: type.rawValue),
@@ -151,6 +243,35 @@ class ApiAssets {
         }.resume()
     }
     
+    func getAllAssets(completion: @escaping(Result<[AssetRespondeModel], Error>) -> Void) {
+        var urlComponent = URLComponents(string: "\(apiHost)/api/v1/\(apiDB)/assets/")!
+        urlComponent.queryItems = [
+            //            URLQueryItem(name: "fields", value: "{\"name\":1,\"brand\":1,\"model\":1,\"serial\":1,\"EPC\":1,\"location\":1}"),
+            URLQueryItem(name: "query", value: "{\"status\":{\"$ne\":\"decommissioned\"}}")
+        ]
+        var request = URLRequest(url: urlComponent.url!)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            
+            if let json = try? JSONSerialization.jsonObject(with: data!, options: .mutableContainers),
+               let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
+                print(String(decoding: jsonData, as: UTF8.self))
+            } else {
+                print("json data malformed")
+            }
+//
+            guard let data = data else { completion(.failure(WMError.assetsCouldNotBeDownloaded)) ; return }
+            do {
+                let assets = try JSONDecoder().decode(AssetMainRespondeModel.self, from: data)
+                completion(.success(assets.response))
+            } catch {
+                print("Error: 19 al 22 de agosto", error.localizedDescription)
+                completion(.failure(error))
+            }
+        }.resume()
+    }
+    
     func getRealAssets(location: String, completion: @escaping([RealAssetModel]) -> ()) {
         var urlComponent = URLComponents(string: "\(apiHost)/api/v1/\(apiDB)/assets/")!
         urlComponent.queryItems = [
@@ -159,7 +280,7 @@ class ApiAssets {
         ]
         var request = URLRequest(url: urlComponent.url!)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             let assets = try! JSONDecoder().decode(RealAssetsApiModel.self, from: data!)
             DispatchQueue.main.async {
@@ -177,7 +298,7 @@ class ApiAssets {
         ]
         var request = URLRequest(url: urlComponent.url!)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             let assets = try! JSONDecoder().decode(RealAssetsApiModel.self, from: data!)
             DispatchQueue.main.async {

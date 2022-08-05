@@ -18,10 +18,10 @@ struct NewEmployee: View {
     @State var showAlert: Bool = false
     @State var alertMessage: String = ""
 
-    
     @State var profileNames: [String] = []
     @State var profileIds: [String] = []
     @State var selectedProfileName = ""
+    let workModeManager = WorkModeManager()
     
     var body: some View {
         VStack {
@@ -88,19 +88,43 @@ struct NewEmployee: View {
         })
         .onAppear {
             cslvalues.isLoading = true
-            ApiEmployees().getEmployeeProfiles { profiles in
-                if profiles.count > 0 {
-                    selectedProfileName = profiles[0].name
-                    for profile in profiles {
-                        profileIds.append(profile._id)
-                        profileNames.append(profile.name)
+            switch workModeManager.workMode {
+            case .online:
+                ApiEmployees().getEmployeeProfiles { profiles in
+                    if profiles.count > 0 {
+                        selectedProfileName = profiles[0].name
+                        for profile in profiles {
+                            profileIds.append(profile._id)
+                            profileNames.append(profile.name)
+                        }
+                    } else {
+                        alertMessage = "There are no Employee Profiles. Please, first create at least one"
+                        closeModal = true
+                        showAlert = true
                     }
-                } else {
-                    alertMessage = "There are no Employee Profiles. Please, first create at least one"
-                    closeModal = true
-                    showAlert = true
+                    cslvalues.isLoading = false
                 }
-                cslvalues.isLoading = false
+            case .offline:
+                DataManager().getEmployeeProfiles { result in
+                    switch result {
+                    case .success(let profiles):
+                        if profiles.count > 0 {
+                            selectedProfileName = profiles[0].name
+                            for profile in profiles {
+                                profileIds.append(profile._id)
+                                profileNames.append(profile.name)
+                            }
+                        } else {
+                            alertMessage = "There are no Employee Profiles. Please, first create at least one"
+                            closeModal = true
+                            showAlert = true
+                        }
+                    case .failure(_ ):
+                        alertMessage = "There are no Employee Profiles. Please, first create at least one"
+                        closeModal = true
+                        showAlert = true
+                    }
+                }
             }
         }
     }
@@ -110,26 +134,46 @@ struct NewEmployee: View {
             alertMessage = "Please fill all fields"
             showAlert = true
         } else {
-            cslvalues.isLoading = true
-            let selectedProfileIx = profileNames.firstIndex(of: selectedProfileName)
-            let selectedProfile: [String:String] = [
-                "value": profileIds[selectedProfileIx ?? 0],
-                "label": profileNames[selectedProfileIx ?? 0]
-            ]
-            let params: [String:Any] = [
-                "name": name,
-                "lastName": lastName,
-                "employee_id": employeeId,
-                "email": email,
-                "employeeProfile": selectedProfile,
-                "assetsAssigned": []
-            ]
-            ApiEmployees().postEmployee(params: params) {
-                cslvalues.isLoading = false
-                showModal.toggle()
+            switch workModeManager.workMode {
+            case .online:
+                saveOnline()
+            case .offline:
+               saveOffline()
             }
         }
     }
+    
+    private func saveOffline() {
+        cslvalues.isLoading = true
+        let employee = EmployeeModel(_id: employeeId, name: name, lastName: lastName, email: email, employee_id: employeeId, assetsAssigned: nil)
+        let selectedProfileIx = profileNames.firstIndex(of: selectedProfileName)
+        DataManager().save(employee: employee, profileId: profileIds[selectedProfileIx ?? 0], profileName: profileNames[selectedProfileIx ?? 0]) { result in
+            cslvalues.isLoading = false
+            showModal.toggle()
+        }
+    }
+    
+    private func saveOnline() {
+        cslvalues.isLoading = true
+        let selectedProfileIx = profileNames.firstIndex(of: selectedProfileName)
+        let selectedProfile: [String:String] = [
+            "value": profileIds[selectedProfileIx ?? 0],
+            "label": profileNames[selectedProfileIx ?? 0]
+        ]
+        let params: [String:Any] = [
+            "name": name,
+            "lastName": lastName,
+            "employee_id": employeeId,
+            "email": email,
+            "employeeProfile": selectedProfile,
+            "assetsAssigned": []
+        ]
+        ApiEmployees().postEmployee(params: params) {
+            cslvalues.isLoading = false
+            showModal.toggle()
+        }
+    }
+    
 }
 
 struct NewEmployee_Previews: PreviewProvider {

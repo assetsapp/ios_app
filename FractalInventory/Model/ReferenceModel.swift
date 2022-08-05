@@ -57,6 +57,7 @@ struct customField: Codable {
     var fileId: String
     var fileExt: String
 }
+
 struct responseObj: Codable {
     var customFields: [customField]
     var tabs: [tab]

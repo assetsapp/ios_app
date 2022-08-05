@@ -17,6 +17,34 @@ class WorkModeManager {
         let dispatchGroup = DispatchGroup()
         var errors: [WMError] = []
         
+        var inventories: [InventoryDataModel]?
+        
+        dispatchGroup.enter()
+        fetchAssets { result in
+            switch result {
+            case .success(let assets):
+                print("Asset: ", assets.count)
+                break
+            case .failure(_ ):
+                errors.append(WMError.assetsCouldNotBeDownloaded)
+            }
+            dispatchGroup.leave()
+        }
+        
+        dispatchGroup.enter()
+        fetchInventories { result in
+            switch result {
+            case .success(let data):
+                print("Inventories: ", data.count)
+                inventories = data
+            case .failure(_ ):
+                errors.append(WMError.inventoriesCouldNotBeDownloaded)
+            }
+            dispatchGroup.leave()
+        }
+        
+        
+        
         dispatchGroup.enter()
         fetchLocations { result in
             switch result {
@@ -40,6 +68,17 @@ class WorkModeManager {
         }
         
         dispatchGroup.enter()
+        fetchEmployeProfiles { result in
+            switch result {
+            case .success(_ ):
+                break
+            case .failure(_ ):
+                errors.append(WMError.employeesCouldNotBeDownloaded)
+            }
+            dispatchGroup.leave()
+        }
+        
+        dispatchGroup.enter()
         fetchReferences { result in
             switch result {
             case .success(_ ):
@@ -51,44 +90,163 @@ class WorkModeManager {
         }
         
         dispatchGroup.notify(queue: .main) {
-            if errors.isEmpty {
-                self.workMode = .offline
-                completion(.success(self.workMode))
+            if let inventories = inventories {
+                DataManager().save(inventories: inventories) { result in
+                    switch result {
+                    case .success(_ ):
+                        break
+                    case .failure(_ ):
+                        errors.append(.inventoriesCouldNotBeDownloaded)
+                    }
+                    self.processOfflineWorkMode(errors: errors, completion: completion)
+                }
             } else {
-                self.workMode = .online
-                self.deleteAllData()
-                let error = WMError.failedStartOfflineMode(errors: errors)
-                completion(.failure(error))
+                self.processOfflineWorkMode(errors: errors, completion: completion)
             }
         }
     }
     
+    private func processOfflineWorkMode(errors: [WMError], completion: @escaping(Result<WorkMode, WMError>) -> Void) {
+        if errors.isEmpty {
+            self.workMode = .offline
+            completion(.success(self.workMode))
+        } else {
+            self.workMode = .online
+            self.deleteAllData()
+            let error = WMError.failedStartOfflineMode(errors: errors)
+            completion(.failure(error))
+        }
+    }
+    
     func startOnlineMode(completion: @escaping(Result<(workMode: WorkMode, savedAssets: [Asset]), WMError>) -> Void) {
-        DataManager().getAssets { result in
+//        self.deleteAllData()
+        let dispatchGroup = DispatchGroup()
+        var savedAssets: [Asset] = []
+        var errors: [WMError] = []
+        
+        dispatchGroup.enter()
+        DataManager().getAssetsToSync { result in
             switch result {
             case .success(let assets):
                 self.starSync(assets: assets) { result in
                     switch result {
-                    case.success(let savedAssets):
-                        self.workMode = .online
-                        self.deleteAllData()
-                        completion(.success((workMode: self.workMode, savedAssets: savedAssets)))
+                    case.success(let savedAssetsR):
+                        print("Termino de sincronizar los Assets:", savedAssetsR.count)
+                        savedAssets = savedAssetsR
                     case .failure(let error):
-                        self.workMode = .offline
+//                        self.workMode = .offline
                         switch error {
                         case .failedToSyncAssets(_ ,let  savedAssets):
                             self.deleteAssets(savedAssets)
                         default:
                             break
                         }
-                        completion(.failure(error))
+                        errors.append(error)
+//                        completion(.failure(error))
                     }
+                    dispatchGroup.leave()
                 }
             case .failure(_ ):
-                self.workMode = .offline
-                completion(.failure(WMError.failedFetchAssets))
+                errors.append(WMError.failedFetchAssets)
+                dispatchGroup.leave()
+//                self.workMode = .offline
+//                completion(.failure(WMError.failedFetchAssets))
             }
         }
+        
+        dispatchGroup.enter()
+        DataManager().getAssetsToUpdate { result in
+            switch result {
+            case .success(let assets):
+                self.starUpdate(assets: assets) { result in
+                    switch result {
+                    case.success(let updatedAssets):
+                        print("Termino de actualizar los Assets:", updatedAssets.count)
+                    case .failure(let error):
+//                        self.workMode = .offline
+                        switch error {
+                        case .failedToSyncAssets(_ ,let  savedAssets):
+                            self.deleteAssets(savedAssets)
+                        default:
+                            break
+                        }
+                        errors.append(error)
+//                        completion(.failure(error))
+                    }
+                    dispatchGroup.leave()
+                }
+            case .failure(_ ):
+                errors.append(WMError.failedFetchAssets)
+                dispatchGroup.leave()
+//                self.workMode = .offline
+//                completion(.failure(WMError.failedFetchAssets))
+            }
+        }
+        
+        // empleados
+        dispatchGroup.enter()
+        DataManager().getEmployeesToSync { result in
+            switch result {
+            case .success(let employees):
+                self.starSync(employees: employees) { result in
+                    switch result {
+                    case .success(let savedEmployees):
+                        print("Termino de actualizar los Empleados:", savedEmployees.count)
+                    case .failure(let error):
+                        switch error {
+                        case .failedToSyncEmployees(_ , let savedEmployee):
+                            break
+//                            self.deleteAssets(savedAssets)
+                        default:
+                            break
+                        }
+                        errors.append(error)
+                    }
+                    dispatchGroup.leave()
+                }
+            case .failure(_ ):
+                errors.append(WMError.failedFetchEmployees)
+                dispatchGroup.leave()
+            }
+        }
+        
+        //inventarios
+        dispatchGroup.enter()
+        DataManager().getInventorySessionToSync { result in
+            switch result {
+            case .success(let inventorySessions):
+                self.starSync(inventorySessions: inventorySessions) { result in
+                    switch result {
+                    case .success(let savedInventories):
+                        print("Termino de actualizar los Inventarios:", savedInventories.count)
+                    case .failure(let error):
+                        switch error {
+                        case .failedToSyncInventories(_ , let savedInventories):
+                            break
+//                            self.deleteAssets(savedAssets)
+                        default:
+                            break
+                        }
+                    }
+                    dispatchGroup.leave()
+                }
+            case .failure(_ ):
+                errors.append(WMError.failedFetchInventories)
+                dispatchGroup.leave()
+            }
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            self.deleteAllData()
+            if errors.isEmpty {
+                self.workMode = .online
+                completion(.success((workMode: self.workMode , savedAssets: savedAssets)))
+            } else {
+                self.workMode = .offline
+                completion(.failure(WMError.synchronizationFailure(errors: errors)))
+            }
+        }
+        
     }
     
     func getLocations(by id: String, and level: String, completion: @escaping(Result<[LocationModel2],Error>) -> Void) {
@@ -104,14 +262,14 @@ class WorkModeManager {
     }
     
     func getAssets(completion:  @escaping(Result<[Asset], Error>) -> Void) {
-        DataManager().getAssets(completion: completion)
+        DataManager().getAssetsToSync(completion: completion)
     }
     
     func tag(asset reference: ReferenceModel, location: LocationModel, locationPath: String, epc: [String], userId: String, serialNumber: String, tabs: [[String: Any]], customFields: [[String: Any]], customFieldsValues: [String], employee: EmployeeModel, image: Data?, completion: @escaping(Result<Asset, Error>) -> Void) {
         DataManager().tag(asset: reference,
                           location: location,
                           locationPath: locationPath,
-                          epc: epc,
+                          epc: epc.first ?? "",
                           userId: userId,
                           serialNumber: serialNumber,
                           tabs: tabs,
@@ -125,6 +283,30 @@ class WorkModeManager {
 }
 
 extension WorkModeManager {
+    private func fetchAssets(completion: @escaping(Result<[AssetRespondeModel],Error>) -> Void) {
+        ApiAssets().getAllAssets { result in
+            switch result {
+            case .success(let assets):
+                print("get assets succes")
+                DataManager().save(assets: assets, completion: completion)
+                break
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    private func fetchInventories(completion: @escaping(Result<[InventoryDataModel],Error>) -> Void) {
+        ApiInventorySessions().getInventorySessions { result in
+            switch result {
+            case .success(let sessions):
+                completion(.success(sessions))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
     private func fetchLocations(completion: @escaping(Result<[LocationModel2],Error>) -> Void) {
         ApiLocations().getLocations { result in
             switch result {
@@ -133,6 +315,12 @@ extension WorkModeManager {
             case .failure(let error):
                 completion(.failure(error))
             }
+        }
+    }
+    
+    private func fetchEmployeProfiles(completion: @escaping(Result<[EmployeeProfileModel],Error>) -> Void) {
+        ApiEmployees().getEmployeeProfiles { profiles in
+            DataManager().save(employeeProfiles: profiles, completion: completion)
         }
     }
     
@@ -222,13 +410,151 @@ extension WorkModeManager {
         }
     }
     
+    private func starUpdate(assets: [Asset], completion: @escaping(Result<[Asset], WMError>) -> Void) {
+        let dispatchGroup = DispatchGroup()
+        var savedAssets: [Asset] = []
+        var errors:[WMError] = []
+        
+        for asset in assets {
+            dispatchGroup.enter()
+            if let imageData = asset.image {
+                let image = UIImage(data: imageData)!
+                syncUpdate(image: image, asset: asset) { result in
+                    switch result {
+                    case .success(_ ):
+                        savedAssets.append(asset)
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                        errors.append(WMError.failedToUpdate(asset: asset))
+                    }
+                    dispatchGroup.leave()
+                }
+            } else {
+                syncUpdate(asset: asset) { result in
+                    switch result {
+                    case .success(_ ):
+                        savedAssets.append(asset)
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                        errors.append(WMError.failedToUpdate(asset: asset))
+                    }
+                    dispatchGroup.leave()
+                }
+            }
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            if errors.isEmpty {
+                completion(.success(savedAssets))
+            } else {
+                var assets: [Asset] = []
+                for error in errors {
+                    switch error{
+                    case .failedToSync(let asset):
+                        assets.append(asset)
+                    default:
+                        break
+                    }
+                }
+                completion(.failure(WMError.failedToSyncAssets(errorAssets: assets, savedAssets: savedAssets)))
+            }
+        }
+    }
+    
+    private func starSync(employees: [EmployeeModel], completion: @escaping(Result<[EmployeeModel], WMError>) -> Void) {
+        let dispatchGroup = DispatchGroup()
+        var savedEmployees: [EmployeeModel] = []
+        var errors:[WMError] = []
+        
+        for employee in employees {
+            dispatchGroup.enter()
+            sync(employee: employee) { result in
+                switch result {
+                case .success(_ ):
+                    savedEmployees.append(employee)
+                case .failure(let error):
+                    print(error.localizedDescription)
+                    errors.append(WMError.failedToSyncEmployee(employee: employee))
+                }
+                dispatchGroup.leave()
+            }
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            if errors.isEmpty {
+                completion(.success(savedEmployees))
+            } else {
+                var errorEmployee: [EmployeeModel] = []
+                for error in errors {
+                    switch error {
+                    case .failedToSyncEmployee(let employee):
+                        errorEmployee.append(employee)
+                    default:
+                        break
+                    }
+                }
+                completion(.failure(.failedToSyncEmployees(errorEmployee: errorEmployee, savedEmployee: savedEmployees)))
+            }
+        }
+    }
+    
+    private func starSync(inventorySessions: [InventorySession], completion: @escaping(Result<[InventorySession], WMError>) -> Void) {
+        let dispatchGroup = DispatchGroup()
+        var savedInventories: [InventorySession] = []
+        var errors:[WMError] = []
+        
+        for session in inventorySessions {
+            dispatchGroup.enter()
+            sync(inventorySession: session) { result in
+                switch result {
+                case .success(_ ):
+                    savedInventories.append(session)
+                case .failure(let error):
+                    print(error.localizedDescription)
+                    errors.append(WMError.failedToSyncInventory(inventory: session))
+                }
+                dispatchGroup.leave()
+            }
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            if errors.isEmpty {
+                completion(.success(savedInventories))
+            } else {
+                var errorInventory: [InventorySession] = []
+                for error in errors {
+                    switch error {
+                    case .failedToSyncInventory(let inventory):
+                        errorInventory.append(inventory)
+                    default:
+                        break
+                    }
+                }
+                completion(.failure(.failedToSyncInventories(errorInventorie: errorInventory, savedInventories: savedInventories)))
+            }
+        }
+    }
+    
     private func sync(asset: Asset, completion: @escaping(Result<[SavedAsset], Error>) -> Void) {
         ApiReferences().postAssets(params: convert(asset: asset), completion: completion)
     }
     
+    private func sync(employee: EmployeeModel, completion: @escaping(Result<EmployeeModel, Error>) -> Void) {
+        ApiEmployees().postEmployee(params: convert(employee: employee)) {
+            completion(.success(employee))
+        }
+    }
+    
+    private func sync(inventorySession: InventorySession, completion: @escaping(Result<InventorySession, Error>) -> Void) {
+        let type = InventoryType(rawValue: inventorySession.type ?? "") ?? .root
+        ApiAssets().getInventoryAssets(location: inventorySession.locationId ?? "", locationName: inventorySession.locationName ?? "", sessionId: inventorySession.sessionId ?? "", inventoryName: inventorySession.name ?? "", type: type) { result in
+            completion(.success(inventorySession))
+        }
+    }
+    
     private func sync(image: UIImage, asset: Asset, completion: @escaping(Result<[SavedAsset], Error>) -> Void) {
         let params = self.convert(asset: asset)
-        ApiFile().postImage(image: image) { result in
+        ApiFile().postImage(image: image, _id: asset.identifier ?? "") { result in
             switch result {
             case .success(let uploadFile):
                 let fileparams: [String: Any] = [
@@ -237,6 +563,32 @@ extension WorkModeManager {
                 ]
                 let fileassetsparams = params.merging(fileparams) { (_, new) in new }
                 ApiReferences().postAssets(params: fileassetsparams, completion: completion)
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    private func syncUpdate(asset: Asset, completion: @escaping(Result<[SavedAsset], Error>) -> Void) {
+        ApiAssets().updateAsset(assetId: asset.identifier ?? "", params: convertUpdate(asset: asset)) {
+            completion(.success([SavedAsset(_id: asset.identifier ?? "", EPC: asset.epc ?? "")]))
+        }
+    }
+    
+    private func syncUpdate(image: UIImage, asset: Asset, completion: @escaping(Result<[SavedAsset], Error>) -> Void) {
+        let params = self.convertUpdate(asset: asset)
+        ApiFile().postImage(image: image, _id: asset.identifier ?? "") { result in
+            switch result {
+            case .success(let uploadFile):
+                let fileparams: [String: Any] = [
+                    "filename": uploadFile.filename,
+                    "path": uploadFile.path
+                ]
+                let fileassetsparams = params.merging(fileparams) { (_, new) in new }
+//                ApiReferences().postAssets(params: fileassetsparams, completion: completion)
+                ApiAssets().updateAsset(assetId: asset.identifier ?? "", params: fileassetsparams) {
+                    completion(.success([SavedAsset(_id: asset.identifier ?? "", EPC: asset.epc ?? "")]))
+                }
             case .failure(let error):
                 completion(.failure(error))
             }
@@ -255,7 +607,7 @@ extension WorkModeManager {
                         "location": asset.location ?? "",
                         "locationPath": asset.locationPath ?? "",
                         "creator": asset.creator ?? "",
-                        "labeling_user": asset.userId ?? "",
+                        "labeling_user": asset.identifier ?? "",
                         "customFieldsTab": asset.customFieldsTab ?? "",
                         "referenceId": asset.referenceId ?? "",
                         "tabs": asset.tabs ?? "",
@@ -279,7 +631,7 @@ extension WorkModeManager {
             "location": asset.location ?? "",
             "locationPath": asset.locationPath ?? "",
             "creator": asset.creator ?? "",
-            "labeling_user": asset.userId ?? "",
+            "labeling_user": asset.labelingUser ?? "",
             "customFieldsTab": asset.customFieldsTab ?? "",
             "referenceId": asset.referenceId ?? "",
             "tabs": asset.tabs ?? "",
@@ -287,6 +639,30 @@ extension WorkModeManager {
             "customFieldsValues": asset.customFieldsValues ?? "",
             "assigned": asset.assigned ?? "",
             "assignedTo": asset.assignedTo ?? ""
+        ]
+        return params
+    }
+    
+    private func convertUpdate(asset: Asset) -> [String: Any] {
+        let params: [String: Any] = [
+            "serial": asset.serial ?? "",
+            "EPC": asset.epc ?? ""
+        ]
+        return params
+    }
+    
+    private func convert(employee: EmployeeModel) -> [String: Any] {
+        let selectedProfile: [String:String] = [
+            "value": employee.profileId ?? "",
+            "label": employee.profileName ?? ""
+        ]
+        let params: [String : Any] = [
+            "name": employee.name,
+            "lastName": employee.lastName,
+            "employee_id": employee.employee_id ?? "",
+            "email": employee.email,
+            "employeeProfile": selectedProfile,
+            "assetsAssigned": []
         ]
         return params
     }

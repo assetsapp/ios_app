@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct inventorySessionModel: Codable, Hashable {
+struct InventoryDataModel: Codable, Hashable {
     var _id: String
     var sessionId: String
     var name: String
@@ -16,9 +16,26 @@ struct inventorySessionModel: Codable, Hashable {
     var locationName: String
     var status: String
     var creation: String
+    var assets: [AssetModel]?
 }
 
-struct inventoryAssetModel: Codable, Hashable {
+extension InventoryDataModel {
+    init(inventorySession: InventorySession) {
+        self._id = inventorySession.identifier ?? ""
+        self.sessionId = inventorySession.sessionId ?? ""
+        self.name = inventorySession.name ?? ""
+        self.locationId = inventorySession.locationId ?? ""
+        self.locationName = inventorySession.locationName ?? ""
+        self.status = inventorySession.status ?? ""
+        self.creation = inventorySession.creation ?? ""
+        
+        if let assetsData = inventorySession.assets?.allObjects as? [Asset] {
+            assets = assetsData.map({ AssetModel(asset: $0)})
+        }
+    }
+}
+
+struct ConstanciainventoryAssetModel: Codable, Hashable {
     var _id: String
     var name: String
     var brand: String
@@ -32,7 +49,7 @@ struct inventoryAssetModel: Codable, Hashable {
 struct InventorySessionsApiModel: Codable {
     var platform: NSObject?
     var request: NSObject?
-    var response: [inventorySessionModel]
+    var response: [InventoryDataModel]
     
     private enum CodingKeys: String, CodingKey {
         case response
@@ -54,7 +71,7 @@ class ApiInventorySessions {
     @AppStorage(Settings.apiDBKey) var apiDB = "notes-db-app"
     @AppStorage(Settings.userTokenKey) var token = ""
 
-    func getInventorySessions(location: String, completion: @escaping([inventorySessionModel]) -> ()) {
+    func getInventorySessions(location: String, completion: @escaping(Result<[InventoryDataModel], WMError>) -> Void) {
         var urlComponent = URLComponents(string: "\(apiHost)/api/v1/\(apiDB)/inventorySessions/")!
         urlComponent.queryItems = [
             URLQueryItem(name: "fields", value: "{\"_id\":1,\"name\":1,\"sessionId\":1,\"locationId\":1,\"locationName\":1,\"status\":1,\"creation\":1}"),
@@ -66,9 +83,46 @@ class ApiInventorySessions {
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         URLSession.shared.dataTask(with: request) { data, response, error in
-            let inventorySessions = try! JSONDecoder().decode(InventorySessionsApiModel.self, from: data!)
-            DispatchQueue.main.async {
-                completion(inventorySessions.response)
+            guard let data = data else {
+                completion(.failure(.inventoriesCouldNotBeDownloaded))
+                return
+            }
+
+            do {
+                let inventorySessions = try JSONDecoder().decode(InventorySessionsApiModel.self, from: data)
+                completion(.success(inventorySessions.response))
+            } catch {
+                completion(.failure(.inventoriesCouldNotBeDownloaded))
+            }
+        }.resume()
+    }
+    
+    func getInventorySessions(completion: @escaping(Result<[InventoryDataModel], WMError>) -> Void) {
+        let urlComponent = URLComponents(string: "\(apiHost)/api/v1/\(apiDB)/inventorySessions/")!
+     
+        var request = URLRequest(url: urlComponent.url!)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let data = data else {
+                completion(.failure(.inventoriesCouldNotBeDownloaded))
+                return
+            }
+            
+            if let json = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers),
+                           let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
+                            print(String(decoding: jsonData, as: UTF8.self))
+                        } else {
+                            print("json data malformed")
+                        }
+            
+            
+
+            do {
+                let inventorySessions = try JSONDecoder().decode(InventorySessionsApiModel.self, from: data)
+                completion(.success(inventorySessions.response))
+            } catch {
+                completion(.failure(.inventoriesCouldNotBeDownloaded))
             }
         }.resume()
     }

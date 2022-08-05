@@ -26,6 +26,7 @@ struct AssetView: View {
     @State var showDuplicatedEPCModal: Bool = false
     @State var customFieldsImages: [AssetPhoto] = []
     @State var customFieldsImagesData: [ImageCustomField] = []
+    let workModeManager = WorkModeManager()
     
     var body: some View {
         VStack {
@@ -47,35 +48,40 @@ struct AssetView: View {
         })
         .navigationBarItems(trailing:
                                 HStack {
-                                    Button("Update") { validateEPC() }
-                                    .alert(isPresented: $showDuplicatedEPCModal, content: {
-                                        Alert(
-                                            title: Text("New EPC already exists, please read a different one"),
-                                            dismissButton: .cancel(Text("OK"), action: {})
-                                        )
-                                    })
-                                }
+            Button("Update") { validateEPC() }
+                .alert(isPresented: $showDuplicatedEPCModal, content: {
+                    Alert(
+                        title: Text("New EPC already exists, please read a different one"),
+                        dismissButton: .cancel(Text("OK"), action: {})
+                    )
+                })
+        }
         )
         .onAppear {
             serialNumber = asset.serial ?? ""
             EPC = asset.EPC ?? ""
             originalEPC = asset.EPC ?? ""
             
-            cslvalues.isLoading = true
-            ApiReferences().getCustomFields(id: asset._id, collection: "assets") { customField in
-                self.customFields = customField
-                
-                for field in customField.customFields {
-                    customFieldsValues.append(field.initialValue)
+            switch workModeManager.workMode {
+            case .online:
+                cslvalues.isLoading = true
+                ApiReferences().getCustomFields(id: asset._id, collection: "assets") { customField in
+                    self.customFields = customField
                     
-                    @State var image = UIImage(systemName: "photo")!
-                    @State var isNewImage = false
-                    @State var isModalOpen = false
-                    let imageObj = ImageCustomField(id: field.fileId, image: image, index: field.fieldIndex, isNewImage: isNewImage, isModalOpen: isModalOpen)
-                    customFieldsImagesData.append(imageObj)
-                    
+                    for field in customField.customFields {
+                        customFieldsValues.append(field.initialValue)
+                        
+                        @State var image = UIImage(systemName: "photo")!
+                        @State var isNewImage = false
+                        @State var isModalOpen = false
+                        let imageObj = ImageCustomField(id: field.fileId, image: image, index: field.fieldIndex, isNewImage: isNewImage, isModalOpen: isModalOpen)
+                        customFieldsImagesData.append(imageObj)
+                        
+                    }
+                    cslvalues.isLoading = false
                 }
-                cslvalues.isLoading = false
+            case .offline:
+                break 
             }
         }
         .onChange(of: cslvalues.isTriggerApplied) { isTriggerApplied in
@@ -122,7 +128,7 @@ struct AssetView: View {
             "EPC": EPC
         ]
         let modifiedCustomFields = filterModifiedCustomFields()
-
+        
         if !isNewImageSelected {
             cslvalues.isLoading = true
             ApiAssets().updateAsset(assetId: asset._id, params: params) {
@@ -157,19 +163,60 @@ struct AssetView: View {
         }
     }
     
+    func onUpdateOffline() {
+        cslvalues.isLoading = true
+        let imageData = imageSelected.jpegData(compressionQuality: 0.2)
+        DataManager().update(asset: asset._id, epc: EPC, serialNumber: serialNumber, image: imageData) { result in
+            switch result {
+            case .success(_ ):
+                showUpdateModal.toggle()
+            case .failure(let error):
+                print("Error: ", error.localizedDescription)
+            }
+            cslvalues.isLoading = false
+        }
+    }
+    
     func validateEPC() {
         if EPC != originalEPC {
-            let params: [String: Any] = ["fieldValues": [EPC]]
-            
-            ApiAssets().validateEPCS(params: params) { _existingEPCS in
-                if _existingEPCS.count > 0 {
-                    showDuplicatedEPCModal.toggle()
-                } else {
-                    onUpdate()
-                }
+            switch workModeManager.workMode {
+            case .online:
+                validateEPCOnline()
+            case .offline:
+                validateEPCOffline()
             }
         } else {
             onUpdate()
+        }
+    }
+    
+    private func validateEPCOnline() {
+        let params: [String: Any] = ["fieldValues": [EPC]]
+        ApiAssets().validateEPCS(params: params) { _existingEPCS in
+            if _existingEPCS.count > 0 {
+                showDuplicatedEPCModal.toggle()
+            } else {
+                onUpdate()
+            }
+        }
+
+    }
+    
+    private func validateEPCOffline() {
+        DataManager().getAsset(EPC: EPC) { result in
+            var isDuplicated = false
+            switch result {
+            case .success(let data):
+                isDuplicated = data != nil
+            case .failure(let error):
+                print("Error: ", error.localizedDescription)
+            }
+            
+            if isDuplicated {
+                showDuplicatedEPCModal.toggle()
+            } else {
+                onUpdateOffline()
+            }
         }
     }
     
@@ -233,7 +280,7 @@ struct AssetInfo: View {
                                         showAssetSheet.toggle()
                                     }
                                 }.padding(.trailing)
-
+                                
                                 LoadImage(fileExt: asset.fileExt ?? "", id: asset._id, folder: "assets", sizeFraction: 1)
                             }
                         }
@@ -256,7 +303,7 @@ struct AssetActions: View {
     @Binding var customFieldsValues: [String]
     @Binding var customFieldsImages: [AssetPhoto]
     @Binding var customFieldsImagesData: [ImageCustomField]
-
+    
     var body: some View {
         HStack {
             Button("Asset Photo") {
@@ -321,9 +368,9 @@ struct AssetOtherFields: View {
                     cslvalues.singleBarcode = ""
                 }
             })
-                .padding(.top, -3)
-                .padding(.bottom)
-
+            .padding(.top, -3)
+            .padding(.bottom)
+            
             VStack(alignment: .leading) {
                 Button("Geiger") {
                     showGeiger.toggle()
@@ -391,7 +438,7 @@ struct AssetOtherFields: View {
                                         CSLRfidAppEngine.shared().soundAlert(1005)
                                     }
                                 })
-                            .disabled(true)
+                                .disabled(true)
                             Text("Geiger Intensity: \(geigerLevel, specifier: "%.0f")")
                                 .fontWeight(.bold)
                                 .font(.title3)

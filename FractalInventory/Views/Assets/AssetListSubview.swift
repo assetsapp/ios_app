@@ -18,6 +18,7 @@ struct AssetListSubview: View {
     @Binding var navigateToIdentify: Bool
     @State var selectedEmployee: EmployeeModel = EmployeeModel(_id: "", name: "", lastName: "", email: "", assetsAssigned: [])
     @State var showSearchList: Bool = false
+    let workModeManager = WorkModeManager()
 
     var placeholder = "Search for name, brand, model, EPC or serial number"
     
@@ -75,20 +76,59 @@ struct AssetListSubview: View {
     
     func onAppearLoad() {
         if locationId != "" {
-            cslvalues.isLoading = true
+            getAssets(by: locationId)
+        } else if selectedEmployee._id != "" {
+            getAssets(by: selectedEmployee.assetsAssigned ?? [])
+        }
+    }
+    
+    private func getAssets(by locationID: String) {
+        cslvalues.isLoading = true
+        switch workModeManager.workMode {
+        case .online:
             ApiAssets().getRealAssets(location: locationId) { assets in
                 self.apiAssets = assets
                 cslvalues.isLoading = false
             }
-        } else if selectedEmployee._id != "" {
-            cslvalues.isLoading = true
-            var assetIds: [String] = []
-            for _asset in selectedEmployee.assetsAssigned ?? [] {
+        case .offline:
+            DataManager().getAssets(by: locationID) { result in
+                switch result {
+                case .success(let assets):
+                    self.apiAssets = assets
+                case .failure(let error):
+                    print("Error:", error.localizedDescription)
+                    break
+                }
+                cslvalues.isLoading = false
+            }
+        }
+    }
+    
+    private func getAssets(by assignedAssets: [AssetsAssigned]) {
+        var assetIds: [String] = []
+        cslvalues.isLoading = true
+        switch workModeManager.workMode {
+        case .online:
+            for _asset in assignedAssets {
                 let assetId = _asset.id ?? ""
                 assetIds.append("\"ObjectId('\(assetId)')\"")
             }
             ApiAssets().getRealAssetsForEmployee(assetIds: assetIds) { assets in
                 self.apiAssets = assets
+                cslvalues.isLoading = false
+            }
+        case .offline:
+            for _asset in assignedAssets {
+                assetIds.append(_asset.id ?? "")
+            }
+            DataManager().getAssets(by: assetIds) { result in
+                switch result {
+                case .success(let assets):
+                    self.apiAssets = assets
+                case .failure(let error):
+                    print("Error:", error.localizedDescription)
+                    break
+                }
                 cslvalues.isLoading = false
             }
         }

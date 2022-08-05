@@ -102,6 +102,7 @@ struct EmployeeView: View {
         .onAppear {
             onAppearLoad()
         }
+        .navigationBarHidden(false)
     }
     
     // MARK: FUNCTIONS

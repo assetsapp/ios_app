@@ -13,11 +13,19 @@ struct DashboardView: View {
     
     var body: some View {
         NavigationView {
+            
             Main(cslvalues: cslvalues, isUserLoggedOut: $isUserLoggedOut)
                 .navigationBarTitle("Home")
                 .navigationBarHidden(true)
         }
         .navigationViewStyle(StackNavigationViewStyle())
+        .onAppear() {
+//            ApiAssets().getAllAssets { assets in
+//                print("\n-----")
+//                print("****** Fetch assets done -> ")
+//                print("\n-----")
+//            }
+        }
     }
 }
 
@@ -30,20 +38,15 @@ struct Main: View {
     var body: some View {
         ZStack {
             VStack {
-
                 HStack {
-                    
                     Spacer()
-                    
                     Button(action: { sideMenuOpen.toggle() }) {
                         Image(systemName: "line.horizontal.3")
                             .imageScale(.large)
                             .foregroundColor(.primary)
                     }
                 }
-
                 Spacer()
-                
                 ScrollView(.vertical, showsIndicators: false) {
                     Dashboard(cslvalues: cslvalues, sideMenuOpen: $sideMenuOpen, isUserLoggedOut: $isUserLoggedOut)
                 }
@@ -55,9 +58,7 @@ struct Main: View {
                     sideMenuOpen = false
                 }
             }
-            
             Menu(cslvalues: cslvalues, isMenuOpen: $sideMenuOpen, isUserLoggedOut: $isUserLoggedOut)
-            
         }
     }
     
