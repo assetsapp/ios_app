@@ -108,16 +108,6 @@ class ApiInventorySessions {
                 completion(.failure(.inventoriesCouldNotBeDownloaded))
                 return
             }
-            
-            if let json = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers),
-                           let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
-                            print(String(decoding: jsonData, as: UTF8.self))
-                        } else {
-                            print("json data malformed")
-                        }
-            
-            
-
             do {
                 let inventorySessions = try JSONDecoder().decode(InventorySessionsApiModel.self, from: data)
                 completion(.success(inventorySessions.response))

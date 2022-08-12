@@ -24,7 +24,6 @@ class WorkModeManager {
             switch result {
             case .success(let assets):
                 print("Asset: ", assets.count)
-                break
             case .failure(_ ):
                 errors.append(WMError.assetsCouldNotBeDownloaded)
             }
@@ -42,8 +41,6 @@ class WorkModeManager {
             }
             dispatchGroup.leave()
         }
-        
-        
         
         dispatchGroup.enter()
         fetchLocations { result in
@@ -91,11 +88,14 @@ class WorkModeManager {
         
         dispatchGroup.notify(queue: .main) {
             if let inventories = inventories {
+                print("-> Empezo A Guardar los inventarios en BD")
                 DataManager().save(inventories: inventories) { result in
                     switch result {
-                    case .success(_ ):
+                    case .success(let inv):
+                        print("<- Termino de Guardar los inventarios en BD:", inv.count)
                         break
-                    case .failure(_ ):
+                    case .failure(let error):
+                        print("<- Error de Guardar los inventarios en BD:", error.localizedDescription)
                         errors.append(.inventoriesCouldNotBeDownloaded)
                     }
                     self.processOfflineWorkMode(errors: errors, completion: completion)
@@ -109,8 +109,10 @@ class WorkModeManager {
     private func processOfflineWorkMode(errors: [WMError], completion: @escaping(Result<WorkMode, WMError>) -> Void) {
         if errors.isEmpty {
             self.workMode = .offline
+            print("\n\n ###### \n Termino la carga de modo offline\n######\n\n")
             completion(.success(self.workMode))
         } else {
+            print("\n\n ###### \n Termino la carga de modo offline Con errores \n######\n\n")
             self.workMode = .online
             self.deleteAllData()
             let error = WMError.failedStartOfflineMode(errors: errors)
@@ -119,7 +121,6 @@ class WorkModeManager {
     }
     
     func startOnlineMode(completion: @escaping(Result<(workMode: WorkMode, savedAssets: [Asset]), WMError>) -> Void) {
-//        self.deleteAllData()
         let dispatchGroup = DispatchGroup()
         var savedAssets: [Asset] = []
         var errors: [WMError] = []
@@ -134,7 +135,6 @@ class WorkModeManager {
                         print("Termino de sincronizar los Assets:", savedAssetsR.count)
                         savedAssets = savedAssetsR
                     case .failure(let error):
-//                        self.workMode = .offline
                         switch error {
                         case .failedToSyncAssets(_ ,let  savedAssets):
                             self.deleteAssets(savedAssets)
@@ -142,15 +142,12 @@ class WorkModeManager {
                             break
                         }
                         errors.append(error)
-//                        completion(.failure(error))
                     }
                     dispatchGroup.leave()
                 }
             case .failure(_ ):
                 errors.append(WMError.failedFetchAssets)
                 dispatchGroup.leave()
-//                self.workMode = .offline
-//                completion(.failure(WMError.failedFetchAssets))
             }
         }
         
@@ -163,7 +160,6 @@ class WorkModeManager {
                     case.success(let updatedAssets):
                         print("Termino de actualizar los Assets:", updatedAssets.count)
                     case .failure(let error):
-//                        self.workMode = .offline
                         switch error {
                         case .failedToSyncAssets(_ ,let  savedAssets):
                             self.deleteAssets(savedAssets)
@@ -171,15 +167,12 @@ class WorkModeManager {
                             break
                         }
                         errors.append(error)
-//                        completion(.failure(error))
                     }
                     dispatchGroup.leave()
                 }
             case .failure(_ ):
                 errors.append(WMError.failedFetchAssets)
                 dispatchGroup.leave()
-//                self.workMode = .offline
-//                completion(.failure(WMError.failedFetchAssets))
             }
         }
         
@@ -196,7 +189,6 @@ class WorkModeManager {
                         switch error {
                         case .failedToSyncEmployees(_ , let savedEmployee):
                             break
-//                            self.deleteAssets(savedAssets)
                         default:
                             break
                         }
@@ -223,7 +215,6 @@ class WorkModeManager {
                         switch error {
                         case .failedToSyncInventories(_ , let savedInventories):
                             break
-//                            self.deleteAssets(savedAssets)
                         default:
                             break
                         }
@@ -289,7 +280,6 @@ extension WorkModeManager {
             case .success(let assets):
                 print("get assets succes")
                 DataManager().save(assets: assets, completion: completion)
-                break
             case .failure(let error):
                 completion(.failure(error))
             }
@@ -585,7 +575,6 @@ extension WorkModeManager {
                     "path": uploadFile.path
                 ]
                 let fileassetsparams = params.merging(fileparams) { (_, new) in new }
-//                ApiReferences().postAssets(params: fileassetsparams, completion: completion)
                 ApiAssets().updateAsset(assetId: asset.identifier ?? "", params: fileassetsparams) {
                     completion(.success([SavedAsset(_id: asset.identifier ?? "", EPC: asset.epc ?? "")]))
                 }

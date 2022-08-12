@@ -213,6 +213,7 @@ class ApiAssets {
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
+        request.timeoutInterval = 999.0
         
         URLSession.shared.dataTask(with: request) { data, response, error in
             guard let data = data else {
@@ -253,19 +254,11 @@ class ApiAssets {
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         URLSession.shared.dataTask(with: request) { data, response, error in
-            
-            if let json = try? JSONSerialization.jsonObject(with: data!, options: .mutableContainers),
-               let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
-                print(String(decoding: jsonData, as: UTF8.self))
-            } else {
-                print("json data malformed")
-            }
-//
             guard let data = data else { completion(.failure(WMError.assetsCouldNotBeDownloaded)) ; return }
             do {
                 let assets = try JSONDecoder().decode(AssetMainRespondeModel.self, from: data)
                 completion(.success(assets.response))
-            } catch {
+            } catch let error {
                 print("Error: 19 al 22 de agosto", error.localizedDescription)
                 completion(.failure(error))
             }

@@ -15,13 +15,14 @@ class DataManager: ObservableObject {
     init() {
         container.loadPersistentStores { descrip, error in
             if let error = error {
-                print("Core data Error: \(error.localizedDescription)")
+                print("********  Core data Error: \(error.localizedDescription)")
             }
         }
     }
     
     //MARK: - CoreData
     func save(assets: [AssetRespondeModel], completion: @escaping(Result<[AssetRespondeModel],Error>) -> Void) {
+        container.viewContext.retainsRegisteredObjects = true
         for item in assets {
             let asset = Asset(context: container.viewContext)
             asset.name = item.name
@@ -528,7 +529,7 @@ class DataManager: ObservableObject {
     
     func getInventorySessionToSync(completion:  @escaping(Result<[InventorySession], Error>) -> Void) {
         let request = InventorySession.fetchRequest()
-        request.predicate = NSPredicate(format: "beenCreated == NO") 
+        request.predicate = NSPredicate(format: "beenCreated == YES") 
         request.returnsObjectsAsFaults = false
         request.relationshipKeyPathsForPrefetching = ["assets"]
         do {

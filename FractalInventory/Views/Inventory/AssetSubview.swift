@@ -107,9 +107,9 @@ struct AssetSubview: View {
                 "name" : asset.name,
                 "brand" : asset.brand,
                 "model" : asset.model,
-                "serial" : asset.serial,
+                "serial" : asset.serial ?? "",
                 "location" : locationId,
-                "EPC" : asset.EPC,
+                "EPC" : asset.EPC ?? "",
                 "status" : "found"
             ]
             let params: [String: Any] = [
