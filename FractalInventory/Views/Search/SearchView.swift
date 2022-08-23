@@ -150,6 +150,15 @@ struct SearchView: View {
     }
     
     func assignAssetToEmployee() {
+        switch workModeManager.workMode {
+        case .online:
+            assignAssetToEmployeeOnline()
+        case .offline:
+            assignAssetToEmployeeOffline()
+        }
+    }
+    
+    func assignAssetToEmployeeOnline() {
         cslvalues.isLoading = true
         ApiAssets().assignEmployeeToAsset(assetId: selectedAsset._id, employee: selectedEmployee) {
             let params: [String: Any] = [
@@ -167,6 +176,22 @@ struct SearchView: View {
                 selectedEmployee.assetsAssigned?.append(newAssetAssigned)
                 closeModal.toggle()
             }
+        }
+    }
+    
+    func assignAssetToEmployeeOffline() {
+        cslvalues.isLoading = true
+        DataManager().assign(assetId: selectedAsset._id, to: selectedEmployee._id, replace: oldEmployeeId.isEmpty ? nil : oldEmployeeId) { result in
+            cslvalues.isLoading = false
+            switch result {
+            case .success(_ ):
+                print("Actualizo el asset correctamente")
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+            let newAssetAssigned = AssetsAssigned(id: selectedAsset._id, name: selectedAsset.name, brand: selectedAsset.brand, model: selectedAsset.model, assigned: true, serial: selectedAsset.serial, EPC: selectedAsset.EPC, creationDate: "")
+            selectedEmployee.assetsAssigned?.append(newAssetAssigned)
+            closeModal.toggle()
         }
     }
 }

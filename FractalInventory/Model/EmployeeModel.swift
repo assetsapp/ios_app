@@ -26,9 +26,12 @@ extension EmployeeModel {
         self.name = employee.name ?? ""
         self.lastName = employee.lastName ?? ""
         self.email = employee.email ?? ""
-        self.assetsAssigned = []
         self.profileId = employee.profileId
         self.profileName = employee.profileName
+        
+        if let assetsData = employee.assets?.allObjects as? [Asset] {
+            self.assetsAssigned = assetsData.map({ AssetsAssigned(asset: $0)})
+        }
     }
 }
 
@@ -41,9 +44,24 @@ struct AssetsAssigned: Codable, Hashable {
     var serial: String? = ""
     var EPC: String? = ""
     var creationDate: String? = ""
+    var originalAssigned: String? = ""
     
     private enum CodingKeys: String, CodingKey {
         case id, name, brand, model, serial, EPC
+    }
+}
+
+extension AssetsAssigned {
+    init(asset: Asset) {
+        self.id = asset.identifier ?? ""
+        self.brand = asset.brand ?? ""
+        self.model = asset.model ?? ""
+        self.name = asset.name ?? ""
+        self.EPC = asset.epc ?? ""
+        self.serial = asset.serial
+        self.assigned = true
+        self.creationDate = asset.creationDate
+        self.originalAssigned = asset.originalAssigned
     }
 }
 
@@ -98,6 +116,14 @@ class ApiEmployees {
                 completion(.failure(WMError.employeesCouldNotBeDownloaded))
                 return
             }
+            
+            if let json = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers),
+               let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
+                print(String(decoding: jsonData, as: UTF8.self))
+            } else {
+                print("json data malformed")
+            }
+            
             
             do {
                 let employees = try JSONDecoder().decode(EmployeesApiModel.self, from: data)

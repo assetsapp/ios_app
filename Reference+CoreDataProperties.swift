@@ -1,8 +1,8 @@
 //
 //  Reference+CoreDataProperties.swift
-//  
+//  FractalInventory
 //
-//  Created by Jonathan Saldivar on 06/04/22.
+//  Created by Jonathan Saldivar on 18/08/22.
 //
 //
 
@@ -16,10 +16,14 @@ extension Reference {
         return NSFetchRequest<Reference>(entityName: "Reference")
     }
 
-    @NSManaged public var id: String?
     @NSManaged public var brand: String?
+    @NSManaged public var fileExt: String?
+    @NSManaged public var id: String?
     @NSManaged public var model: String?
     @NSManaged public var name: String?
-    @NSManaged public var fileExt: String?
+
+}
+
+extension Reference : Identifiable {
 
 }

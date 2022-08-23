@@ -1,8 +1,8 @@
 //
 //  Location+CoreDataProperties.swift
-//  
+//  FractalInventory
 //
-//  Created by Jonathan Saldivar on 06/04/22.
+//  Created by Jonathan Saldivar on 18/08/22.
 //
 //
 
@@ -16,12 +16,16 @@ extension Location {
         return NSFetchRequest<Location>(entityName: "Location")
     }
 
-    @NSManaged public var id: String?
-    @NSManaged public var name: String?
-    @NSManaged public var profileName: String?
-    @NSManaged public var profileLevel: String?
-    @NSManaged public var parent: String?
     @NSManaged public var assetsCount: Int32
     @NSManaged public var childrenCount: Int32
+    @NSManaged public var id: String?
+    @NSManaged public var name: String?
+    @NSManaged public var parent: String?
+    @NSManaged public var profileLevel: String?
+    @NSManaged public var profileName: String?
+
+}
+
+extension Location : Identifiable {
 
 }

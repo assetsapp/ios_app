@@ -269,9 +269,8 @@ struct InventoryView: View {
                     primaryButton: .default(Text("OK"), action: { resetInventory() }),
                     secondaryButton: .cancel(Text("Cancel"))
                 )
-            })
-        }
-        )
+            })})
+        .navigationViewStyle(.stack)
     }
     
     // MARK: FUNCTIONS
@@ -452,6 +451,7 @@ struct InventoryView: View {
             DataManager().updateInventorySession(by: inventorySession, foundEPCS: inventoryUpdates, closeSession: closeInventory) { result in
                 switch result {
                 case .success(_ ):
+                    print("updateInventorySession Success")
                     break
                 case .failure(let error):
                     print("Error: ", error.localizedDescription)

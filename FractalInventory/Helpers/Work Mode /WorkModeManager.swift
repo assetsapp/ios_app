@@ -18,6 +18,7 @@ class WorkModeManager {
         var errors: [WMError] = []
         
         var inventories: [InventoryDataModel]?
+        var employees: [EmployeeModel]?
         
         dispatchGroup.enter()
         fetchAssets { result in
@@ -56,8 +57,8 @@ class WorkModeManager {
         dispatchGroup.enter()
         fetchEmployees { result in
             switch result {
-            case .success(_ ):
-                break
+            case .success(let data):
+                employees = data
             case .failure(_ ):
                 errors.append(WMError.employeesCouldNotBeDownloaded)
             }
@@ -87,22 +88,50 @@ class WorkModeManager {
         }
         
         dispatchGroup.notify(queue: .main) {
-            if let inventories = inventories {
-                print("-> Empezo A Guardar los inventarios en BD")
-                DataManager().save(inventories: inventories) { result in
-                    switch result {
-                    case .success(let inv):
-                        print("<- Termino de Guardar los inventarios en BD:", inv.count)
-                        break
-                    case .failure(let error):
-                        print("<- Error de Guardar los inventarios en BD:", error.localizedDescription)
-                        errors.append(.inventoriesCouldNotBeDownloaded)
-                    }
-                    self.processOfflineWorkMode(errors: errors, completion: completion)
-                }
+            if inventories != nil || employees != nil {
+                self.processSync(inventories: inventories, employees: employees, errors: errors, completion: completion)
             } else {
                 self.processOfflineWorkMode(errors: errors, completion: completion)
             }
+        }
+    }
+    
+    private func processSync(inventories: [InventoryDataModel]?, employees: [EmployeeModel]? ,errors: [WMError], completion: @escaping(Result<WorkMode, WMError>) -> Void) {
+        var processSyncErrors = errors
+        let dispatchGroup = DispatchGroup()
+        
+        if let inventories = inventories {
+            print("-> Empezo A Guardar los inventarios en BD")
+            dispatchGroup.enter()
+            DataManager().save(inventories: inventories) { result in
+                switch result {
+                case .success(let inv):
+                    print("<- Termino de Guardar los inventarios en BD:", inv.count)
+                    break
+                case .failure(let error):
+                    print("<- Error de Guardar los inventarios en BD:", error.localizedDescription)
+                    processSyncErrors.append(.inventoriesCouldNotBeDownloaded)
+                }
+                dispatchGroup.leave()
+            }
+        }
+        
+        if let employees = employees {
+            dispatchGroup.enter()
+            DataManager().save(employees: employees) { result in
+                switch result {
+                case .success(let emp):
+                    print("<- Termino de Guardar los Empleados en BD:", emp.count)
+                case .failure(let error):
+                    print("<- Error de Guardar los Empleados en BD:", error.localizedDescription)
+                    processSyncErrors.append(.employeesCouldNotBeDownloaded)
+                }
+                dispatchGroup.leave()
+            }
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            self.processOfflineWorkMode(errors: errors, completion: completion)
         }
     }
     
@@ -155,6 +184,7 @@ class WorkModeManager {
         DataManager().getAssetsToUpdate { result in
             switch result {
             case .success(let assets):
+                print("Asses para actualizar \(assets.count)")
                 self.starUpdate(assets: assets) { result in
                     switch result {
                     case.success(let updatedAssets):
@@ -185,6 +215,32 @@ class WorkModeManager {
                     switch result {
                     case .success(let savedEmployees):
                         print("Termino de actualizar los Empleados:", savedEmployees.count)
+                    case .failure(let error):
+                        switch error {
+                        case .failedToSyncEmployees(_ , let savedEmployee):
+                            break
+                        default:
+                            break
+                        }
+                        errors.append(error)
+                    }
+                    dispatchGroup.leave()
+                }
+            case .failure(_ ):
+                errors.append(WMError.failedFetchEmployees)
+                dispatchGroup.leave()
+            }
+        }
+        
+        // empleados
+        dispatchGroup.enter()
+        DataManager().getEmployeesToUpdate { result in
+            switch result {
+            case .success(let employees):
+                self.startUpdateSync(employees: employees) { result in
+                    switch result {
+                    case .success(let savedEmployees):
+                        print("Termino de actualizar los Empleados asignados:", savedEmployees.count)
                     case .failure(let error):
                         switch error {
                         case .failedToSyncEmployees(_ , let savedEmployee):
@@ -278,7 +334,7 @@ extension WorkModeManager {
         ApiAssets().getAllAssets { result in
             switch result {
             case .success(let assets):
-                print("get assets succes")
+                print("get assets succes \(assets.count)")
                 DataManager().save(assets: assets, completion: completion)
             case .failure(let error):
                 completion(.failure(error))
@@ -318,7 +374,9 @@ extension WorkModeManager {
         ApiEmployees().getEmployees { result in
             switch result {
             case .success(let employees):
-                DataManager().save(employees: employees, completion: completion)
+               // DataManager().save(employees: employees, completion: completion)
+                // Se traslada el guardado al momento en el que ya se tienen los assets
+                completion(.success(employees))
             case .failure(let error):
                 completion(.failure(error))
             }
@@ -408,6 +466,7 @@ extension WorkModeManager {
         for asset in assets {
             dispatchGroup.enter()
             if let imageData = asset.image {
+                print("Actualizando asset con imagen nueva")
                 let image = UIImage(data: imageData)!
                 syncUpdate(image: image, asset: asset) { result in
                     switch result {
@@ -420,6 +479,7 @@ extension WorkModeManager {
                     dispatchGroup.leave()
                 }
             } else {
+                print("Actualizando asset \(asset.id)")
                 syncUpdate(asset: asset) { result in
                     switch result {
                     case .success(_ ):
@@ -459,6 +519,43 @@ extension WorkModeManager {
         for employee in employees {
             dispatchGroup.enter()
             sync(employee: employee) { result in
+                switch result {
+                case .success(_ ):
+                    savedEmployees.append(employee)
+                case .failure(let error):
+                    print(error.localizedDescription)
+                    errors.append(WMError.failedToSyncEmployee(employee: employee))
+                }
+                dispatchGroup.leave()
+            }
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            if errors.isEmpty {
+                completion(.success(savedEmployees))
+            } else {
+                var errorEmployee: [EmployeeModel] = []
+                for error in errors {
+                    switch error {
+                    case .failedToSyncEmployee(let employee):
+                        errorEmployee.append(employee)
+                    default:
+                        break
+                    }
+                }
+                completion(.failure(.failedToSyncEmployees(errorEmployee: errorEmployee, savedEmployee: savedEmployees)))
+            }
+        }
+    }
+    
+    private func startUpdateSync(employees: [EmployeeModel], completion: @escaping(Result<[EmployeeModel], WMError>) -> Void) {
+        let dispatchGroup = DispatchGroup()
+        var savedEmployees: [EmployeeModel] = []
+        var errors:[WMError] = []
+        
+        for employee in employees {
+            dispatchGroup.enter()
+            syncUpdate(employee: employee) { result in
                 switch result {
                 case .success(_ ):
                     savedEmployees.append(employee)
@@ -535,6 +632,25 @@ extension WorkModeManager {
         }
     }
     
+    private func syncUpdate(employee: EmployeeModel, completion: @escaping(Result<EmployeeModel, Error>) -> Void) {
+        let asset = employee.assetsAssigned?.first
+        let assetId = asset?.id ?? ""
+        ApiAssets().assignEmployeeToAsset(assetId: assetId, employee: employee) {
+            let params: [String: Any] = [
+                "id": asset?.id ?? "",
+                "name": asset?.name ?? "",
+                "brand": asset?.brand ?? "",
+                "model": asset?.model ?? "",
+                "EPC": asset?.EPC ?? "",
+                "serial": asset?.serial ?? "",
+                "oldEmployeeId": asset?.originalAssigned ?? ""
+            ]
+            ApiEmployees().assignAssetToEmployee(params: params, employeeId: employee._id) {
+                completion(.success(employee))
+            }
+        }
+    }
+    
     private func sync(inventorySession: InventorySession, completion: @escaping(Result<InventorySession, Error>) -> Void) {
         let type = InventoryType(rawValue: inventorySession.type ?? "") ?? .root
         ApiAssets().getInventoryAssets(location: inventorySession.locationId ?? "", locationName: inventorySession.locationName ?? "", sessionId: inventorySession.sessionId ?? "", inventoryName: inventorySession.name ?? "", type: type) { result in
@@ -570,6 +686,7 @@ extension WorkModeManager {
         ApiFile().postImage(image: image, _id: asset.identifier ?? "") { result in
             switch result {
             case .success(let uploadFile):
+                print("Actualizo imagen de asset")
                 let fileparams: [String: Any] = [
                     "filename": uploadFile.filename,
                     "path": uploadFile.path

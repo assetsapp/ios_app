@@ -1,5 +1,5 @@
 //
-//  InventorySession+CoreDataProperties.swift
+//  Employee+CoreDataProperties.swift
 //  FractalInventory
 //
 //  Created by Jonathan Saldivar on 18/08/22.
@@ -10,28 +10,26 @@ import Foundation
 import CoreData
 
 
-extension InventorySession {
+extension Employee {
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<InventorySession> {
-        return NSFetchRequest<InventorySession>(entityName: "InventorySession")
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<Employee> {
+        return NSFetchRequest<Employee>(entityName: "Employee")
     }
 
-    @NSManaged public var beenCreated: Bool
     @NSManaged public var beenUpdated: Bool
-    @NSManaged public var creation: String?
+    @NSManaged public var beenCreated: Bool
+    @NSManaged public var email: String?
     @NSManaged public var identifier: String?
-    @NSManaged public var locationId: String?
-    @NSManaged public var locationName: String?
+    @NSManaged public var lastName: String?
     @NSManaged public var name: String?
-    @NSManaged public var sessionId: String?
-    @NSManaged public var status: String?
-    @NSManaged public var type: String?
+    @NSManaged public var profileId: String?
+    @NSManaged public var profileName: String?
     @NSManaged public var assets: NSSet?
 
 }
 
 // MARK: Generated accessors for assets
-extension InventorySession {
+extension Employee {
 
     @objc(addAssetsObject:)
     @NSManaged public func addToAssets(_ value: Asset)
@@ -47,6 +45,6 @@ extension InventorySession {
 
 }
 
-extension InventorySession : Identifiable {
+extension Employee : Identifiable {
 
 }

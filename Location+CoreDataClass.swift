@@ -1,8 +1,8 @@
 //
 //  Location+CoreDataClass.swift
-//  
+//  FractalInventory
 //
-//  Created by Jonathan Saldivar on 06/04/22.
+//  Created by Jonathan Saldivar on 18/08/22.
 //
 //
 

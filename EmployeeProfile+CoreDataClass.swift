@@ -2,7 +2,7 @@
 //  EmployeeProfile+CoreDataClass.swift
 //  FractalInventory
 //
-//  Created by Jonathan Saldivar on 04/08/22.
+//  Created by Jonathan Saldivar on 18/08/22.
 //
 //
 

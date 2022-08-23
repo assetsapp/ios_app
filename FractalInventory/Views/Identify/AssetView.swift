@@ -165,7 +165,7 @@ struct AssetView: View {
     
     func onUpdateOffline() {
         cslvalues.isLoading = true
-        let imageData = imageSelected.jpegData(compressionQuality: 0.2)
+        let imageData = isNewImageSelected ? imageSelected.jpegData(compressionQuality: 0.2) : nil
         DataManager().update(asset: asset._id, epc: EPC, serialNumber: serialNumber, image: imageData) { result in
             switch result {
             case .success(_ ):
@@ -178,6 +178,7 @@ struct AssetView: View {
     }
     
     func validateEPC() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         if EPC != originalEPC {
             switch workModeManager.workMode {
             case .online:
@@ -186,7 +187,12 @@ struct AssetView: View {
                 validateEPCOffline()
             }
         } else {
-            onUpdate()
+            switch workModeManager.workMode {
+            case .online:
+                onUpdate()
+            case .offline:
+                onUpdateOffline()
+            }
         }
     }
     
@@ -199,7 +205,6 @@ struct AssetView: View {
                 onUpdate()
             }
         }
-
     }
     
     private func validateEPCOffline() {

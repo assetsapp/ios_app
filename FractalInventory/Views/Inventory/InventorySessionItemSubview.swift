@@ -43,6 +43,7 @@ struct InventorySessionItemSubview: View {
             Divider()
                 .padding(.horizontal)
         }
+        .navigationViewStyle(.stack)
     }
 }
 

@@ -404,12 +404,14 @@ class ApiAssets {
         let urlComponent = URLComponents(string: "\(apiHost)/api/v1/\(apiDB)/assets/\(assetId)")!
         let jsonData = try? JSONSerialization.data(withJSONObject: params)
         var request = URLRequest(url: urlComponent.url!)
+        print("params: \(String(describing: jsonData))")
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "PUT"
         request.httpBody = jsonData
         
         URLSession.shared.dataTask(with: request) { data, response, error in
+            print("Actualizo Asset, error: \(error?.localizedDescription)")
             DispatchQueue.main.async {
                 completion()
             }

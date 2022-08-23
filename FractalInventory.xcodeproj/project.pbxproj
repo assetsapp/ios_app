@@ -11,20 +11,20 @@
 		36188C1B27F44A84008EC7CD /* WorkModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36188C1A27F44A84008EC7CD /* WorkModeManager.swift */; };
 		36188C1F27FE5722008EC7CD /* Inventory.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 36188C1D27FE5722008EC7CD /* Inventory.xcdatamodeld */; };
 		36188C3A27FE5FE7008EC7CD /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36188C3927FE5FE7008EC7CD /* DataManager.swift */; };
-		36188C4127FE7013008EC7CD /* Reference+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36188C3B27FE7012008EC7CD /* Reference+CoreDataClass.swift */; };
-		36188C4227FE7013008EC7CD /* Location+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36188C3C27FE7012008EC7CD /* Location+CoreDataProperties.swift */; };
-		36188C4327FE7013008EC7CD /* Reference+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36188C3D27FE7012008EC7CD /* Reference+CoreDataProperties.swift */; };
-		36188C4427FE7013008EC7CD /* Location+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36188C3E27FE7013008EC7CD /* Location+CoreDataClass.swift */; };
-		36188C4527FE7013008EC7CD /* Employee+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36188C3F27FE7013008EC7CD /* Employee+CoreDataClass.swift */; };
-		36188C4627FE7013008EC7CD /* Employee+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36188C4027FE7013008EC7CD /* Employee+CoreDataProperties.swift */; };
-		36208FDB289855C400AE795B /* InventorySession+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36208FD9289855C400AE795B /* InventorySession+CoreDataClass.swift */; };
-		36208FDC289855C400AE795B /* InventorySession+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36208FDA289855C400AE795B /* InventorySession+CoreDataProperties.swift */; };
-		362FB736289B9CFD006223FD /* EmployeeProfile+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362FB734289B9CFD006223FD /* EmployeeProfile+CoreDataClass.swift */; };
-		362FB737289B9CFD006223FD /* EmployeeProfile+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362FB735289B9CFD006223FD /* EmployeeProfile+CoreDataProperties.swift */; };
 		36548C94281709CD0065D05B /* WMError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36548C93281709CD0065D05B /* WMError.swift */; };
-		367CBFF82893BCAB002E68E1 /* Asset+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367CBFF62893BCAB002E68E1 /* Asset+CoreDataClass.swift */; };
-		367CBFF92893BCAB002E68E1 /* Asset+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367CBFF72893BCAB002E68E1 /* Asset+CoreDataProperties.swift */; };
 		36AA9E142806A66B00434A98 /* WMConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36AA9E132806A66B00434A98 /* WMConstants.swift */; };
+		36E2880E28AE09C8009FCA60 /* Asset+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E2880228AE09C7009FCA60 /* Asset+CoreDataClass.swift */; };
+		36E2880F28AE09C8009FCA60 /* Asset+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E2880328AE09C7009FCA60 /* Asset+CoreDataProperties.swift */; };
+		36E2881028AE09C8009FCA60 /* InventorySession+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E2880428AE09C7009FCA60 /* InventorySession+CoreDataClass.swift */; };
+		36E2881128AE09C8009FCA60 /* InventorySession+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E2880528AE09C7009FCA60 /* InventorySession+CoreDataProperties.swift */; };
+		36E2881228AE09C8009FCA60 /* Reference+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E2880628AE09C7009FCA60 /* Reference+CoreDataClass.swift */; };
+		36E2881328AE09C8009FCA60 /* Reference+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E2880728AE09C8009FCA60 /* Reference+CoreDataProperties.swift */; };
+		36E2881428AE09C8009FCA60 /* Employee+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E2880828AE09C8009FCA60 /* Employee+CoreDataClass.swift */; };
+		36E2881528AE09C8009FCA60 /* Employee+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E2880928AE09C8009FCA60 /* Employee+CoreDataProperties.swift */; };
+		36E2881628AE09C8009FCA60 /* Location+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E2880A28AE09C8009FCA60 /* Location+CoreDataClass.swift */; };
+		36E2881728AE09C8009FCA60 /* Location+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E2880B28AE09C8009FCA60 /* Location+CoreDataProperties.swift */; };
+		36E2881828AE09C8009FCA60 /* EmployeeProfile+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E2880C28AE09C8009FCA60 /* EmployeeProfile+CoreDataClass.swift */; };
+		36E2881928AE09C8009FCA60 /* EmployeeProfile+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E2880D28AE09C8009FCA60 /* EmployeeProfile+CoreDataProperties.swift */; };
 		51912303D9BAD715244BA88E /* Pods_FractalInventory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6100A6A96CC0C8F133CC38C /* Pods_FractalInventory.framework */; };
 		7601038526D335E8003C39BA /* LocationSubview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7601038426D335E8003C39BA /* LocationSubview.swift */; };
 		7601038826D33BBC003C39BA /* LocationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7601038726D33BBC003C39BA /* LocationModel.swift */; };
@@ -127,20 +127,21 @@
 		36188C1A27F44A84008EC7CD /* WorkModeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkModeManager.swift; sourceTree = "<group>"; };
 		36188C1E27FE5722008EC7CD /* Inventory.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Inventory.xcdatamodel; sourceTree = "<group>"; };
 		36188C3927FE5FE7008EC7CD /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
-		36188C3B27FE7012008EC7CD /* Reference+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Reference+CoreDataClass.swift"; sourceTree = "<group>"; };
-		36188C3C27FE7012008EC7CD /* Location+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Location+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		36188C3D27FE7012008EC7CD /* Reference+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Reference+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		36188C3E27FE7013008EC7CD /* Location+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Location+CoreDataClass.swift"; sourceTree = "<group>"; };
-		36188C3F27FE7013008EC7CD /* Employee+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Employee+CoreDataClass.swift"; sourceTree = "<group>"; };
-		36188C4027FE7013008EC7CD /* Employee+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Employee+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		36208FD9289855C400AE795B /* InventorySession+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InventorySession+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
-		36208FDA289855C400AE795B /* InventorySession+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InventorySession+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
-		362FB734289B9CFD006223FD /* EmployeeProfile+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EmployeeProfile+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
-		362FB735289B9CFD006223FD /* EmployeeProfile+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EmployeeProfile+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		36548C93281709CD0065D05B /* WMError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WMError.swift; sourceTree = "<group>"; };
-		367CBFF62893BCAB002E68E1 /* Asset+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Asset+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
-		367CBFF72893BCAB002E68E1 /* Asset+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Asset+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
+		3678807A28AE06C80027CCE9 /* Inventory 1.1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Inventory 1.1.xcdatamodel"; sourceTree = "<group>"; };
 		36AA9E132806A66B00434A98 /* WMConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WMConstants.swift; sourceTree = "<group>"; };
+		36E2880228AE09C7009FCA60 /* Asset+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Asset+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
+		36E2880328AE09C7009FCA60 /* Asset+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Asset+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
+		36E2880428AE09C7009FCA60 /* InventorySession+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InventorySession+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
+		36E2880528AE09C7009FCA60 /* InventorySession+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InventorySession+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
+		36E2880628AE09C7009FCA60 /* Reference+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reference+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
+		36E2880728AE09C8009FCA60 /* Reference+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reference+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
+		36E2880828AE09C8009FCA60 /* Employee+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Employee+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
+		36E2880928AE09C8009FCA60 /* Employee+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Employee+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
+		36E2880A28AE09C8009FCA60 /* Location+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Location+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
+		36E2880B28AE09C8009FCA60 /* Location+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Location+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
+		36E2880C28AE09C8009FCA60 /* EmployeeProfile+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EmployeeProfile+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
+		36E2880D28AE09C8009FCA60 /* EmployeeProfile+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EmployeeProfile+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		4E471B217947CF0F7CF94590 /* Pods-FractalInventory.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FractalInventory.debug.xcconfig"; path = "Target Support Files/Pods-FractalInventory/Pods-FractalInventory.debug.xcconfig"; sourceTree = "<group>"; };
 		6A581ACFB2E21DBDE129DD82 /* Pods-FractalInventory.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FractalInventory.release.xcconfig"; path = "Target Support Files/Pods-FractalInventory/Pods-FractalInventory.release.xcconfig"; sourceTree = "<group>"; };
 		7601038426D335E8003C39BA /* LocationSubview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSubview.swift; sourceTree = "<group>"; };
@@ -307,18 +308,18 @@
 		36188C2027FE594D008EC7CD /* Entities */ = {
 			isa = PBXGroup;
 			children = (
-				362FB734289B9CFD006223FD /* EmployeeProfile+CoreDataClass.swift */,
-				362FB735289B9CFD006223FD /* EmployeeProfile+CoreDataProperties.swift */,
-				36208FD9289855C400AE795B /* InventorySession+CoreDataClass.swift */,
-				36208FDA289855C400AE795B /* InventorySession+CoreDataProperties.swift */,
-				367CBFF62893BCAB002E68E1 /* Asset+CoreDataClass.swift */,
-				367CBFF72893BCAB002E68E1 /* Asset+CoreDataProperties.swift */,
-				36188C3F27FE7013008EC7CD /* Employee+CoreDataClass.swift */,
-				36188C4027FE7013008EC7CD /* Employee+CoreDataProperties.swift */,
-				36188C3E27FE7013008EC7CD /* Location+CoreDataClass.swift */,
-				36188C3C27FE7012008EC7CD /* Location+CoreDataProperties.swift */,
-				36188C3B27FE7012008EC7CD /* Reference+CoreDataClass.swift */,
-				36188C3D27FE7012008EC7CD /* Reference+CoreDataProperties.swift */,
+				36E2880228AE09C7009FCA60 /* Asset+CoreDataClass.swift */,
+				36E2880328AE09C7009FCA60 /* Asset+CoreDataProperties.swift */,
+				36E2880428AE09C7009FCA60 /* InventorySession+CoreDataClass.swift */,
+				36E2880528AE09C7009FCA60 /* InventorySession+CoreDataProperties.swift */,
+				36E2880628AE09C7009FCA60 /* Reference+CoreDataClass.swift */,
+				36E2880728AE09C8009FCA60 /* Reference+CoreDataProperties.swift */,
+				36E2880828AE09C8009FCA60 /* Employee+CoreDataClass.swift */,
+				36E2880928AE09C8009FCA60 /* Employee+CoreDataProperties.swift */,
+				36E2880A28AE09C8009FCA60 /* Location+CoreDataClass.swift */,
+				36E2880B28AE09C8009FCA60 /* Location+CoreDataProperties.swift */,
+				36E2880C28AE09C8009FCA60 /* EmployeeProfile+CoreDataClass.swift */,
+				36E2880D28AE09C8009FCA60 /* EmployeeProfile+CoreDataProperties.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -834,9 +835,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				76F5AB2B26CB2C79001B8B89 /* LogInView.swift in Sources */,
+				36E2881128AE09C8009FCA60 /* InventorySession+CoreDataProperties.swift in Sources */,
 				7655821026DC808100F6C973 /* MQTTProperties.m in Sources */,
 				7655823126DC80C600F6C973 /* CSLBleTag.m in Sources */,
-				36188C4527FE7013008EC7CD /* Employee+CoreDataClass.swift in Sources */,
 				7601038526D335E8003C39BA /* LocationSubview.swift in Sources */,
 				7655821D26DC808100F6C973 /* CSLTemperatureTagSettings.m in Sources */,
 				7655821F26DC808100F6C973 /* CSLReaderFrequency.m in Sources */,
@@ -844,6 +845,7 @@
 				767C671727545EB200A5AA3E /* ValidatedView.swift in Sources */,
 				7655820D26DC808100F6C973 /* MQTTMessage.m in Sources */,
 				76190AF52725151900AD0EE0 /* UserModel.swift in Sources */,
+				36E2880E28AE09C8009FCA60 /* Asset+CoreDataClass.swift in Sources */,
 				767C671C2755FF7C00A5AA3E /* SearchView.swift in Sources */,
 				76D1EAEE276D5F3900EE85B8 /* EmployeeModel.swift in Sources */,
 				36AA9E142806A66B00434A98 /* WMConstants.swift in Sources */,
@@ -856,38 +858,37 @@
 				76B3995F2725F0CB000A363A /* ConnectionsSubview.swift in Sources */,
 				7655821626DC808100F6C973 /* MQTTStrict.m in Sources */,
 				7655825526DE127300F6C973 /* RawRfidView.swift in Sources */,
-				367CBFF92893BCAB002E68E1 /* Asset+CoreDataProperties.swift in Sources */,
 				76190AEB2713EB2B00AD0EE0 /* InventorySessionItemSubview.swift in Sources */,
 				767F77BB276163D400FD905B /* WKView.swift in Sources */,
 				76F5AB1E26CA2242001B8B89 /* ContentView.swift in Sources */,
 				7655823426DC80C600F6C973 /* CSLBlePacket.m in Sources */,
-				36208FDC289855C400AE795B /* InventorySession+CoreDataProperties.swift in Sources */,
+				36E2880F28AE09C8009FCA60 /* Asset+CoreDataProperties.swift in Sources */,
 				765581B926DC202A00F6C973 /* EpcsArray.swift in Sources */,
+				36E2881728AE09C8009FCA60 /* Location+CoreDataProperties.swift in Sources */,
 				76838CFB26FFEE2B00B0EDF8 /* AssetSubview.swift in Sources */,
 				76190AEF2713FE9C00AD0EE0 /* AssetListSubview.swift in Sources */,
 				76546C8626DB00AF00336C10 /* ReferencesArray.swift in Sources */,
+				36E2881928AE09C8009FCA60 /* EmployeeProfile+CoreDataProperties.swift in Sources */,
 				76BAC80E272524EC008DF3FA /* HomeView.swift in Sources */,
-				362FB737289B9CFD006223FD /* EmployeeProfile+CoreDataProperties.swift in Sources */,
+				36E2881528AE09C8009FCA60 /* Employee+CoreDataProperties.swift in Sources */,
 				36188C1F27FE5722008EC7CD /* Inventory.xcdatamodeld in Sources */,
+				36E2881428AE09C8009FCA60 /* Employee+CoreDataClass.swift in Sources */,
 				7655820626DC808100F6C973 /* MQTTSSLSecurityPolicyTransport.m in Sources */,
 				76190AED2713EBC500AD0EE0 /* InventorySessionModel.swift in Sources */,
 				7655823626DC80C600F6C973 /* CSLBleReader+AccessControl.m in Sources */,
 				7655823326DC80C600F6C973 /* CSLBleInterface.m in Sources */,
 				7655820E26DC808100F6C973 /* MQTTDecoder.m in Sources */,
+				36E2881828AE09C8009FCA60 /* EmployeeProfile+CoreDataClass.swift in Sources */,
 				76546C8B26DB3A4A00336C10 /* TaggingView.swift in Sources */,
 				7655825726DF285100F6C973 /* CSL.swift in Sources */,
 				7655821B26DC808100F6C973 /* MQTTSessionSynchron.m in Sources */,
-				362FB736289B9CFD006223FD /* EmployeeProfile+CoreDataClass.swift in Sources */,
 				76838D0126FFF60500B0EDF8 /* InventoryView.swift in Sources */,
 				76D1EAF12771586200EE85B8 /* EmployeeView.swift in Sources */,
 				7655821126DC808100F6C973 /* MQTTSSLSecurityPolicyDecoder.m in Sources */,
-				36208FDB289855C400AE795B /* InventorySession+CoreDataClass.swift in Sources */,
-				367CBFF82893BCAB002E68E1 /* Asset+CoreDataClass.swift in Sources */,
-				36188C4427FE7013008EC7CD /* Location+CoreDataClass.swift in Sources */,
 				7655820B26DC808100F6C973 /* GCDTimer.m in Sources */,
-				36188C4127FE7013008EC7CD /* Reference+CoreDataClass.swift in Sources */,
 				76546C8826DB060200336C10 /* ReferenceSubview.swift in Sources */,
 				7655821726DC808100F6C973 /* MQTTInMemoryPersistence.m in Sources */,
+				36E2881228AE09C8009FCA60 /* Reference+CoreDataClass.swift in Sources */,
 				76AB757826E4383200862AD6 /* DashboardView.swift in Sources */,
 				76D7CD8227748FE200D3C89D /* NewEmployee.swift in Sources */,
 				76F5AB1C26CA2242001B8B89 /* FractalInventoryApp.swift in Sources */,
@@ -915,8 +916,8 @@
 				7655821226DC808100F6C973 /* MQTTSSLSecurityPolicyEncoder.m in Sources */,
 				76546C8426DB006D00336C10 /* ReferenceModel.swift in Sources */,
 				7601038B26D340AC003C39BA /* LocationsView.swift in Sources */,
+				36E2881328AE09C8009FCA60 /* Reference+CoreDataProperties.swift in Sources */,
 				7655820F26DC808100F6C973 /* MQTTSSLSecurityPolicy.m in Sources */,
-				36188C4327FE7013008EC7CD /* Reference+CoreDataProperties.swift in Sources */,
 				7655826226DF5EAB00F6C973 /* CSLGlobalVariables.swift in Sources */,
 				76B3996627267F05000A363A /* FileModel.swift in Sources */,
 				767C67192755EAC400A5AA3E /* ValidatedItemSubview.swift in Sources */,
@@ -926,16 +927,16 @@
 				7655820A26DC808100F6C973 /* MQTTSessionManager.m in Sources */,
 				767F77B92761626400FD905B /* WebViewStateModel.swift in Sources */,
 				36188C1927F43C91008EC7CD /* WorkMode.swift in Sources */,
+				36E2881628AE09C8009FCA60 /* Location+CoreDataClass.swift in Sources */,
+				36E2881028AE09C8009FCA60 /* InventorySession+CoreDataClass.swift in Sources */,
 				7655821E26DC808100F6C973 /* CSLReaderSettings.m in Sources */,
 				76190AE92713DEFB00AD0EE0 /* InventorySessionSubview.swift in Sources */,
 				76AB758026E47A9200862AD6 /* ReadingSubview.swift in Sources */,
-				36188C4227FE7013008EC7CD /* Location+CoreDataProperties.swift in Sources */,
 				7655822126DC808100F6C973 /* CSLReaderBarcode.m in Sources */,
 				7655821426DC808100F6C973 /* ReconnectTimer.m in Sources */,
 				767C671527544F4B00A5AA3E /* IdentifyReadingSubview.swift in Sources */,
 				76190AF32724F1FE00AD0EE0 /* TestingAppModel.swift in Sources */,
 				76546C8226DB001F00336C10 /* ReferencesView.swift in Sources */,
-				36188C4627FE7013008EC7CD /* Employee+CoreDataProperties.swift in Sources */,
 				76190AF1271400D200AD0EE0 /* AssetListItemSubview.swift in Sources */,
 				7655820C26DC808100F6C973 /* MQTTCFSocketTransport.m in Sources */,
 				76AB757C26E443F600862AD6 /* CSLValues.swift in Sources */,
@@ -1147,9 +1148,10 @@
 		36188C1D27FE5722008EC7CD /* Inventory.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				3678807A28AE06C80027CCE9 /* Inventory 1.1.xcdatamodel */,
 				36188C1E27FE5722008EC7CD /* Inventory.xcdatamodel */,
 			);
-			currentVersion = 36188C1E27FE5722008EC7CD /* Inventory.xcdatamodel */;
+			currentVersion = 3678807A28AE06C80027CCE9 /* Inventory 1.1.xcdatamodel */;
 			path = Inventory.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

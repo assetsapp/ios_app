@@ -46,10 +46,14 @@ struct InventorySessionSubview: View {
                                 }
                                 NavigationLink(destination: InventoryView(cslvalues: cslvalues, locationPath: locationPath, location: session.locationId, inventorySession: session.sessionId, inventoryName: session.name, isExistingSession: true)) {
                                     InventorySessionItemSubview(session: session)
+                                    EmptyView()
                                 }
                             } else {
                                 Button(action: { reopenSessionModal.toggle() }) {
                                     VStack {
+                                        NavigationLink(destination: EmptyView()) {
+                                            EmptyView()
+                                        }
                                         InventorySessionItemSubview(session: session)
                                         NavigationLink(destination: InventoryView(cslvalues: cslvalues, locationPath: locationPath, location: session.locationId, inventorySession: session.sessionId, inventoryName: session.name, isExistingSession: true), isActive: $navigateToInventory) {
                                             EmptyView()
@@ -86,10 +90,12 @@ struct InventorySessionSubview: View {
                     case .failure(let error):
                         print(error.localizedDescription)
                     }
-                    cslvalues.isLoading = false
+                    DispatchQueue.main.async {
+                        cslvalues.isLoading = false
+                    }
                 }
             case .offline:
-                DataManager().getInventories { result in
+                DataManager().getInventories(locationId: location?._id ?? "") { result in
                     switch result {
                     case .success(let inventorySessions):
                         self.apiInventorySessions = inventorySessions
@@ -101,6 +107,7 @@ struct InventorySessionSubview: View {
             }
             isClosedSessionsFilter = false
         }
+        .navigationViewStyle(.stack)
     }
     
     func getFilteredSessions() -> [InventoryDataModel] {

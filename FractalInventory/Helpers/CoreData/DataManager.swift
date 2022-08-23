@@ -25,6 +25,7 @@ class DataManager: ObservableObject {
         container.viewContext.retainsRegisteredObjects = true
         for item in assets {
             let asset = Asset(context: container.viewContext)
+            print("Guardando serial: \(item.serial ?? "nil")")
             asset.name = item.name
             asset.brand = item.brand
             asset.model = item.model
@@ -56,11 +57,12 @@ class DataManager: ObservableObject {
             asset.notes  = item.notes
             asset.labelingDate  = item.labeling_date
             asset.price  = item.price
-            asset.image = nil // TODO: Descargar imagen por imagen
+            asset.image = nil // TODO: Descargar imagen por imagen 2455
         }
         
         do {
             try container.viewContext.save()
+            print("save assets succes \(assets.count)")
             completion(.success(assets))
         } catch {
             completion(.failure(error))
@@ -124,12 +126,33 @@ class DataManager: ObservableObject {
     }
     
     func save(employees: [EmployeeModel], completion: @escaping(Result<[EmployeeModel],Error>) -> Void) {
+        var test: [Employee] = []
         for item in employees {
             let employee = Employee(context: container.viewContext)
-            employee.identifier = item._id
+            employee.identifier = item.employee_id
             employee.name = item.name
             employee.lastName = item.lastName
             employee.email = item.email
+            
+            if let assets = item.assetsAssigned {
+                for asset in assets {
+                    if let assetId = asset.id {
+                        let assetRequest = Asset.fetchRequest()
+                        assetRequest.predicate = NSPredicate(format: "identifier == %@", assetId)
+                        do {
+                            let assetResult = try container.viewContext.fetch(assetRequest)
+                            if let oneAsset = assetResult.first {
+                                employee.addToAssets(oneAsset)
+                                try container.viewContext.save()
+                                print("Se agrega asset: \(oneAsset.id) a empleado \(item._id)")
+                            }
+                        } catch {
+                            print("NO SE PUDO AGREGAR EL ASSET Al EMPLEADO: ", error.localizedDescription)
+                        }
+                    }
+                }
+            }
+            test.append(employee)
         }
         
         do {
@@ -153,6 +176,45 @@ class DataManager: ObservableObject {
         do {
             try container.viewContext.save()
             completion(.success(employee))
+        } catch {
+            completion(.failure(error))
+        }
+    }
+    
+    func assign(assetId: String, to employeeId: String, replace oldEmployeeId: String?, completion: @escaping(Result<String, Error>) -> Void) {
+        
+        do {
+            let assetRequest = Asset.fetchRequest()
+            assetRequest.predicate = NSPredicate(format: "identifier IN %@", assetId)
+            assetRequest.returnsObjectsAsFaults = false
+            let assetsResult = try container.viewContext.fetch(assetRequest)
+            guard let assetResult = assetsResult.first else {completion(.failure(WMError.failedFetchAssets)); return }
+            
+            let employeeRequest = Employee.fetchRequest()
+            employeeRequest.returnsObjectsAsFaults = false
+            employeeRequest.predicate = NSPredicate(format: "identifier IN %@", employeeId)
+            let employeesResult = try container.viewContext.fetch(employeeRequest)
+            guard let employeeResult = employeesResult.first else {completion(.failure(WMError.failedFetchEmployees)); return }
+            
+            if let oldEmployeeId = oldEmployeeId {
+                let oldEmployeeRequest = Employee.fetchRequest()
+                oldEmployeeRequest.returnsObjectsAsFaults = false
+                oldEmployeeRequest.predicate = NSPredicate(format: "identifier IN %@", oldEmployeeId)
+                let oldEmployeesResult = try container.viewContext.fetch(oldEmployeeRequest)
+                if let oldEmployee = oldEmployeesResult.first {
+                    oldEmployee.removeFromAssets(assetResult)
+                    oldEmployee.beenUpdated = true
+                    assetResult.originalAssigned = oldEmployeeId
+                }
+            }
+            
+            assetResult.assignedTo = "\(employeeResult.name ?? "") \(employeeResult.lastName ?? "") <\(employeeResult.email ?? "")>"
+            assetResult.assigned = employeeId
+            assetResult.beenUpdated = true
+            employeeResult.addToAssets(assetResult)
+            employeeResult.beenUpdated = true
+            try container.viewContext.save()
+            completion(.success(employeeId))
         } catch {
             completion(.failure(error))
         }
@@ -252,6 +314,23 @@ class DataManager: ObservableObject {
         }
     }
     
+    func getEmployeesToUpdate(completion:  @escaping(Result<[EmployeeModel], Error>) -> Void) {
+        let request = Employee.fetchRequest()
+        request.predicate = NSPredicate(format: "beenCreated == NO")
+        request.predicate = NSPredicate(format: "beenUpdated == YES")
+        request.returnsObjectsAsFaults = false
+        do {
+            let result = try container.viewContext.fetch(request)
+            var employees: [EmployeeModel] = []
+            for data in result {
+                employees.append(EmployeeModel(from: data))
+            }
+            completion(.success(employees))
+        } catch {
+            completion(.failure(error))
+        }
+    }
+    
     func getEmployeeProfiles(completion:  @escaping(Result<[EmployeeProfileModel], Error>) -> Void) {
         let request = EmployeeProfile.fetchRequest()
         request.returnsObjectsAsFaults = false
@@ -324,7 +403,6 @@ class DataManager: ObservableObject {
     
     func getAssetsToUpdate(completion:  @escaping(Result<[Asset],Error>) -> Void) {
         let request = Asset.fetchRequest()
-        //        beenUpdated
         request.predicate = NSPredicate(format: "beenCreated == NO") 
         request.predicate = NSPredicate(format: "beenUpdated == YES")
         request.returnsObjectsAsFaults = false
@@ -407,7 +485,7 @@ class DataManager: ObservableObject {
     
     func update(asset id: String, epc: String, serialNumber: String, image: Data?, completion:  @escaping(Result<Asset?, Error>) -> Void) {
         let request = Asset.fetchRequest()
-        request.predicate = NSPredicate(format: "identifier IN %@", id)
+        request.predicate = NSPredicate(format: "identifier == %@", id)
         request.returnsObjectsAsFaults = false
         do {
             let result = try container.viewContext.fetch(request)
@@ -426,7 +504,7 @@ class DataManager: ObservableObject {
     
     func getAsset(EPC: String, completion:  @escaping(Result<RealAssetModel?, Error>) -> Void) {
         let request = Asset.fetchRequest()
-        request.predicate = NSPredicate(format: "epc IN %@", EPC)
+        request.predicate = NSPredicate(format: "epc == %@", EPC)
         request.returnsObjectsAsFaults = false
         do {
             let result = try container.viewContext.fetch(request)
@@ -458,10 +536,10 @@ class DataManager: ObservableObject {
             NSPredicate(format: "location CONTAINS[c] %@ ", searchText),
             NSPredicate(format: "name CONTAINS[c] %@ ", searchText),
             NSPredicate(format: "identifier CONTAINS[c] %@ ", searchText),
-            NSPredicate(format: "identifier CONTAINS[c] %@ ", searchText),
             NSPredicate(format: "creationDate CONTAINS[c] %@ ", searchText),
             NSPredicate(format: "responsible CONTAINS[c] %@ ", searchText),
             NSPredicate(format: "notes CONTAINS[c] %@ ", searchText),
+            NSPredicate(format: "serial CONTAINS[c] %@ ", searchText),
             NSPredicate(format: "model CONTAINS[c] %@ ", searchText)
         ]
         request.predicate = NSCompoundPredicate(type: .or, subpredicates: predicates)
@@ -490,6 +568,21 @@ class DataManager: ObservableObject {
         }
     }
     
+    func getInventories(locationId: String, completion:  @escaping(Result<[InventoryDataModel], Error>) -> Void) {
+        let request = InventorySession.fetchRequest()
+        if !locationId.isEmpty {
+            request.predicate = NSPredicate(format: "locationId == %@", locationId)
+        }
+        request.returnsObjectsAsFaults = false
+        do {
+            let result = try container.viewContext.fetch(request)
+            let resultData = result.map({ InventoryDataModel(inventorySession: $0)})
+            completion(.success(resultData))
+        } catch {
+            completion(.failure(error))
+        }
+    }
+    
     func updateInventory(by id: String, status: String, completion:  @escaping(Result<InventoryDataModel, Error>) -> Void) {
         let request = InventorySession.fetchRequest()
         request.predicate = NSPredicate(format: "identifier == %@", id)
@@ -508,7 +601,6 @@ class DataManager: ObservableObject {
             completion(.failure(error))
         }
     }
-    
     
     func getInventorySession(by id: String, completion:  @escaping(Result<InventoryDataModel, Error>) -> Void) {
         let request = InventorySession.fetchRequest()

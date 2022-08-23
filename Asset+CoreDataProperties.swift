@@ -2,7 +2,7 @@
 //  Asset+CoreDataProperties.swift
 //  FractalInventory
 //
-//  Created by Jonathan Saldivar on 29/07/22.
+//  Created by Jonathan Saldivar on 18/08/22.
 //
 //
 
@@ -18,6 +18,8 @@ extension Asset {
 
     @NSManaged public var assigned: String?
     @NSManaged public var assignedTo: String?
+    @NSManaged public var beenCreated: Bool
+    @NSManaged public var beenUpdated: Bool
     @NSManaged public var brand: String?
     @NSManaged public var creationDate: String?
     @NSManaged public var creator: String?
@@ -48,9 +50,7 @@ extension Asset {
     @NSManaged public var tabs: [[String: Any]]?
     @NSManaged public var totalPrice: String?
     @NSManaged public var updateDate: String?
-    @NSManaged public var beenCreated: Bool
-    @NSManaged public var beenUpdated: Bool
-
+    @NSManaged public var originalAssigned: String?
 }
 
 extension Asset : Identifiable {
