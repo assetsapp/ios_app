@@ -143,9 +143,9 @@ class DataManager: ObservableObject {
                             let assetResult = try container.viewContext.fetch(assetRequest)
                             if let oneAsset = assetResult.first {
                                 employee.addToAssets(oneAsset)
-                                try container.viewContext.save()
                                 print("Se agrega asset: \(oneAsset.id) a empleado \(item._id)")
                             }
+                            try container.viewContext.save()
                         } catch {
                             print("NO SE PUDO AGREGAR EL ASSET Al EMPLEADO: ", error.localizedDescription)
                         }
