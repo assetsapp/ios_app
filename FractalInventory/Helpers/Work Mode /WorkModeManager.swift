@@ -685,11 +685,10 @@ extension WorkModeManager {
         let params = self.convertUpdate(asset: asset)
         ApiFile().postImage(image: image, _id: asset.identifier ?? "") { result in
             switch result {
-            case .success(let uploadFile):
+            case .success(_ ):
                 print("Actualizo imagen de asset")
                 let fileparams: [String: Any] = [
-                    "filename": uploadFile.filename,
-                    "path": uploadFile.path
+                    "fileExt": "jpeg"
                 ]
                 let fileassetsparams = params.merging(fileparams) { (_, new) in new }
                 ApiAssets().updateAsset(assetId: asset.identifier ?? "", params: fileassetsparams) {
