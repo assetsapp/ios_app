@@ -90,18 +90,26 @@ struct NewEmployee: View {
             cslvalues.isLoading = true
             switch workModeManager.workMode {
             case .online:
-                ApiEmployees().getEmployeeProfiles { profiles in
-                    if profiles.count > 0 {
-                        selectedProfileName = profiles[0].name
-                        for profile in profiles {
-                            profileIds.append(profile._id)
-                            profileNames.append(profile.name)
+                ApiEmployees().getEmployeeProfiles { result in
+                    switch result {
+                    case .success(let profiles):
+                        if profiles.count > 0 {
+                            selectedProfileName = profiles[0].name
+                            for profile in profiles {
+                                profileIds.append(profile._id)
+                                profileNames.append(profile.name)
+                            }
+                        } else {
+                            alertMessage = "There are no Employee Profiles. Please, first create at least one"
+                            closeModal = true
+                            showAlert = true
                         }
-                    } else {
+                    case .failure(_ ):
                         alertMessage = "There are no Employee Profiles. Please, first create at least one"
                         closeModal = true
                         showAlert = true
                     }
+                    
                     cslvalues.isLoading = false
                 }
             case .offline:
@@ -168,7 +176,7 @@ struct NewEmployee: View {
             "employeeProfile": selectedProfile,
             "assetsAssigned": []
         ]
-        ApiEmployees().postEmployee(params: params) {
+        ApiEmployees().postEmployee(params: params) { _ in
             cslvalues.isLoading = false
             showModal.toggle()
         }

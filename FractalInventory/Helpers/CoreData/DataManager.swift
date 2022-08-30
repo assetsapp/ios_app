@@ -185,21 +185,21 @@ class DataManager: ObservableObject {
         
         do {
             let assetRequest = Asset.fetchRequest()
-            assetRequest.predicate = NSPredicate(format: "identifier IN %@", assetId)
+            assetRequest.predicate = NSPredicate(format: "identifier == %@", assetId)
             assetRequest.returnsObjectsAsFaults = false
             let assetsResult = try container.viewContext.fetch(assetRequest)
             guard let assetResult = assetsResult.first else {completion(.failure(WMError.failedFetchAssets)); return }
             
             let employeeRequest = Employee.fetchRequest()
             employeeRequest.returnsObjectsAsFaults = false
-            employeeRequest.predicate = NSPredicate(format: "identifier IN %@", employeeId)
+            employeeRequest.predicate = NSPredicate(format: "identifier == %@", employeeId)
             let employeesResult = try container.viewContext.fetch(employeeRequest)
             guard let employeeResult = employeesResult.first else {completion(.failure(WMError.failedFetchEmployees)); return }
             
             if let oldEmployeeId = oldEmployeeId {
                 let oldEmployeeRequest = Employee.fetchRequest()
                 oldEmployeeRequest.returnsObjectsAsFaults = false
-                oldEmployeeRequest.predicate = NSPredicate(format: "identifier IN %@", oldEmployeeId)
+                oldEmployeeRequest.predicate = NSPredicate(format: "identifier == %@", oldEmployeeId)
                 let oldEmployeesResult = try container.viewContext.fetch(oldEmployeeRequest)
                 if let oldEmployee = oldEmployeesResult.first {
                     oldEmployee.removeFromAssets(assetResult)

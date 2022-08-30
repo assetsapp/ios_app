@@ -71,7 +71,7 @@ class WorkModeManager {
             case .success(_ ):
                 break
             case .failure(_ ):
-                errors.append(WMError.employeesCouldNotBeDownloaded)
+                errors.append(WMError.employeeProfilesCouldNotBeDownloaded)
             }
             dispatchGroup.leave()
         }
@@ -152,6 +152,7 @@ class WorkModeManager {
     func startOnlineMode(completion: @escaping(Result<(workMode: WorkMode, savedAssets: [Asset]), WMError>) -> Void) {
         let dispatchGroup = DispatchGroup()
         var savedAssets: [Asset] = []
+        var savedEmployees: [EmployeeModel] = []
         var errors: [WMError] = []
         
         dispatchGroup.enter()
@@ -213,8 +214,9 @@ class WorkModeManager {
             case .success(let employees):
                 self.starSync(employees: employees) { result in
                     switch result {
-                    case .success(let savedEmployees):
-                        print("Termino de actualizar los Empleados:", savedEmployees.count)
+                    case .success(let _savedEmployees):
+                        print("Termino de actualizar los Empleados:", _savedEmployees.count)
+                        savedEmployees = _savedEmployees
                     case .failure(let error):
                         switch error {
                         case .failedToSyncEmployees(_ , let savedEmployee):
@@ -274,6 +276,7 @@ class WorkModeManager {
                         default:
                             break
                         }
+                        errors.append(error)
                     }
                     dispatchGroup.leave()
                 }
@@ -284,8 +287,8 @@ class WorkModeManager {
         }
         
         dispatchGroup.notify(queue: .main) {
-            self.deleteAllData()
             if errors.isEmpty {
+                self.deleteAllData()
                 self.workMode = .online
                 completion(.success((workMode: self.workMode , savedAssets: savedAssets)))
             } else {
@@ -365,8 +368,13 @@ extension WorkModeManager {
     }
     
     private func fetchEmployeProfiles(completion: @escaping(Result<[EmployeeProfileModel],Error>) -> Void) {
-        ApiEmployees().getEmployeeProfiles { profiles in
-            DataManager().save(employeeProfiles: profiles, completion: completion)
+        ApiEmployees().getEmployeeProfiles { result in
+            switch result {
+            case.failure(let error):
+                completion(.failure(error))
+            case .success(let profiles):
+                DataManager().save(employeeProfiles: profiles, completion: completion)
+            }
         }
     }
     
@@ -500,7 +508,7 @@ extension WorkModeManager {
                 var assets: [Asset] = []
                 for error in errors {
                     switch error{
-                    case .failedToSync(let asset):
+                    case .failedToUpdate(let asset):
                         assets.append(asset)
                     default:
                         break
@@ -627,26 +635,41 @@ extension WorkModeManager {
     }
     
     private func sync(employee: EmployeeModel, completion: @escaping(Result<EmployeeModel, Error>) -> Void) {
-        ApiEmployees().postEmployee(params: convert(employee: employee)) {
-            completion(.success(employee))
+        ApiEmployees().postEmployee(params: convert(employee: employee)) { result in
+            switch result {
+            case .success(_ ):
+                completion(.success(employee))
+            case .failure(let error):
+                completion(.failure(error))
+            }
         }
     }
     
     private func syncUpdate(employee: EmployeeModel, completion: @escaping(Result<EmployeeModel, Error>) -> Void) {
         let asset = employee.assetsAssigned?.first
         let assetId = asset?.id ?? ""
-        ApiAssets().assignEmployeeToAsset(assetId: assetId, employee: employee) {
-            let params: [String: Any] = [
-                "id": asset?.id ?? "",
-                "name": asset?.name ?? "",
-                "brand": asset?.brand ?? "",
-                "model": asset?.model ?? "",
-                "EPC": asset?.EPC ?? "",
-                "serial": asset?.serial ?? "",
-                "oldEmployeeId": asset?.originalAssigned ?? ""
-            ]
-            ApiEmployees().assignAssetToEmployee(params: params, employeeId: employee._id) {
-                completion(.success(employee))
+        ApiAssets().assignEmployeeToAsset(assetId: assetId, employee: employee) { result in
+            switch result {
+            case .failure(let error):
+                completion(.failure(error))
+            case .success(_ ):
+                let params: [String: Any] = [
+                    "id": asset?.id ?? "",
+                    "name": asset?.name ?? "",
+                    "brand": asset?.brand ?? "",
+                    "model": asset?.model ?? "",
+                    "EPC": asset?.EPC ?? "",
+                    "serial": asset?.serial ?? "",
+                    "oldEmployeeId": asset?.originalAssigned ?? ""
+                ]
+                ApiEmployees().assignAssetToEmployee(params: params, employeeId: employee._id) { result in
+                    switch result {
+                    case .success(_ ):
+                        completion(.success(employee))
+                    case .failure(let error):
+                        completion(.failure(error))
+                    }
+                }
             }
         }
     }
@@ -654,7 +677,12 @@ extension WorkModeManager {
     private func sync(inventorySession: InventorySession, completion: @escaping(Result<InventorySession, Error>) -> Void) {
         let type = InventoryType(rawValue: inventorySession.type ?? "") ?? .root
         ApiAssets().getInventoryAssets(location: inventorySession.locationId ?? "", locationName: inventorySession.locationName ?? "", sessionId: inventorySession.sessionId ?? "", inventoryName: inventorySession.name ?? "", type: type) { result in
-            completion(.success(inventorySession))
+            switch result {
+            case .success(_ ):
+                completion(.success(inventorySession))
+            case .failure(let error):
+                completion(.failure(error))
+            }
         }
     }
     
@@ -676,13 +704,19 @@ extension WorkModeManager {
     }
     
     private func syncUpdate(asset: Asset, completion: @escaping(Result<[SavedAsset], Error>) -> Void) {
-        ApiAssets().updateAsset(assetId: asset.identifier ?? "", params: convertUpdate(asset: asset)) {
-            completion(.success([SavedAsset(_id: asset.identifier ?? "", EPC: asset.epc ?? "")]))
+        ApiAssets().updateAsset(assetId: asset.identifier ?? "", params: convertUpdate(asset: asset)) { result in
+            switch result {
+            case .success(_ ):
+                completion(.success([SavedAsset(_id: asset.identifier ?? "", EPC: asset.epc ?? "")]))
+            case .failure(let error):
+                completion(.failure(error))
+            }
         }
     }
     
     private func syncUpdate(image: UIImage, asset: Asset, completion: @escaping(Result<[SavedAsset], Error>) -> Void) {
         let params = self.convertUpdate(asset: asset)
+        let assetId = asset.identifier ?? ""
         ApiFile().postImage(image: image, _id: asset.identifier ?? "") { result in
             switch result {
             case .success(_ ):
@@ -691,8 +725,13 @@ extension WorkModeManager {
                     "fileExt": "jpeg"
                 ]
                 let fileassetsparams = params.merging(fileparams) { (_, new) in new }
-                ApiAssets().updateAsset(assetId: asset.identifier ?? "", params: fileassetsparams) {
-                    completion(.success([SavedAsset(_id: asset.identifier ?? "", EPC: asset.epc ?? "")]))
+                ApiAssets().updateAsset(assetId: assetId, params: fileassetsparams) { result in
+                    switch result {
+                    case .success(_ ):
+                        completion(.success([SavedAsset(_id: asset.identifier ?? "", EPC: asset.epc ?? "")]))
+                    case .failure(let error):
+                        completion(.failure(error))
+                    }
                 }
             case .failure(let error):
                 completion(.failure(error))

@@ -160,7 +160,7 @@ struct SearchView: View {
     
     func assignAssetToEmployeeOnline() {
         cslvalues.isLoading = true
-        ApiAssets().assignEmployeeToAsset(assetId: selectedAsset._id, employee: selectedEmployee) {
+        ApiAssets().assignEmployeeToAsset(assetId: selectedAsset._id, employee: selectedEmployee) { result in
             let params: [String: Any] = [
                 "id": selectedAsset._id,
                 "name": selectedAsset.name,
@@ -170,7 +170,7 @@ struct SearchView: View {
                 "serial": selectedAsset.serial ?? "",
                 "oldEmployeeId": oldEmployeeId
             ]
-            ApiEmployees().assignAssetToEmployee(params: params, employeeId: selectedEmployee._id) {
+            ApiEmployees().assignAssetToEmployee(params: params, employeeId: selectedEmployee._id) { _ in
                 cslvalues.isLoading = false
                 let newAssetAssigned = AssetsAssigned(id: selectedAsset._id, name: selectedAsset.name, brand: selectedAsset.brand, model: selectedAsset.model, assigned: true, serial: selectedAsset.serial, EPC: selectedAsset.EPC, creationDate: "")
                 selectedEmployee.assetsAssigned?.append(newAssetAssigned)

@@ -40,7 +40,7 @@ extension WMError: CustomStringConvertible {
         case .synchronizationFailure(let errors):
             var message = ""
             for error in errors {
-                message += error.localizedDescription + "\n"
+                message += error.description + "\n"
             }
             return message
         case .locationsCouldNotBeDownloaded:

@@ -197,7 +197,7 @@ class ApiAssets {
     @AppStorage(Settings.apiDBKey) var apiDB = "notes-db-app"
     @AppStorage(Settings.userTokenKey) var token = ""
     
-    func getInventoryAssets(location: String, locationName: String, sessionId: String, inventoryName: String, type: InventoryType, completion: @escaping([AssetModel]) -> ()) {
+    func getInventoryAssets(location: String, locationName: String, sessionId: String, inventoryName: String, type: InventoryType, completion: @escaping(Result<[AssetModel], Error>) -> Void) {
         var urlComponent = URLComponents(string: "\(apiHost)/api/v1/app/\(apiDB)/assets/inventory/")!
         
         print("location: \(location)\nlocationName: \(locationName)\nsessionId: \(sessionId)\ninventoryName: \(inventoryName)\ntype: \(type)")
@@ -216,13 +216,19 @@ class ApiAssets {
         request.timeoutInterval = 999.0
         
         URLSession.shared.dataTask(with: request) { data, response, error in
-            guard let data = data else {
-                completion([])
-                return
-            }
-            let assets = try! JSONDecoder().decode(AssetsApiModel.self, from: data)
-            DispatchQueue.main.async {
-                completion(assets.response)
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                guard let data = data else {
+                    completion(.failure(WMError.inventoriesCouldNotBeDownloaded))
+                    return
+                }
+                do {
+                    let assets = try JSONDecoder().decode(AssetsApiModel.self, from: data)
+                    completion(.success(assets.response))
+                } catch {
+                    completion(.failure(error))
+                }
             }
         }.resume()
     }
@@ -400,7 +406,7 @@ class ApiAssets {
         }.resume()
     }
     
-    func updateAsset(assetId: String, params: [String: Any], completion: @escaping() -> ()) {
+    func updateAsset(assetId: String, params: [String: Any], completion: @escaping(Result<String, Error>) -> Void) {
         let urlComponent = URLComponents(string: "\(apiHost)/api/v1/\(apiDB)/assets/\(assetId)")!
         let jsonData = try? JSONSerialization.data(withJSONObject: params)
         var request = URLRequest(url: urlComponent.url!)
@@ -411,14 +417,16 @@ class ApiAssets {
         request.httpBody = jsonData
         
         URLSession.shared.dataTask(with: request) { data, response, error in
-            print("Actualizo Asset, error: \(error?.localizedDescription)")
-            DispatchQueue.main.async {
-                completion()
+            print("Actualizo Asset, error: \(error?.localizedDescription ?? "nilll")")
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success(assetId))
             }
         }.resume()
     }
     
-    func assignEmployeeToAsset(assetId: String, employee: EmployeeModel, completion: @escaping() -> ()) {
+    func assignEmployeeToAsset(assetId: String, employee: EmployeeModel, completion: @escaping(Result<String, Error>) -> Void) {
         let urlComponent = URLComponents(string: "\(apiHost)/api/v1/\(apiDB)/assets/\(assetId)")!
         let params: [String: Any] = [
             "assigned": employee._id,
@@ -432,8 +440,10 @@ class ApiAssets {
         request.httpBody = jsonData
         
         URLSession.shared.dataTask(with: request) { data, response, error in
-            DispatchQueue.main.async {
-                completion()
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success(assetId))
             }
         }.resume()
     }

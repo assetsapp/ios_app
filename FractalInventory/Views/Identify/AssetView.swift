@@ -131,7 +131,7 @@ struct AssetView: View {
         
         if !isNewImageSelected {
             cslvalues.isLoading = true
-            ApiAssets().updateAsset(assetId: asset._id, params: params) {
+            ApiAssets().updateAsset(assetId: asset._id, params: params) { result in
                 if modifiedCustomFields.count > 0 {
                     ApiReferences().updateCustomFields(id: asset._id, updatedCustomFields: modifiedCustomFields) {
                         showUpdateModal.toggle()
@@ -149,7 +149,7 @@ struct AssetView: View {
                     "fileExt": "jpeg"
                 ]
                 let fileassetsparams = params.merging(fileparams) { (_, new) in new }
-                ApiAssets().updateAsset(assetId: asset._id, params: fileassetsparams) {
+                ApiAssets().updateAsset(assetId: asset._id, params: fileassetsparams) { result in
                     if modifiedCustomFields.count > 0 {
                         ApiReferences().updateCustomFields(id: asset._id, updatedCustomFields: modifiedCustomFields) {
                             showUpdateModal.toggle()

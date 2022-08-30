@@ -316,8 +316,13 @@ struct InventoryView: View {
         cslvalues.isLoading = true
         switch workModeManager.workMode {
         case .online:
-            ApiAssets().getInventoryAssets(location: location, locationName: locationName, sessionId: inventorySession, inventoryName: inventoryName, type: type) { _assets in
-                self.assets = _assets
+            ApiAssets().getInventoryAssets(location: location, locationName: locationName, sessionId: inventorySession, inventoryName: inventoryName, type: type) { result in
+                switch result {
+                case .success(let _assets):
+                    self.assets = _assets
+                case .failure(_ ):
+                    break
+                }
                 cslvalues.isLoading = false
             }
         case .offline:
