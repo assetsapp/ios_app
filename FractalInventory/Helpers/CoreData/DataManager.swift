@@ -708,7 +708,9 @@ class DataManager: ObservableObject {
         do {
             let result = try container.viewContext.fetch(request)
             for assetResult in result {
+                print("Agregando asst \(assetResult.identifier) a session")
                 inventorySession.addToAssets(assetResult)
+                try container.viewContext.save()
             }
             
             try container.viewContext.save()

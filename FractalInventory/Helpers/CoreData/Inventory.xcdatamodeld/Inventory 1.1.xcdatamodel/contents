@@ -36,6 +36,7 @@
         <attribute name="tabs" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[[String: Any]]"/>
         <attribute name="totalPrice" optional="YES" attributeType="String"/>
         <attribute name="updateDate" optional="YES" attributeType="String"/>
+        <relationship name="inventorySession" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="InventorySession" inverseName="assets" inverseEntity="InventorySession"/>
     </entity>
     <entity name="Employee" representedClassName="Employee" syncable="YES">
         <attribute name="beenCreated" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
@@ -63,7 +64,7 @@
         <attribute name="sessionId" optional="YES" attributeType="String"/>
         <attribute name="status" optional="YES" attributeType="String"/>
         <attribute name="type" optional="YES" attributeType="String"/>
-        <relationship name="assets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Asset"/>
+        <relationship name="assets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Asset" inverseName="inventorySession" inverseEntity="Asset"/>
     </entity>
     <entity name="Location" representedClassName="Location" syncable="YES">
         <attribute name="assetsCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
@@ -82,7 +83,7 @@
         <attribute name="name" optional="YES" attributeType="String"/>
     </entity>
     <elements>
-        <element name="Asset" positionX="-45" positionY="54" width="128" height="554"/>
+        <element name="Asset" positionX="-45" positionY="54" width="128" height="569"/>
         <element name="Employee" positionX="-36" positionY="72" width="128" height="164"/>
         <element name="EmployeeProfile" positionX="-45" positionY="144" width="128" height="59"/>
         <element name="InventorySession" positionX="-45" positionY="144" width="128" height="194"/>

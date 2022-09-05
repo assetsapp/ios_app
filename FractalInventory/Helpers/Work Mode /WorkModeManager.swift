@@ -600,6 +600,7 @@ extension WorkModeManager {
         
         for session in inventorySessions {
             dispatchGroup.enter()
+            print("starSync inventorySession: \(session.identifier), count: \(session.assets?.count)")
             sync(inventorySession: session) { result in
                 switch result {
                 case .success(_ ):

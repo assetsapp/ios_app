@@ -142,7 +142,9 @@ struct EmployeeView: View {
                 case .failure(_ ):
                     self.apiEmployees = []
                 }
-                cslvalues.isLoading = false
+                DispatchQueue.main.async {
+                    cslvalues.isLoading = false
+                }
             }
         }
     }
