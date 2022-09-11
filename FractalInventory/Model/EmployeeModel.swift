@@ -22,7 +22,7 @@ struct EmployeeModel: Codable, Hashable {
 extension EmployeeModel {
     init(from employee: Employee) {
         self._id = employee.identifier ?? ""
-        self.employee_id = employee.identifier ?? ""
+        self.employee_id = employee.employeeId ?? ""
         self.name = employee.name ?? ""
         self.lastName = employee.lastName ?? ""
         self.email = employee.email ?? ""
@@ -33,7 +33,7 @@ extension EmployeeModel {
             self.assetsAssigned = assetsData.map({ AssetsAssigned(asset: $0)})
         }
     }
-}
+}   
 
 struct AssetsAssigned: Codable, Hashable {
     var id: String? = ""
@@ -182,8 +182,8 @@ class ApiEmployees {
         request.httpBody = jsonData
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
+                print("ERROR postEmployee: \(error.localizedDescription)")
                 completion(.failure(error))
-                return
             } else {
                 completion(.success(true))
             }

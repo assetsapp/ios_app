@@ -20,6 +20,7 @@ extension Employee {
     @NSManaged public var beenCreated: Bool
     @NSManaged public var email: String?
     @NSManaged public var identifier: String?
+    @NSManaged public var employeeId: String?
     @NSManaged public var lastName: String?
     @NSManaged public var name: String?
     @NSManaged public var profileId: String?

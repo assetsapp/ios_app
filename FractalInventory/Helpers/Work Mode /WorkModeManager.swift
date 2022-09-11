@@ -152,7 +152,6 @@ class WorkModeManager {
     func startOnlineMode(completion: @escaping(Result<(workMode: WorkMode, savedAssets: [Asset]), WMError>) -> Void) {
         let dispatchGroup = DispatchGroup()
         var savedAssets: [Asset] = []
-        var savedEmployees: [EmployeeModel] = []
         var errors: [WMError] = []
         
         dispatchGroup.enter()
@@ -207,6 +206,16 @@ class WorkModeManager {
             }
         }
         
+        dispatchGroup.notify(queue: .main) {
+            self.continueStartOnlineMode(savedAssets, and: errors, completion: completion)
+        }
+    }
+    
+    private func continueStartOnlineMode(_ savedAssets: [Asset], and lastErrors: [WMError] ,completion: @escaping(Result<(workMode: WorkMode, savedAssets: [Asset]), WMError>) -> Void) {
+        let dispatchGroup = DispatchGroup()
+        var errors: [WMError] = lastErrors
+        var savedEmployees: [EmployeeModel] = []
+    
         // empleados
         dispatchGroup.enter()
         DataManager().getEmployeesToSync { result in
@@ -219,7 +228,7 @@ class WorkModeManager {
                         savedEmployees = _savedEmployees
                     case .failure(let error):
                         switch error {
-                        case .failedToSyncEmployees(_ , let savedEmployee):
+                        case .failedToSyncEmployees(_ , _):
                             break
                         default:
                             break
@@ -245,7 +254,7 @@ class WorkModeManager {
                         print("Termino de actualizar los Empleados asignados:", savedEmployees.count)
                     case .failure(let error):
                         switch error {
-                        case .failedToSyncEmployees(_ , let savedEmployee):
+                        case .failedToSyncEmployees(_ , _):
                             break
                         default:
                             break
@@ -271,7 +280,7 @@ class WorkModeManager {
                         print("Termino de actualizar los Inventarios:", savedInventories.count)
                     case .failure(let error):
                         switch error {
-                        case .failedToSyncInventories(_ , let savedInventories):
+                        case .failedToSyncInventories(_ , _):
                             break
                         default:
                             break
@@ -296,7 +305,6 @@ class WorkModeManager {
                 completion(.failure(WMError.synchronizationFailure(errors: errors)))
             }
         }
-        
     }
     
     func getLocations(by id: String, and level: String, completion: @escaping(Result<[LocationModel2],Error>) -> Void) {
@@ -399,7 +407,6 @@ extension WorkModeManager {
             case .failure(let error):
                 completion(.failure(error))
             }
-            
         }
     }
     
@@ -788,6 +795,20 @@ extension WorkModeManager {
         return params
     }
     
+    private func convert(asset: AssetsAssigned) -> [String: Any] {
+        let params: [String: Any] = [
+            "id": asset.id ?? "",
+            "name": asset.name ?? "",
+            "brand": asset.brand ?? "",
+            "model": asset.model ?? "",
+            "assigned": asset.assigned ?? true,
+            "EPC": asset.EPC ?? "",
+            "serial": asset.serial ?? "",
+            "creationDate": asset.creationDate ?? ""
+        ]
+        return params
+    }
+    
     private func convertUpdate(asset: Asset) -> [String: Any] {
         let params: [String: Any] = [
             "serial": asset.serial ?? "",
@@ -797,6 +818,12 @@ extension WorkModeManager {
     }
     
     private func convert(employee: EmployeeModel) -> [String: Any] {
+        var assetsAssigned: [[String: Any]] = []
+        if let assets = employee.assetsAssigned {
+            for asset in assets {
+                assetsAssigned.append(convert(asset: asset))
+            }
+        }
         let selectedProfile: [String:String] = [
             "value": employee.profileId ?? "",
             "label": employee.profileName ?? ""
@@ -807,7 +834,7 @@ extension WorkModeManager {
             "employee_id": employee.employee_id ?? "",
             "email": employee.email,
             "employeeProfile": selectedProfile,
-            "assetsAssigned": []
+            "assetsAssigned": assetsAssigned
         ]
         return params
     }

@@ -54,7 +54,7 @@ struct EmployeeView: View {
                 
                 VStack {
                     LazyVStack {
-                        ForEach(getFilteredEmployees(), id: \.self) { employee in
+                        ForEach(getFilteredEmployees(), id: \._id) { employee in
                             VStack {
                                 Button (action: {
                                     selectedEmployee = employee
@@ -73,7 +73,6 @@ struct EmployeeView: View {
                         }
                     }
                 }
-                
             }
             .padding(.top, 5)
             .navigationBarTitleDisplayMode(.inline)

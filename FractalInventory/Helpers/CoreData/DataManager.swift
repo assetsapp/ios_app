@@ -129,10 +129,12 @@ class DataManager: ObservableObject {
         var test: [Employee] = []
         for item in employees {
             let employee = Employee(context: container.viewContext)
-            employee.identifier = item.employee_id
+            employee.identifier = item._id
             employee.name = item.name
             employee.lastName = item.lastName
             employee.email = item.email
+            employee.profileId = item.profileId
+            employee.employeeId = item.employee_id
             
             if let assets = item.assetsAssigned {
                 for asset in assets {
@@ -142,16 +144,23 @@ class DataManager: ObservableObject {
                         do {
                             let assetResult = try container.viewContext.fetch(assetRequest)
                             if let oneAsset = assetResult.first {
-                                employee.addToAssets(oneAsset)
+                                employee.addToAssets(NSSet(array: assetResult))
                                 print("Se agrega asset: \(oneAsset.id) a empleado \(item._id)")
+                                try container.viewContext.save()
                             }
-                            try container.viewContext.save()
                         } catch {
                             print("NO SE PUDO AGREGAR EL ASSET Al EMPLEADO: ", error.localizedDescription)
                         }
                     }
                 }
             }
+            
+            do {
+                try container.viewContext.save()
+            } catch {
+                print("NO SE PUDO AGREGAR EL ASSET Al EMPLEADO: ", error.localizedDescription)
+            }
+            
             test.append(employee)
         }
         
@@ -285,11 +294,13 @@ class DataManager: ObservableObject {
     
     func getEmployees(completion:  @escaping(Result<[EmployeeModel], Error>) -> Void) {
         let request = Employee.fetchRequest()
-        request.returnsObjectsAsFaults = false
+        request.relationshipKeyPathsForPrefetching = ["assets"]
+        request.returnsObjectsAsFaults = true
         do {
             let result = try container.viewContext.fetch(request)
             var employees: [EmployeeModel] = []
             for data in result {
+                print("Empleado \(data.identifier) assets: \(data.assets?.count)")
                 employees.append(EmployeeModel(from: data))
             }
             completion(.success(employees))
@@ -301,6 +312,7 @@ class DataManager: ObservableObject {
     func getEmployeesToSync(completion:  @escaping(Result<[EmployeeModel], Error>) -> Void) {
         let request = Employee.fetchRequest()
         request.predicate = NSPredicate(format: "beenCreated == YES")
+        request.relationshipKeyPathsForPrefetching = ["assets"]
         request.returnsObjectsAsFaults = false
         do {
             let result = try container.viewContext.fetch(request)
@@ -316,8 +328,8 @@ class DataManager: ObservableObject {
     
     func getEmployeesToUpdate(completion:  @escaping(Result<[EmployeeModel], Error>) -> Void) {
         let request = Employee.fetchRequest()
-        request.predicate = NSPredicate(format: "beenCreated == NO")
-        request.predicate = NSPredicate(format: "beenUpdated == YES")
+        request.predicate = NSPredicate(format: "beenUpdated == YES AND beenCreated == NO")
+        request.relationshipKeyPathsForPrefetching = ["assets"]
         request.returnsObjectsAsFaults = false
         do {
             let result = try container.viewContext.fetch(request)

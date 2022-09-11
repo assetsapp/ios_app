@@ -190,8 +190,8 @@
             filePath = "FractalInventory/Helpers/CoreData/DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "613"
-            endingLineNumber = "613"
+            startingLineNumber = "625"
+            endingLineNumber = "625"
             landmarkName = "getInventorySession(by:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -206,8 +206,8 @@
             filePath = "FractalInventory/Helpers/CoreData/DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "615"
-            endingLineNumber = "615"
+            startingLineNumber = "627"
+            endingLineNumber = "627"
             landmarkName = "getInventorySession(by:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -222,8 +222,8 @@
             filePath = "FractalInventory/Helpers/CoreData/DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "618"
-            endingLineNumber = "618"
+            startingLineNumber = "630"
+            endingLineNumber = "630"
             landmarkName = "getInventorySession(by:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -430,8 +430,8 @@
             filePath = "FractalInventory/Helpers/CoreData/DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "180"
-            endingLineNumber = "180"
+            startingLineNumber = "189"
+            endingLineNumber = "189"
             landmarkName = "save(employee:profileId:profileName:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -446,8 +446,8 @@
             filePath = "FractalInventory/Helpers/CoreData/DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "178"
-            endingLineNumber = "178"
+            startingLineNumber = "187"
+            endingLineNumber = "187"
             landmarkName = "save(employee:profileId:profileName:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -494,25 +494,9 @@
             filePath = "FractalInventory/Views/Employees/EmployeeView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "141"
-            endingLineNumber = "141"
+            startingLineNumber = "140"
+            endingLineNumber = "140"
             landmarkName = "onAppearLoad()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "7A9BF0FA-C022-43C5-B294-75D47C29D147"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FractalInventory/Helpers/Work Mode /WorkModeManager.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "296"
-            endingLineNumber = "296"
-            landmarkName = "startOnlineMode(completion:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -654,8 +638,8 @@
             filePath = "FractalInventory/Helpers/CoreData/DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "498"
-            endingLineNumber = "498"
+            startingLineNumber = "510"
+            endingLineNumber = "510"
             landmarkName = "update(asset:epc:serialNumber:image:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -670,8 +654,8 @@
             filePath = "FractalInventory/Helpers/CoreData/DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "501"
-            endingLineNumber = "501"
+            startingLineNumber = "513"
+            endingLineNumber = "513"
             landmarkName = "update(asset:epc:serialNumber:image:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -808,7 +792,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "95E00BAD-3943-4380-9B67-039225F50EC2"
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FractalInventory/Model/EmployeeModel.swift"
@@ -824,14 +808,14 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "B636CD36-1CEB-4C5C-87CC-DB43B14850ED"
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FractalInventory/Helpers/CoreData/DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "295"
-            endingLineNumber = "295"
+            startingLineNumber = "306"
+            endingLineNumber = "306"
             landmarkName = "getEmployees(completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -846,8 +830,8 @@
             filePath = "FractalInventory/Helpers/CoreData/DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "139"
-            endingLineNumber = "139"
+            startingLineNumber = "141"
+            endingLineNumber = "141"
             landmarkName = "save(employees:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -862,8 +846,8 @@
             filePath = "FractalInventory/Helpers/CoreData/DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "145"
-            endingLineNumber = "145"
+            startingLineNumber = "147"
+            endingLineNumber = "147"
             landmarkName = "save(employees:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -910,8 +894,8 @@
             filePath = "FractalInventory/Helpers/CoreData/DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "159"
-            endingLineNumber = "159"
+            startingLineNumber = "168"
+            endingLineNumber = "168"
             landmarkName = "save(employees:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -926,8 +910,8 @@
             filePath = "FractalInventory/Helpers/CoreData/DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "160"
-            endingLineNumber = "160"
+            startingLineNumber = "169"
+            endingLineNumber = "169"
             landmarkName = "save(employees:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -942,8 +926,8 @@
             filePath = "FractalInventory/Helpers/Work Mode /WorkModeManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "494"
-            endingLineNumber = "494"
+            startingLineNumber = "501"
+            endingLineNumber = "501"
             landmarkName = "starUpdate(assets:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -958,8 +942,8 @@
             filePath = "FractalInventory/Helpers/Work Mode /WorkModeManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "496"
-            endingLineNumber = "496"
+            startingLineNumber = "503"
+            endingLineNumber = "503"
             landmarkName = "starUpdate(assets:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -974,8 +958,8 @@
             filePath = "FractalInventory/Helpers/Work Mode /WorkModeManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "482"
-            endingLineNumber = "482"
+            startingLineNumber = "489"
+            endingLineNumber = "489"
             landmarkName = "starUpdate(assets:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -990,8 +974,8 @@
             filePath = "FractalInventory/Helpers/Work Mode /WorkModeManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "485"
-            endingLineNumber = "485"
+            startingLineNumber = "492"
+            endingLineNumber = "492"
             landmarkName = "starUpdate(assets:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1054,8 +1038,8 @@
             filePath = "FractalInventory/Helpers/Work Mode /WorkModeManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "729"
-            endingLineNumber = "729"
+            startingLineNumber = "736"
+            endingLineNumber = "736"
             landmarkName = "syncUpdate(image:asset:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1070,8 +1054,8 @@
             filePath = "FractalInventory/Helpers/Work Mode /WorkModeManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "721"
-            endingLineNumber = "721"
+            startingLineNumber = "728"
+            endingLineNumber = "728"
             landmarkName = "syncUpdate(image:asset:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1102,8 +1086,8 @@
             filePath = "FractalInventory/Helpers/Work Mode /WorkModeManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "721"
-            endingLineNumber = "721"
+            startingLineNumber = "728"
+            endingLineNumber = "728"
             landmarkName = "syncUpdate(image:asset:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1127,47 +1111,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "BF2E9D88-C463-4986-B8DF-C7471D38DE8C"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FractalInventory/Helpers/Work Mode /WorkModeManager.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "221"
-            endingLineNumber = "221"
-            landmarkName = "startOnlineMode(completion:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "F8E646E5-2CB3-436B-BD52-B0087B0CF016"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FractalInventory/Helpers/Work Mode /WorkModeManager.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "247"
-            endingLineNumber = "247"
-            landmarkName = "startOnlineMode(completion:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "A0779893-4368-49FC-9A4D-B08860D16833"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FractalInventory/Helpers/Work Mode /WorkModeManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "652"
-            endingLineNumber = "652"
+            startingLineNumber = "659"
+            endingLineNumber = "659"
             landmarkName = "syncUpdate(employee:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1182,8 +1134,8 @@
             filePath = "FractalInventory/Helpers/Work Mode /WorkModeManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "666"
-            endingLineNumber = "666"
+            startingLineNumber = "673"
+            endingLineNumber = "673"
             landmarkName = "syncUpdate(employee:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1198,8 +1150,8 @@
             filePath = "FractalInventory/Helpers/Work Mode /WorkModeManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "655"
-            endingLineNumber = "655"
+            startingLineNumber = "662"
+            endingLineNumber = "662"
             landmarkName = "syncUpdate(employee:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1208,14 +1160,14 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "1D0B7761-7EDD-4976-B608-6FE3A4C54009"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FractalInventory/Helpers/Work Mode /WorkModeManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "669"
-            endingLineNumber = "669"
+            startingLineNumber = "676"
+            endingLineNumber = "676"
             landmarkName = "syncUpdate(employee:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1224,14 +1176,14 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "F37C72D6-A98D-409A-B357-55EEAD9D72F8"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FractalInventory/Helpers/Work Mode /WorkModeManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "671"
-            endingLineNumber = "671"
+            startingLineNumber = "678"
+            endingLineNumber = "678"
             landmarkName = "syncUpdate(employee:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1288,7 +1240,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "723D4775-A691-41ED-B812-8E81D1FEB07D"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FractalInventory/Model/AssetModel.swift"
@@ -1310,8 +1262,8 @@
             filePath = "FractalInventory/Views/Employees/EmployeeView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "143"
-            endingLineNumber = "143"
+            startingLineNumber = "142"
+            endingLineNumber = "142"
             landmarkName = "onAppearLoad()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1320,30 +1272,30 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "1B7E64E1-7D00-42AD-AA4A-B926575E41BE"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FractalInventory/Views/Employees/EmployeeView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "111"
-            endingLineNumber = "111"
-            landmarkName = "getFilteredEmployees()"
-            landmarkType = "7">
+            startingLineNumber = "110"
+            endingLineNumber = "110"
+            landmarkName = "body"
+            landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "FD85F96A-526E-41B3-BFD3-D63A64ED37DF"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FractalInventory/Views/Employees/EmployeeView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "118"
-            endingLineNumber = "118"
+            startingLineNumber = "117"
+            endingLineNumber = "117"
             landmarkName = "getFilteredEmployees()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1390,8 +1342,8 @@
             filePath = "FractalInventory/Helpers/CoreData/DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "672"
-            endingLineNumber = "672"
+            startingLineNumber = "684"
+            endingLineNumber = "684"
             landmarkName = "getInventoryAssets(location:locationName:sessionId:inventoryName:type:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1406,8 +1358,8 @@
             filePath = "FractalInventory/Helpers/CoreData/DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "669"
-            endingLineNumber = "669"
+            startingLineNumber = "681"
+            endingLineNumber = "681"
             landmarkName = "getInventoryAssets(location:locationName:sessionId:inventoryName:type:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1422,8 +1374,8 @@
             filePath = "FractalInventory/Helpers/CoreData/DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "716"
-            endingLineNumber = "716"
+            startingLineNumber = "728"
+            endingLineNumber = "728"
             landmarkName = "createInventorySession(by:locationName:sessionId:inventoryName:type:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1438,8 +1390,8 @@
             filePath = "FractalInventory/Helpers/CoreData/DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "717"
-            endingLineNumber = "717"
+            startingLineNumber = "729"
+            endingLineNumber = "729"
             landmarkName = "createInventorySession(by:locationName:sessionId:inventoryName:type:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1454,8 +1406,8 @@
             filePath = "FractalInventory/Helpers/CoreData/DataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "718"
-            endingLineNumber = "718"
+            startingLineNumber = "730"
+            endingLineNumber = "730"
             landmarkName = "createInventorySession(by:locationName:sessionId:inventoryName:type:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1470,9 +1422,105 @@
             filePath = "FractalInventory/Helpers/Work Mode /WorkModeManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "604"
-            endingLineNumber = "604"
+            startingLineNumber = "611"
+            endingLineNumber = "611"
             landmarkName = "starSync(inventorySessions:completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "236FBC3E-E332-437C-8C1C-55E568545A77"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FractalInventory/Helpers/CoreData/DataManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "308"
+            endingLineNumber = "308"
+            landmarkName = "getEmployees(completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "3C0C2F84-57D1-48B8-8C13-1EC967994B39"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FractalInventory/Helpers/Work Mode /WorkModeManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "193"
+            endingLineNumber = "193"
+            landmarkName = "startOnlineMode(completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "3F7D996E-641F-4646-96BF-7F97F66BC772"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FractalInventory/Helpers/CoreData/DataManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "302"
+            endingLineNumber = "302"
+            landmarkName = "getEmployees(completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "1C815455-141A-4019-89B7-7E5C3DFC3DE7"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FractalInventory/Helpers/CoreData/DataManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "139"
+            endingLineNumber = "139"
+            landmarkName = "save(employees:completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "B177E40B-4E7C-41F5-BC66-A0087CD81D4C"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FractalInventory/Views/Employees/EmployeeView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "128"
+            endingLineNumber = "128"
+            landmarkName = "EmployeeView"
+            landmarkType = "14">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "28F4EF0B-60EB-414B-A302-D32A20504243"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FractalInventory/Helpers/CoreData/DataManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "171"
+            endingLineNumber = "171"
+            landmarkName = "save(employees:completion:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

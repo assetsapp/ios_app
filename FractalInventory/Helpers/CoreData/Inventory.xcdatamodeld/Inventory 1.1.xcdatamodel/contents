@@ -36,18 +36,20 @@
         <attribute name="tabs" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[[String: Any]]"/>
         <attribute name="totalPrice" optional="YES" attributeType="String"/>
         <attribute name="updateDate" optional="YES" attributeType="String"/>
+        <relationship name="employees" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Employee" inverseName="assets" inverseEntity="Employee"/>
         <relationship name="inventorySession" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="InventorySession" inverseName="assets" inverseEntity="InventorySession"/>
     </entity>
     <entity name="Employee" representedClassName="Employee" syncable="YES">
         <attribute name="beenCreated" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="beenUpdated" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="email" optional="YES" attributeType="String"/>
+        <attribute name="employeeId" optional="YES" attributeType="String"/>
         <attribute name="identifier" optional="YES" attributeType="String"/>
         <attribute name="lastName" optional="YES" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="profileId" optional="YES" attributeType="String"/>
         <attribute name="profileName" optional="YES" attributeType="String"/>
-        <relationship name="assets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Asset"/>
+        <relationship name="assets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Asset" inverseName="employees" inverseEntity="Asset"/>
     </entity>
     <entity name="EmployeeProfile" representedClassName="EmployeeProfile" syncable="YES">
         <attribute name="identifier" optional="YES" attributeType="String"/>
@@ -83,8 +85,8 @@
         <attribute name="name" optional="YES" attributeType="String"/>
     </entity>
     <elements>
-        <element name="Asset" positionX="-45" positionY="54" width="128" height="569"/>
-        <element name="Employee" positionX="-36" positionY="72" width="128" height="164"/>
+        <element name="Asset" positionX="-45" positionY="54" width="128" height="584"/>
+        <element name="Employee" positionX="-36" positionY="72" width="128" height="179"/>
         <element name="EmployeeProfile" positionX="-45" positionY="144" width="128" height="59"/>
         <element name="InventorySession" positionX="-45" positionY="144" width="128" height="194"/>
         <element name="Location" positionX="-63" positionY="-18" width="128" height="134"/>
