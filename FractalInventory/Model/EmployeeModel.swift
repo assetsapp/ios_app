@@ -101,8 +101,6 @@ class ApiEmployees {
     @AppStorage(Settings.apiHostKey) var apiHost = "http://159.203.41.87:3001"
     @AppStorage(Settings.apiDBKey) var apiDB = "notes-db-app"
     @AppStorage(Settings.userTokenKey) var token = ""
-    
-    
     func getEmployees(completion: @escaping(Result<[EmployeeModel], Error>) -> ()) {
         var urlComponent = URLComponents(string: "\(apiHost)/api/v1/\(apiDB)/employees")!
         urlComponent.queryItems = [
@@ -133,7 +131,6 @@ class ApiEmployees {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "PUT"
         request.httpBody = jsonData
-        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 completion(.failure(error))
@@ -182,7 +179,6 @@ class ApiEmployees {
         request.httpBody = jsonData
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
-                print("ERROR postEmployee: \(error.localizedDescription)")
                 completion(.failure(error))
             } else {
                 completion(.success(true))

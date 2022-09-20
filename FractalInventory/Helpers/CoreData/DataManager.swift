@@ -178,6 +178,7 @@ class DataManager: ObservableObject {
         item.name = employee.name
         item.lastName = employee.lastName
         item.email = employee.email
+        item.employeeId = employee.employee_id
         item.profileId = profileId
         item.profileName = profileName
         item.beenCreated = true

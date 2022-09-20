@@ -161,35 +161,35 @@ struct AssetMainRespondeModel: Codable {
 }
 
 struct AssetRespondeModel: Codable {
-          var serial: String?
-          var location: String?
-          var status: String?
-          var creator: String?
-          var assigned: String?
-          var EPC: String?
-          var referenceId: String?
-          var locationPath: String?
-          var brand: String?
-          var _id: String?
-          var creation_date: String?
-          var updateDate: String?
-//          var category: Any?
-          var fileExt: String?
-//          var customFieldsTab: Any?
-          var name: String?
-          var parent: String?
-          var imageURL: String?
-          var quantity: Int?
-          var responsible: String?
-          var purchase_date: String?
-//          var history: Any?
-          var purchase_price: String?
-          var total_price: String?
-          var model: String?
-          var labeling_user: String?
-          var notes: String?
-          var labeling_date: String?
-          var price: String?
+    var serial: String?
+    var location: String?
+    var status: String?
+    var creator: String?
+    var assigned: String?
+    var EPC: String?
+    var referenceId: String?
+    var locationPath: String?
+    var brand: String?
+    var _id: String?
+    var creation_date: String?
+    var updateDate: String?
+    //          var category: Any?
+    var fileExt: String?
+    //          var customFieldsTab: Any?
+    var name: String?
+    var parent: String?
+    var imageURL: String?
+    var quantity: Int?
+    var responsible: String?
+    var purchase_date: String?
+    //          var history: Any?
+    var purchase_price: String?
+    var total_price: String?
+    var model: String?
+    var labeling_user: String?
+    var notes: String?
+    var labeling_date: String?
+    var price: String?
 }
 
 class ApiAssets {
@@ -199,9 +199,6 @@ class ApiAssets {
     
     func getInventoryAssets(location: String, locationName: String, sessionId: String, inventoryName: String, type: InventoryType, completion: @escaping(Result<[AssetModel], Error>) -> Void) {
         var urlComponent = URLComponents(string: "\(apiHost)/api/v1/app/\(apiDB)/assets/inventory/")!
-        
-        print("location: \(location)\nlocationName: \(locationName)\nsessionId: \(sessionId)\ninventoryName: \(inventoryName)\ntype: \(type)")
-        
         urlComponent.queryItems = [
             URLQueryItem(name: "location", value: location),
             URLQueryItem(name: "children", value: type.rawValue),
@@ -253,7 +250,6 @@ class ApiAssets {
     func getAllAssets(completion: @escaping(Result<[AssetRespondeModel], Error>) -> Void) {
         var urlComponent = URLComponents(string: "\(apiHost)/api/v1/\(apiDB)/assets/")!
         urlComponent.queryItems = [
-            //            URLQueryItem(name: "fields", value: "{\"name\":1,\"brand\":1,\"model\":1,\"serial\":1,\"EPC\":1,\"location\":1}"),
             URLQueryItem(name: "query", value: "{\"status\":{\"$ne\":\"decommissioned\"}}")
         ]
         var request = URLRequest(url: urlComponent.url!)
@@ -265,7 +261,6 @@ class ApiAssets {
                 let assets = try JSONDecoder().decode(AssetMainRespondeModel.self, from: data)
                 completion(.success(assets.response))
             } catch let error {
-                print("Error: 19 al 22 de agosto", error.localizedDescription)
                 completion(.failure(error))
             }
         }.resume()
@@ -393,11 +388,6 @@ class ApiAssets {
         request.httpBody = jsonData
         
         URLSession.shared.dataTask(with: request) { data, response, error in
-            let deserializedValues = try! JSONSerialization.jsonObject(with: data!)
-            print("===============================>")
-            print(deserializedValues)
-            print("===============================>")
-            
             let asset = try! JSONDecoder().decode(RealAssetsWithLocationApiModel.self, from: data!)
             print(asset)
             DispatchQueue.main.async {
@@ -410,14 +400,12 @@ class ApiAssets {
         let urlComponent = URLComponents(string: "\(apiHost)/api/v1/\(apiDB)/assets/\(assetId)")!
         let jsonData = try? JSONSerialization.data(withJSONObject: params)
         var request = URLRequest(url: urlComponent.url!)
-        print("params: \(String(describing: jsonData))")
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "PUT"
         request.httpBody = jsonData
         
         URLSession.shared.dataTask(with: request) { data, response, error in
-            print("Actualizo Asset, error: \(error?.localizedDescription ?? "nilll")")
             if let error = error {
                 completion(.failure(error))
             } else {
