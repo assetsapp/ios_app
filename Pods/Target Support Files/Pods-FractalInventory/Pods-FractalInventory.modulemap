@@ -1,6 +1,0 @@
-framework module Pods_FractalInventory {
-  umbrella header "Pods-FractalInventory-umbrella.h"
-
-  export *
-  module * { export * }
-}
