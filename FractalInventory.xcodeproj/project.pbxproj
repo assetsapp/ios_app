@@ -120,6 +120,7 @@
 		76F5AB2026CA2245001B8B89 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 76F5AB1F26CA2245001B8B89 /* Assets.xcassets */; };
 		76F5AB2326CA2245001B8B89 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 76F5AB2226CA2245001B8B89 /* Preview Assets.xcassets */; };
 		76F5AB2B26CB2C79001B8B89 /* LogInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F5AB2A26CB2C79001B8B89 /* LogInView.swift */; };
+		F2F813572AF3219F00FCD753 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2F813562AF3219F00FCD753 /* Constants.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -280,6 +281,7 @@
 		76F5AB2426CA2245001B8B89 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		76F5AB2A26CB2C79001B8B89 /* LogInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInView.swift; sourceTree = "<group>"; };
 		A6100A6A96CC0C8F133CC38C /* Pods_FractalInventory.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FractalInventory.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F2F813562AF3219F00FCD753 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -691,6 +693,7 @@
 		76F5AB1A26CA2242001B8B89 /* FractalInventory */ = {
 			isa = PBXGroup;
 			children = (
+				F2F813552AF3210000FCD753 /* Constants */,
 				765581C426DC805B00F6C973 /* Hardware */,
 				764E264126DC02DF00D7742B /* Helpers */,
 				7601038626D33B91003C39BA /* Model */,
@@ -719,6 +722,14 @@
 				6A581ACFB2E21DBDE129DD82 /* Pods-FractalInventory.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		F2F813552AF3210000FCD753 /* Constants */ = {
+			isa = PBXGroup;
+			children = (
+				F2F813562AF3219F00FCD753 /* Constants.swift */,
+			);
+			path = Constants;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -879,6 +890,7 @@
 				7655823326DC80C600F6C973 /* CSLBleInterface.m in Sources */,
 				7655820E26DC808100F6C973 /* MQTTDecoder.m in Sources */,
 				36E2881828AE09C8009FCA60 /* EmployeeProfile+CoreDataClass.swift in Sources */,
+				F2F813572AF3219F00FCD753 /* Constants.swift in Sources */,
 				76546C8B26DB3A4A00336C10 /* TaggingView.swift in Sources */,
 				7655825726DF285100F6C973 /* CSL.swift in Sources */,
 				7655821B26DC808100F6C973 /* MQTTSessionSynchron.m in Sources */,

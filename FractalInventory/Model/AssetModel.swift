@@ -193,8 +193,8 @@ struct AssetRespondeModel: Codable {
 }
 
 class ApiAssets {
-    @AppStorage(Settings.apiHostKey) var apiHost = "http://159.203.41.87:3001"
-    @AppStorage(Settings.apiDBKey) var apiDB = "notes-db-app"
+    @AppStorage(Settings.apiHostKey) var apiHost = Constants.apiHost
+    @AppStorage(Settings.apiDBKey) var apiDB = Constants.apiDB
     @AppStorage(Settings.userTokenKey) var token = ""
     
     func getInventoryAssets(location: String, locationName: String, sessionId: String, inventoryName: String, type: InventoryType, completion: @escaping(Result<[AssetModel], Error>) -> Void) {

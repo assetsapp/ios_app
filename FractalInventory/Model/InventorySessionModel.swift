@@ -67,8 +67,8 @@ struct InventoryAssetsApiModel: Codable {
 }
 
 class ApiInventorySessions {
-    @AppStorage(Settings.apiHostKey) var apiHost = "http://159.203.41.87:3001"
-    @AppStorage(Settings.apiDBKey) var apiDB = "notes-db-app"
+    @AppStorage(Settings.apiHostKey) var apiHost = Constants.apiHost
+    @AppStorage(Settings.apiDBKey) var apiDB = Constants.apiDB
     @AppStorage(Settings.userTokenKey) var token = ""
 
     func getInventorySessions(location: String, completion: @escaping(Result<[InventoryDataModel], WMError>) -> Void) {

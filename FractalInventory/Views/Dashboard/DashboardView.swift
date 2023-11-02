@@ -208,7 +208,7 @@ struct Menu: View {
     @AppStorage(Settings.userNameKey) var userName = "Guest"
     @AppStorage(Settings.userLastNameKey) var userLastName = "User"
     @AppStorage(Settings.userFileExt) var userFileExt = ""
-    @AppStorage(Settings.apiHostKey) var apiHost = "http://159.203.41.87:3001"
+    @AppStorage(Settings.apiHostKey) var apiHost = Constants.apiHost
     
     var body: some View {
         VStack {

@@ -21,7 +21,7 @@ struct CustomFields: View {
     @Binding var customFieldsImages: [AssetPhoto]
     @Binding var customFieldsImagesData: [ImageCustomField]
     @ObservedObject var webViewStateModel: WebViewStateModel = WebViewStateModel()
-    @AppStorage(Settings.apiHostKey) var apiHost = "http://159.203.41.87:3001"
+    @AppStorage(Settings.apiHostKey) var apiHost = Constants.apiHost
     @State var fieldSelectedIndex = -1
     
     var body: some View {
