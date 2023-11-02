@@ -217,6 +217,11 @@ struct InventoryView: View {
                 HStack(alignment: .center) {
                     Text("EPC Readings (\(cslvalues.readings.count)):")
                         .foregroundColor(.secondary)
+//                    Text("MANUAL_READ")
+//                        .onTapGesture {
+//                            onNewManualReading(epc: "4E3034353033393135000000")
+//                            onNewManualReading(epc: "4B344A264A00808220000709")
+//                        }
                     Spacer()
                     Rectangle()
                         .frame(width: 30, height: 30, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
@@ -411,6 +416,26 @@ struct InventoryView: View {
                             let externalAsset = AssetModel(_id: external._id, brand: external.brand ?? "", model: external.model ?? "", name: external.name, EPC: external.EPC ?? "", serial: external.serial ?? "", location: location , status: "external", locationPath: external.locationPath ?? "")
                             assets.append(externalAsset)
                         }
+                    }
+                }
+            }
+        }
+    }
+    
+    func onNewManualReading(epc: String) {
+        if !localEPCs.contains(epc) {
+            localEPCs.append(epc)
+            let foundAssetIndex = assets.firstIndex { $0.EPC == epc } ?? -1
+            if foundAssetIndex >= 0 {
+                assets[foundAssetIndex].status = "found"
+                let foundEPC = assets[foundAssetIndex].EPC
+                inventoryUpdates.append(foundEPC ?? "")
+            } else {
+                ApiAssets().getAsset(EPC: epc) { _asset in
+                    if _asset.count > 0 {
+                        let external = _asset[0]
+                        let externalAsset = AssetModel(_id: external._id, brand: external.brand ?? "", model: external.model ?? "", name: external.name, EPC: external.EPC ?? "", serial: external.serial ?? "", location: location , status: "external", locationPath: external.locationPath ?? "")
+                        assets.append(externalAsset)
                     }
                 }
             }
