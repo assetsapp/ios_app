@@ -107,6 +107,7 @@ struct LogInBody: View {
     @State var userName: String = ""
     @State var pwd: String = ""
     @State var validUser: Bool = false
+    @State private var isPasswordVisible: Bool = false
     @State var showErrorModal: Bool = false
     @Binding var isUserLoggedOut: Bool
     @Environment(\.presentationMode) var presentationMode//: Binding<PresentationMode>
@@ -136,8 +137,21 @@ struct LogInBody: View {
                     .foregroundColor(.white)
                     .frame(width: 35, height: 35)
                 
-                SecureField("PASSWORD", text: $pwd)
-                    .foregroundColor(.white)
+                if isPasswordVisible {
+                                    TextField("PASSWORD", text: $pwd)
+                                        .foregroundColor(.white)
+                                } else {
+                                    SecureField("PASSWORD", text: $pwd)
+                                        .foregroundColor(.white)
+                                }
+                                
+                                Button(action: {
+                                    isPasswordVisible.toggle() // Cambiar entre SecureField y TextField
+                                }) {
+                                    Image(systemName: isPasswordVisible ? "eye.fill" : "eye.slash.fill")
+                                        .foregroundColor(.white)
+                                }
+                                .padding(.trailing, 10)
                 
             }
             .padding()
