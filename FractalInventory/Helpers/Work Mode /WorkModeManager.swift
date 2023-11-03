@@ -608,10 +608,19 @@ extension WorkModeManager {
         for session in inventorySessions {
             dispatchGroup.enter()
             print("starSync inventorySession: \(session.identifier), count: \(session.assets?.count)")
+            let inventorySessionFiltered = InventoryDataModel(inventorySession: session)
             sync(inventorySession: session) { result in
                 switch result {
                 case .success(_ ):
-                    savedInventories.append(session)
+                    self.syncInventoryAssets(inventorySession: inventorySessionFiltered) { result2 in
+                        switch result2 {
+                        case .success(_ ):
+                            savedInventories.append(session)
+                        case .failure(let error):
+                            print(error.localizedDescription)
+                            errors.append(WMError.failedToSyncInventory(inventory: session))
+                        }
+                    }
                 case .failure(let error):
                     print(error.localizedDescription)
                     errors.append(WMError.failedToSyncInventory(inventory: session))
@@ -634,6 +643,25 @@ extension WorkModeManager {
                     }
                 }
                 completion(.failure(.failedToSyncInventories(errorInventorie: errorInventory, savedInventories: savedInventories)))
+            }
+        }
+    }
+    
+    private func syncInventoryAssets(inventorySession: InventoryDataModel, completion: @escaping(Result<String, Error>) -> Void) {
+        let params: [String: Any] = [
+            "foundEPCS": inventorySession.assets?
+                .filter { $0.status == "found" }
+                .compactMap { $0.EPC } ?? [],
+            "sessionId": inventorySession.sessionId,
+            "closeInventory": inventorySession.status
+        ]
+        
+        ApiInventorySessions().updateAssetsInInventorySession(params: params) { result in
+            switch result {
+            case .success(_ ):
+                completion(.success(""))
+            case .failure(let error):
+                completion(.failure(error))
             }
         }
     }
