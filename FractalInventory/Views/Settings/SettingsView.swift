@@ -145,6 +145,81 @@ struct SettingsViewContent: View {
                         )
                     }
                 }
+                /// Zebra section
+                Section(header: Text("ZEBRA RFID Handheld scan")) {
+                    Toggle("Start Device Scanning", isOn: $startScanning)
+                        .onChange(of: startScanning, perform: { scan in
+                            if (scan) {
+                                CSLHelper.deviceScanStart()
+                            } else {
+                                CSLHelper.deviceScanStop()
+                                deviceListName = []
+                            }
+                        })
+                    if (startScanning) {
+                        Text("Bellow will appear available devices")
+                        List {
+                            ForEach(Array(deviceListName.enumerated()), id: \.offset) { index, device in
+                                Button(action: {
+                                    selectedDeviceName = device
+                                    selectedDeviceIndex = index
+                                    connectToReader = true
+                                }) {
+                                    Text("Device Name: \(device)")
+                                        .padding()
+                                }
+                            }
+                        }
+                    }
+                }
+                .disabled(isDeviceConnected)
+                .alert(isPresented: $connectToReader ) {
+                    Alert(
+                        title: Text("Connect to reader"),
+                        message: Text("You'll connect to \(selectedDeviceName)"),
+                        primaryButton: .default(Text("OK")) {
+                            cslvalues.isLoading = true
+                            startScanning = false
+                            CSLHelper.connectToDevice(deviceIndex: selectedDeviceIndex)
+                        },
+                        secondaryButton: .default(Text("Cancel")) {
+                            selectedDeviceName = ""
+                            selectedDeviceIndex = -1
+                        }
+                    )
+                }
+                .onChange(of: isDeviceConnected, perform: { value in
+                    if value {
+                        cslvalues.isLoading = false
+                    }
+                })
+                
+                if (isDeviceConnected) {
+                    Section(header: Text("CSL RFID Handheld connected")) {
+                        Text("Device: \(connectedDeviceName)")
+                        Text("SN: \(deviceSerialNumber)")
+                        Text("Battery: \(batteryLevel)")
+                        HStack {
+                            Spacer()
+                            Button(action: { disconnectDevice = true }) {
+                                Text("Disconnect Device")
+                                    .foregroundColor(.red)
+                            }
+                        }
+                    }
+                    .alert(isPresented: $disconnectDevice) {
+                        Alert(
+                            title: Text("Disconnect from reader"),
+                            message: Text("You'll disconnect from \(connectedDeviceName) "),
+                            primaryButton: .default(Text("OK")) {
+                                CSLHelper.disconnectFromDevice()
+                            },
+                            secondaryButton: .default(Text("Cancel")) {
+                                disconnectDevice = false
+                            }
+                        )
+                    }
+                }
                 
                 // Work mode section
                 Section(header: Text("working mode")) {
