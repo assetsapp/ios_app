@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct DashboardView: View {
+    @ObservedObject var zebraValues: ZebraValues
     @ObservedObject var cslvalues: CSLValues
     @Binding var isUserLoggedOut: Bool
     
     var body: some View {
         NavigationView {
             
-            Main(cslvalues: cslvalues, isUserLoggedOut: $isUserLoggedOut)
+            Main(zebraValues: zebraValues, cslvalues: cslvalues, isUserLoggedOut: $isUserLoggedOut)
                 .navigationBarTitle("Home")
                 .navigationBarHidden(true)
         }
@@ -30,7 +31,7 @@ struct DashboardView: View {
 }
 
 struct Main: View {
-    
+    @ObservedObject var zebraValues: ZebraValues
     @ObservedObject var cslvalues: CSLValues
     @State var sideMenuOpen: Bool = false
     @Binding var isUserLoggedOut: Bool
@@ -48,7 +49,7 @@ struct Main: View {
                 }
                 Spacer()
                 ScrollView(.vertical, showsIndicators: false) {
-                    Dashboard(cslvalues: cslvalues, sideMenuOpen: $sideMenuOpen, isUserLoggedOut: $isUserLoggedOut)
+                    Dashboard(cslvalues: cslvalues, zebraValues: zebraValues, sideMenuOpen: $sideMenuOpen, isUserLoggedOut: $isUserLoggedOut)
                 }
                 
             }
@@ -58,7 +59,7 @@ struct Main: View {
                     sideMenuOpen = false
                 }
             }
-            Menu(cslvalues: cslvalues, isMenuOpen: $sideMenuOpen, isUserLoggedOut: $isUserLoggedOut)
+            Menu(zebraValues: zebraValues, cslvalues: cslvalues, isMenuOpen: $sideMenuOpen, isUserLoggedOut: $isUserLoggedOut)
         }
     }
     
@@ -66,6 +67,7 @@ struct Main: View {
 
 struct Dashboard: View {
     @ObservedObject var cslvalues: CSLValues
+    @ObservedObject var zebraValues: ZebraValues
     @Binding var sideMenuOpen: Bool
     @Binding var isUserLoggedOut: Bool
     @State var selectedEmployee: EmployeeModel = EmployeeModel(_id: "", name: "", lastName: "", email: "")
@@ -138,7 +140,7 @@ struct Dashboard: View {
                     sideMenuOpen = false
                 })
                 
-                NavigationLink(destination: SettingsView(cslvalues: cslvalues, isUserLoggedOut: $isUserLoggedOut)) {
+                NavigationLink(destination: SettingsView(cslvalues: cslvalues, zebraValues: zebraValues, isUserLoggedOut: $isUserLoggedOut)) {
                     Card(caption: "6", title: "Settings", subTitle: "Configurations", icon: "slider.horizontal.3", colors: [Color.pink, Color.purple])
                 }
                 .simultaneousGesture(TapGesture().onEnded{
@@ -199,6 +201,7 @@ struct Card: View {
 }
 
 struct Menu: View {
+    @ObservedObject var zebraValues: ZebraValues
     @ObservedObject var cslvalues: CSLValues
     @Binding var isMenuOpen: Bool
     @Binding var isUserLoggedOut: Bool
@@ -296,7 +299,7 @@ struct Menu: View {
                 .simultaneousGesture(TapGesture().onEnded {
                     isMenuOpen = false
                 })
-                NavigationLink(destination: SettingsView(cslvalues: cslvalues, isUserLoggedOut: $isUserLoggedOut)) {
+                NavigationLink(destination: SettingsView(cslvalues: cslvalues, zebraValues: zebraValues, isUserLoggedOut: $isUserLoggedOut)) {
                     Row(moduleActive: .constant(false), moduleIcon: "slider.horizontal.3", moduleName: "Settings")
                 }
                 .simultaneousGesture(TapGesture().onEnded{
@@ -369,6 +372,6 @@ struct Row: View {
 
 struct SideMenu_Previews: PreviewProvider {
     static var previews: some View {
-        DashboardView(cslvalues: CSLValues(), isUserLoggedOut: .constant(false))
+        DashboardView(zebraValues: ZebraValues(), cslvalues: CSLValues(), isUserLoggedOut: .constant(false))
     }
 }

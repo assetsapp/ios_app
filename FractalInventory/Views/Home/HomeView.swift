@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct HomeView: View {
+    @ObservedObject var zebraValues: ZebraValues = ZebraValues()
     @ObservedObject var cslvalues: CSLValues = CSLValues()
     @State var isUserLoggedOut: Bool = true
 
@@ -15,7 +16,7 @@ struct HomeView: View {
             ZStack {
                 CSLDelegates(cslvalues: cslvalues)
                     .frame(height: 0)
-                DashboardView(cslvalues: cslvalues, isUserLoggedOut: $isUserLoggedOut)
+                DashboardView(zebraValues: zebraValues, cslvalues: cslvalues, isUserLoggedOut: $isUserLoggedOut)
                     .alert(isPresented: $cslvalues.showNonConnected, content: {
                         Alert(
                             title: Text("RFID device is not connected"),

@@ -19,13 +19,14 @@ struct Settings {
 
 struct SettingsView: View {
     @ObservedObject var cslvalues: CSLValues
+    @ObservedObject var zebraValues: ZebraValues
     @Binding var isUserLoggedOut: Bool
     
     
     var body: some View {
         VStack {
             let workMode = WorkModeManager().workMode
-            SettingsViewContent(cslvalues: cslvalues, workingModeIsOffline: workMode.isOffline, isUserLoggedOut: $isUserLoggedOut, workingMode: workMode)
+            SettingsViewContent(cslvalues: cslvalues, workingModeIsOffline: workMode.isOffline, isUserLoggedOut: $isUserLoggedOut, workingMode: workMode, zebraValues: zebraValues)
         }
         .navigationBarTitle("Settings", displayMode: .inline)
         .navigationViewStyle(StackNavigationViewStyle())
@@ -58,11 +59,17 @@ struct SettingsViewContent: View {
             workingModeIsOffline = workingMode == .offline
         }
     }
+    @ObservedObject var zebraValues: ZebraValues
+    @State var startScanningZebra: Bool = false
+    @State var isDeviceConnectedZebra: Bool = false
+    @State var deviceZebraListName: [String] = []
+    @State var selectedZebraDeviceName: String = ""
+    @State var selectedZebraDeviceIndex: Int = -1
+    @State var connectZebraToReader: Bool = false
+    
     
     var apiInstance: srfidISdkApi = srfidSdkFactory.createRfidSdkApiInstance()
     var eventListener: EventReceiver = EventReceiver()
-    @State var startScanningZebra: Bool = false
-    @State var isDeviceConnectedZebra: Bool = false
     
     let timer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
     let devName = "CS108ReaderF76D81"
@@ -154,36 +161,36 @@ struct SettingsViewContent: View {
                     Toggle("Start Device Scanning", isOn: $startScanningZebra)
                         .onChange(of: startScanningZebra, perform: { scan in
                             if (scan) {
-                                setupSDK()
+                                startScannigZebra()
                             } else {
-                                //CSLHelper.deviceScanStop()
-                                //deviceListName = []
+                                stopScanningZebra()
+                                deviceZebraListName = []
                             }
                         })
                     if (startScanningZebra) {
                         Text("Bellow will appear available devices")
-//                        List {
-//                            ForEach(Array(deviceListName.enumerated()), id: \.offset) { index, device in
-//                                Button(action: {
-//                                    selectedDeviceName = device
-//                                    selectedDeviceIndex = index
-//                                    connectToReader = true
-//                                }) {
-//                                    Text("Device Name: \(device)")
-//                                        .padding()
-//                                }
-//                            }
-//                        }
+                        List {
+                            ForEach(Array(deviceZebraListName.enumerated()), id: \.offset) { index, device in
+                                Button(action: {
+                                    selectedZebraDeviceName = device
+                                    selectedZebraDeviceIndex = index
+                                    connectZebraToReader = true
+                                }) {
+                                    Text("Device Name: \(device)")
+                                        .padding()
+                                }
+                            }
+                        }
                     }
                 }
                 .disabled(isDeviceConnectedZebra)
-                .alert(isPresented: $connectToReader ) {
+                .alert(isPresented: $connectZebraToReader ) {
                     Alert(
                         title: Text("Connect to reader"),
-                        message: Text("You'll connect to \(selectedDeviceName)"),
+                        message: Text("You'll connect to \(selectedZebraDeviceName)"),
                         primaryButton: .default(Text("OK")) {
                             cslvalues.isLoading = true
-                            startScanning = false
+                            startScanningZebra = false
                             CSLHelper.connectToDevice(deviceIndex: selectedDeviceIndex)
                         },
                         secondaryButton: .default(Text("Cancel")) {
@@ -308,7 +315,9 @@ struct SettingsViewContent: View {
                 getAssetsCount()
             }
     }
-    
+    func startScannigZebra() {
+        setupSDK()
+    }
     func setupSDK() {
         //eventListener.delegate = self
         apiInstance.srfidSetDelegate(eventListener)
@@ -323,7 +332,8 @@ struct SettingsViewContent: View {
         apiInstance.srfidEnableAutomaticSessionReestablishment(true)
         apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_BATTERY))
     }
-    
+    func stopScanningZebra() {
+    }
     func getDeviceInfo() {
         deviceFoundCount = CSLHelper.getDeviceCount()
         deviceListName = CSLHelper.getDeviceListNames()
