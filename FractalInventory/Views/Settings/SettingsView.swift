@@ -59,6 +59,10 @@ struct SettingsViewContent: View {
         }
     }
     
+    var apiInstance: srfidISdkApi = srfidSdkFactory.createRfidSdkApiInstance()
+    var eventListener: EventReceiver = EventReceiver()
+    @State var startScanningZebra: Bool = false
+    @State var isDeviceConnectedZebra: Bool = false
     
     let timer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
     let devName = "CS108ReaderF76D81"
@@ -147,32 +151,32 @@ struct SettingsViewContent: View {
                 }
                 /// Zebra section
                 Section(header: Text("ZEBRA RFID Handheld scan")) {
-                    Toggle("Start Device Scanning", isOn: $startScanning)
-                        .onChange(of: startScanning, perform: { scan in
+                    Toggle("Start Device Scanning", isOn: $startScanningZebra)
+                        .onChange(of: startScanningZebra, perform: { scan in
                             if (scan) {
-                                CSLHelper.deviceScanStart()
+                                setupSDK()
                             } else {
-                                CSLHelper.deviceScanStop()
-                                deviceListName = []
+                                //CSLHelper.deviceScanStop()
+                                //deviceListName = []
                             }
                         })
-                    if (startScanning) {
+                    if (startScanningZebra) {
                         Text("Bellow will appear available devices")
-                        List {
-                            ForEach(Array(deviceListName.enumerated()), id: \.offset) { index, device in
-                                Button(action: {
-                                    selectedDeviceName = device
-                                    selectedDeviceIndex = index
-                                    connectToReader = true
-                                }) {
-                                    Text("Device Name: \(device)")
-                                        .padding()
-                                }
-                            }
-                        }
+//                        List {
+//                            ForEach(Array(deviceListName.enumerated()), id: \.offset) { index, device in
+//                                Button(action: {
+//                                    selectedDeviceName = device
+//                                    selectedDeviceIndex = index
+//                                    connectToReader = true
+//                                }) {
+//                                    Text("Device Name: \(device)")
+//                                        .padding()
+//                                }
+//                            }
+//                        }
                     }
                 }
-                .disabled(isDeviceConnected)
+                .disabled(isDeviceConnectedZebra)
                 .alert(isPresented: $connectToReader ) {
                     Alert(
                         title: Text("Connect to reader"),
@@ -194,7 +198,7 @@ struct SettingsViewContent: View {
                     }
                 })
                 
-                if (isDeviceConnected) {
+                if (isDeviceConnectedZebra) {
                     Section(header: Text("CSL RFID Handheld connected")) {
                         Text("Device: \(connectedDeviceName)")
                         Text("SN: \(deviceSerialNumber)")
@@ -303,6 +307,21 @@ struct SettingsViewContent: View {
                 getDeviceInfo()
                 getAssetsCount()
             }
+    }
+    
+    func setupSDK() {
+        //eventListener.delegate = self
+        apiInstance.srfidSetDelegate(eventListener)
+        apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_READ | SRFID_EVENT_MASK_STATUS))
+        apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_BATTERY | SRFID_EVENT_MASK_TRIGGER))
+        apiInstance.srfidSetOperationalMode(Int32(SRFID_OPMODE_MFI))
+        
+        apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_READER_APPEARANCE | SRFID_EVENT_READER_DISAPPEARANCE))
+        apiInstance.srfidEnableAvailableReadersDetection(true)
+        
+        apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_SESSION_ESTABLISHMENT | SRFID_EVENT_SESSION_TERMINATION))
+        apiInstance.srfidEnableAutomaticSessionReestablishment(true)
+        apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_BATTERY))
     }
     
     func getDeviceInfo() {

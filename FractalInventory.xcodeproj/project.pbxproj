@@ -126,6 +126,7 @@
 		F203F3CA2AF9DEED0037D45B /* libsymbolrfid-sdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F203F3C62AF9DEEC0037D45B /* libsymbolrfid-sdk.a */; };
 		F203F3CB2AF9DEED0037D45B /* libsymbolbt-sdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F203F3C72AF9DEEC0037D45B /* libsymbolbt-sdk.a */; };
 		F203F3CE2AF9DFCD0037D45B /* ZebraProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = F203F3CD2AF9DFCD0037D45B /* ZebraProtocols.swift */; };
+		F203F3D02AF9E2280037D45B /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F203F3CF2AF9E2280037D45B /* ExternalAccessory.framework */; };
 		F2F813572AF3219F00FCD753 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2F813562AF3219F00FCD753 /* Constants.swift */; };
 /* End PBXBuildFile section */
 
@@ -335,6 +336,7 @@
 		F203F3C62AF9DEEC0037D45B /* libsymbolrfid-sdk.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libsymbolrfid-sdk.a"; sourceTree = "<group>"; };
 		F203F3C72AF9DEEC0037D45B /* libsymbolbt-sdk.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libsymbolbt-sdk.a"; sourceTree = "<group>"; };
 		F203F3CD2AF9DFCD0037D45B /* ZebraProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZebraProtocols.swift; sourceTree = "<group>"; };
+		F203F3CF2AF9E2280037D45B /* ExternalAccessory.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExternalAccessory.framework; path = System/Library/Frameworks/ExternalAccessory.framework; sourceTree = SDKROOT; };
 		F2F813562AF3219F00FCD753 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		F2F8138C2AF3493C00FCD753 /* libsymbolrfid-sdk.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libsymbolrfid-sdk.a"; path = "symbolrfid-sdk/libsymbolrfid-sdk.a"; sourceTree = "<group>"; };
 		F2F8138F2AF3496200FCD753 /* RfidAccessConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidAccessConfig.h; sourceTree = "<group>"; };
@@ -390,6 +392,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F203F3D02AF9E2280037D45B /* ExternalAccessory.framework in Frameworks */,
 				F203F3C92AF9DEED0037D45B /* libintegratedsdk.a in Frameworks */,
 				765581BF26DC715F00F6C973 /* CoreBluetooth.framework in Frameworks */,
 				51912303D9BAD715244BA88E /* Pods_FractalInventory.framework in Frameworks */,
@@ -521,6 +524,7 @@
 		765581BD26DC715F00F6C973 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F203F3CF2AF9E2280037D45B /* ExternalAccessory.framework */,
 				F2F8138D2AF3496200FCD753 /* symbolrfid-sdk */,
 				F2F8138C2AF3493C00FCD753 /* libsymbolrfid-sdk.a */,
 				765581BE26DC715F00F6C973 /* CoreBluetooth.framework */,
