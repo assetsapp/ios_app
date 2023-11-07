@@ -9,3 +9,4 @@
 //
 
 #import "CSLRfidAppEngine.h"
+#import "RfidSdkApiDelegate.h"

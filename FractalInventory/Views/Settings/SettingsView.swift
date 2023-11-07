@@ -368,10 +368,10 @@ struct SettingsViewContent: View {
     }
 }
 
-struct SettingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            SettingsView(cslvalues: CSLValues(), isUserLoggedOut: .constant(true))
-        }
-    }
-}
+//struct SettingsView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        NavigationView {
+//            SettingsView(cslvalues: CSLValues(), isUserLoggedOut: .constant(true))
+//        }
+//    }
+//}
