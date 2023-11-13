@@ -140,7 +140,7 @@ struct Dashboard: View {
                     sideMenuOpen = false
                 })
                 
-                NavigationLink(destination: SettingsView(cslvalues: cslvalues, zebraValues: zebraValues, isUserLoggedOut: $isUserLoggedOut)) {
+                NavigationLink(destination: SettingsView(cslvalues: cslvalues,  isUserLoggedOut: $isUserLoggedOut)) {
                     Card(caption: "6", title: "Settings", subTitle: "Configurations", icon: "slider.horizontal.3", colors: [Color.pink, Color.purple])
                 }
                 .simultaneousGesture(TapGesture().onEnded{
@@ -299,7 +299,7 @@ struct Menu: View {
                 .simultaneousGesture(TapGesture().onEnded {
                     isMenuOpen = false
                 })
-                NavigationLink(destination: SettingsView(cslvalues: cslvalues, zebraValues: zebraValues, isUserLoggedOut: $isUserLoggedOut)) {
+                NavigationLink(destination: SettingsView(cslvalues: cslvalues, isUserLoggedOut: $isUserLoggedOut)) {
                     Row(moduleActive: .constant(false), moduleIcon: "slider.horizontal.3", moduleName: "Settings")
                 }
                 .simultaneousGesture(TapGesture().onEnded{

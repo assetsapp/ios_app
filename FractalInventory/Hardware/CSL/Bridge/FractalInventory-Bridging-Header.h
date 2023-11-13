@@ -12,3 +12,4 @@
 /// Zebra
 #import "RfidSdkApiDelegate.h"
 #import "RfidSdkFactory.h"
+#import "RfidLinkProfile.h"

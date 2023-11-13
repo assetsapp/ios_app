@@ -19,14 +19,14 @@ struct Settings {
 
 struct SettingsView: View {
     @ObservedObject var cslvalues: CSLValues
-    @ObservedObject var zebraValues: ZebraValues
+    //@ObservedObject var zebraValues: ZebraValues
     @Binding var isUserLoggedOut: Bool
     
     
     var body: some View {
         VStack {
             let workMode = WorkModeManager().workMode
-            SettingsViewContent(cslvalues: cslvalues, workingModeIsOffline: workMode.isOffline, isUserLoggedOut: $isUserLoggedOut, workingMode: workMode, zebraValues: zebraValues)
+            SettingsViewContent(cslvalues: cslvalues, workingModeIsOffline: workMode.isOffline, isUserLoggedOut: $isUserLoggedOut, workingMode: workMode)
         }
         .navigationBarTitle("Settings", displayMode: .inline)
         .navigationViewStyle(StackNavigationViewStyle())
@@ -43,7 +43,7 @@ struct SettingsViewContent: View {
     @State var startScanning: Bool = false
     @State var isDeviceConnected: Bool = false
     @State var connectedDeviceName: String = ""
-    @State var batteryLevel: String = ""
+    @State var batteryLevel: String = "" //rename rfid device
     @State var deviceSerialNumber: String = ""
     @State var disconnectDevice: Bool = false
     @State var presentSuccessOfflineAlert = false
@@ -59,17 +59,11 @@ struct SettingsViewContent: View {
             workingModeIsOffline = workingMode == .offline
         }
     }
-    @ObservedObject var zebraValues: ZebraValues
     @State var startScanningZebra: Bool = false
-    @State var isDeviceConnectedZebra: Bool = false
-    @State var deviceZebraListName: [String] = []
-    @State var selectedZebraDeviceName: String = ""
-    @State var selectedZebraDeviceIndex: Int = -1
+    @State var selectedZebraDevice: RFIDDevice = .empty
     @State var connectZebraToReader: Bool = false
-    
-    
-    var apiInstance: srfidISdkApi = srfidSdkFactory.createRfidSdkApiInstance()
-    var eventListener: EventReceiver = EventReceiver()
+        
+    @StateObject var viewModelZebra: EventReceiver = EventReceiver()
     
     let timer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
     let devName = "CS108ReaderF76D81"
@@ -164,38 +158,40 @@ struct SettingsViewContent: View {
                                 startScannigZebra()
                             } else {
                                 stopScanningZebra()
-                                deviceZebraListName = []
+                                viewModelZebra.listDevices = []
                             }
                         })
                     if (startScanningZebra) {
                         Text("Bellow will appear available devices")
                         List {
-                            ForEach(Array(deviceZebraListName.enumerated()), id: \.offset) { index, device in
+                            ForEach(Array(viewModelZebra.listDevices.enumerated()), id: \.offset) { index, device in
                                 Button(action: {
-                                    selectedZebraDeviceName = device
-                                    selectedZebraDeviceIndex = index
+                                    selectedZebraDevice = device
                                     connectZebraToReader = true
                                 }) {
-                                    Text("Device Name: \(device)")
+                                    Text("Device Name: \(device.name)")
                                         .padding()
                                 }
                             }
                         }
                     }
                 }
-                .disabled(isDeviceConnectedZebra)
+                .disabled(viewModelZebra.isDeviceConnectedZebra)
                 .alert(isPresented: $connectZebraToReader ) {
                     Alert(
                         title: Text("Connect to reader"),
-                        message: Text("You'll connect to \(selectedZebraDeviceName)"),
+                        message: Text("You'll connect to \(selectedZebraDevice.id)"),
                         primaryButton: .default(Text("OK")) {
                             cslvalues.isLoading = true
                             startScanningZebra = false
-                            CSLHelper.connectToDevice(deviceIndex: selectedDeviceIndex)
+                            viewModelZebra.establishCommunication(readerID: selectedZebraDevice.id)
+                            
                         },
                         secondaryButton: .default(Text("Cancel")) {
-                            selectedDeviceName = ""
-                            selectedDeviceIndex = -1
+                            cslvalues.isLoading = false
+                            startScanningZebra = false
+                            selectedZebraDevice = .empty
+                            connectZebraToReader = false
                         }
                     )
                 }
@@ -205,11 +201,11 @@ struct SettingsViewContent: View {
                     }
                 })
                 
-                if (isDeviceConnectedZebra) {
+                if (viewModelZebra.isDeviceConnectedZebra) {
                     Section(header: Text("CSL RFID Handheld connected")) {
-                        Text("Device: \(connectedDeviceName)")
-                        Text("SN: \(deviceSerialNumber)")
-                        Text("Battery: \(batteryLevel)")
+                        Text("Device: \(selectedZebraDevice.name)")
+                        Text("SN: \(viewModelZebra.serialNumber)")
+                        Text("Battery: \(viewModelZebra.batteryLevel)")
                         HStack {
                             Spacer()
                             Button(action: { disconnectDevice = true }) {
@@ -223,7 +219,7 @@ struct SettingsViewContent: View {
                             title: Text("Disconnect from reader"),
                             message: Text("You'll disconnect from \(connectedDeviceName) "),
                             primaryButton: .default(Text("OK")) {
-                                CSLHelper.disconnectFromDevice()
+                                viewModelZebra.endCommunication(readerID: selectedZebraDevice.id)
                             },
                             secondaryButton: .default(Text("Cancel")) {
                                 disconnectDevice = false
@@ -254,7 +250,6 @@ struct SettingsViewContent: View {
                     if workingModeIsOffline {
                         Text("Last update:  \(workModeManager.offlineStartDateFormatted)")
                         Text("Saved assets:  \(assetsSaved)")
-                        
                     }
                 }            }
         }.alert(item: $error, content: { error in
@@ -316,21 +311,7 @@ struct SettingsViewContent: View {
             }
     }
     func startScannigZebra() {
-        setupSDK()
-    }
-    func setupSDK() {
-        //eventListener.delegate = self
-        apiInstance.srfidSetDelegate(eventListener)
-        apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_READ | SRFID_EVENT_MASK_STATUS))
-        apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_BATTERY | SRFID_EVENT_MASK_TRIGGER))
-        apiInstance.srfidSetOperationalMode(Int32(SRFID_OPMODE_MFI))
-        
-        apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_READER_APPEARANCE | SRFID_EVENT_READER_DISAPPEARANCE))
-        apiInstance.srfidEnableAvailableReadersDetection(true)
-        
-        apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_SESSION_ESTABLISHMENT | SRFID_EVENT_SESSION_TERMINATION))
-        apiInstance.srfidEnableAutomaticSessionReestablishment(true)
-        apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_BATTERY))
+        viewModelZebra.setupSDK()
     }
     func stopScanningZebra() {
     }
@@ -397,10 +378,10 @@ struct SettingsViewContent: View {
     }
 }
 
-//struct SettingsView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        NavigationView {
-//            SettingsView(cslvalues: CSLValues(), isUserLoggedOut: .constant(true))
-//        }
-//    }
-//}
+struct SettingsView_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationView {
+            SettingsView(cslvalues: CSLValues(), isUserLoggedOut: .constant(true))
+        }
+    }
+}
