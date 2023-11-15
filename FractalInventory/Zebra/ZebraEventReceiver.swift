@@ -54,14 +54,20 @@ final class EventReceiver: NSObject, srfidISdkApiDelegate, ObservableObject {
         apiInstance.srfidEnableAutomaticSessionReestablishment(true)
         apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_BATTERY))
         
-        if let device = srfidReaderInfo.init() {
-
-            device.setReaderID(1)
-            device.setReaderName("demo")
-            device.setActive(true)
-
-            updateList(readers: NSMutableArray(array: [device]))
-        }
+        bfprint("setupSDK Start")
+        apiInstance.srfidGetAvailableReadersList(&available_readers)
+        apiInstance.srfidGetActiveReadersList(&active_readers)
+        bfprint("setupSDK available_readers count: = \(available_readers?.count ?? 0)")
+        bfprint("setupSDK active_readers count: = \(active_readers?.count ?? 0)")
+        bfprint("setupSDK End")
+//        if let device = srfidReaderInfo.init() {
+//
+//            device.setReaderID(1)
+//            device.setReaderName("demo")
+//            device.setActive(true)
+//
+//            updateList(readers: NSMutableArray(array: [device]))
+//        }
     }
     
     private func updateList(readers: NSMutableArray?) {
@@ -81,10 +87,14 @@ final class EventReceiver: NSObject, srfidISdkApiDelegate, ObservableObject {
     }
     
     func srfidEventReaderAppeared(_ availableReader: srfidReaderInfo!) {
+        
+        listDevices.removeAll()
+        
         bfprint("RFID reader has appeared: ID = \(availableReader.getReaderID()) name = \(availableReader.getReaderName() ?? "")")
         apiInstance.srfidGetAvailableReadersList(&available_readers)
         apiInstance.srfidGetActiveReadersList(&active_readers)
-        
+        bfprint("available_readers count: = \(available_readers?.count ?? 0)")
+        bfprint("active_readers count: = \(active_readers?.count ?? 0)")
         updateList(readers: available_readers)
         updateList(readers: active_readers)
     }
@@ -95,13 +105,16 @@ final class EventReceiver: NSObject, srfidISdkApiDelegate, ObservableObject {
     
     
     func establishCommunication(readerID: Int32) {
+        bfprint("establishCommunication: ID = \(readerID)")
         apiInstance.srfidEstablishCommunicationSession(readerID)
     }
     func endCommunication(readerID: Int32) {
+        bfprint("endCommunication: ID = \(readerID)")
         apiInstance.srfidTerminateCommunicationSession(readerID)
     }
     
     private func connect(readerID: Int32) {
+        bfprint("connect: ID = \(readerID)")
         let password = "ascii password"
         let result = apiInstance.srfidEstablishAsciiConnection(readerID, aPassword: password)
         if result == SRFID_RESULT_SUCCESS {
