@@ -16,6 +16,15 @@ struct RFIDDevice: Identifiable {
     enum RFIDDeviceType {
         case active
         case available
+        
+        var toString: String {
+            switch self {                
+            case .active:
+                return "Conectado"
+            case .available:
+                return "Disponible"
+            }
+        }
     }
 }
 
@@ -74,6 +83,7 @@ final class EventReceiver: NSObject, srfidISdkApiDelegate, ObservableObject {
         (readers ?? []).forEach { item in
             if let device = item as? srfidReaderInfo {
                 guard !listDevices.contains(where: { $0.id == device.getReaderID() }) else {
+                    bfprint("device exist: \(device.getReaderID())")
                     return
                 }
                 listDevices.append(RFIDDevice(id: device.getReaderID(),

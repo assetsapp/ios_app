@@ -167,9 +167,11 @@ struct SettingsViewContent: View {
                             ForEach(Array(viewModelZebra.listDevices.enumerated()), id: \.offset) { index, device in
                                 Button(action: {
                                     selectedZebraDevice = device
-                                    connectZebraToReader = true
+                                    // if device.type == .available {
+                                        connectZebraToReader = true
+                                    // }
                                 }) {
-                                    Text("Device Name: \(device.name)")
+                                    Text("Device Name: \(device.name) - \(device.type.toString)")
                                         .padding()
                                 }
                             }
