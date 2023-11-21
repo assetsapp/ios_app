@@ -49,6 +49,7 @@ final class EventReceiver: NSObject, srfidISdkApiDelegate, ObservableObject {
     override init() {
         super.init()
         apiInstance.srfidSetDelegate(self)
+        setupSDK()
     }
     
     func setupSDK() {        
