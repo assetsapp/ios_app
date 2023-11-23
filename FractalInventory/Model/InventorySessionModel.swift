@@ -117,7 +117,7 @@ class ApiInventorySessions {
         }.resume()
     }
     
-    func updateAssetsInInventorySession(params: [String: Any], completion: @escaping([SavedAsset]) -> ()) {
+    func updateAssetsInInventorySession(params: [String: Any], completion: @escaping(Result<[SavedAsset], Error>) -> Void) {
         let urlComponent = URLComponents(string: "\(apiHost)/api/v1/app/\(apiDB)/updateInventorySessions")!
         let jsonData = try? JSONSerialization.data(withJSONObject: params)
         var request = URLRequest(url: urlComponent.url!)
@@ -127,10 +127,20 @@ class ApiInventorySessions {
         request.httpBody = jsonData
         
         URLSession.shared.dataTask(with: request) { data, response, error in
-            let savedAssets = try! JSONDecoder().decode(SavedAssetApiModel.self, from: data!)
-            print(savedAssets)
-            DispatchQueue.main.async {
-                completion(savedAssets.response)
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                guard let data = data else {
+                    completion(.failure(WMError.inventoriesCouldNotBeDownloaded))
+                    return
+                }
+                do {
+                    let savedAssets = try JSONDecoder().decode(SavedAssetApiModel.self, from: data)
+                    print(savedAssets)
+                    completion(.success(savedAssets.response))
+                } catch {
+                    completion(.failure(error))
+                }
             }
         }.resume()
     }

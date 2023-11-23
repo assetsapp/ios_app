@@ -129,7 +129,6 @@ final class EventReceiver: NSObject, srfidISdkApiDelegate, ObservableObject {
     private func connect(readerID: Int32) {
         bfprint("connect: ID = \(readerID)")
         let password = "ascii password"
-        //let test = ZT_APP_CFG_READER_ASCII_PASSWORD
         let result = apiInstance.srfidEstablishAsciiConnection(readerID, aPassword: nil)
         if result == SRFID_RESULT_SUCCESS {
             self.isDeviceConnectedZebra = true

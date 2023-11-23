@@ -184,27 +184,25 @@ struct SettingsViewContent: View {
                         title: Text("Connect to reader"),
                         message: Text("You'll connect to \(selectedZebraDevice.id)"),
                         primaryButton: .default(Text("OK")) {
-                            cslvalues.isLoading = true
                             startScanningZebra = false
                             viewModelZebra.establishCommunication(readerID: selectedZebraDevice.id)
                             
                         },
                         secondaryButton: .default(Text("Cancel")) {
-                            cslvalues.isLoading = false
                             startScanningZebra = false
                             selectedZebraDevice = .empty
                             connectZebraToReader = false
                         }
                     )
                 }
-                .onChange(of: isDeviceConnected, perform: { value in
+                .onChange(of: viewModelZebra.isDeviceConnectedZebra, perform: { value in
                     if value {
-                        cslvalues.isLoading = false
+                       
                     }
                 })
                 
                 if (viewModelZebra.isDeviceConnectedZebra) {
-                    Section(header: Text("CSL RFID Handheld connected")) {
+                    Section(header: Text("Zebra RFID Handle connected")) {
                         Text("Device: \(selectedZebraDevice.name)")
                         Text("SN: \(viewModelZebra.serialNumber)")
                         Text("Battery: \(viewModelZebra.batteryLevel)")
