@@ -41,8 +41,8 @@ final class EventReceiver: NSObject, srfidISdkApiDelegate, ObservableObject {
     @Published var serialNumber: String = ""
     @Published var isDeviceConnectedZebra: Bool = false
     
-    private var available_readers: NSMutableArray?
-    private var active_readers: NSMutableArray?
+    private var available_readers: NSMutableArray? = NSMutableArray()
+    private var active_readers: NSMutableArray? = NSMutableArray()
     
     private let apiInstance: srfidISdkApi = srfidSdkFactory.createRfidSdkApiInstance()
     
@@ -65,6 +65,8 @@ final class EventReceiver: NSObject, srfidISdkApiDelegate, ObservableObject {
         apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_BATTERY))
         
         bfprint("setupSDK Start")
+        available_readers = NSMutableArray()
+        active_readers = NSMutableArray()
         apiInstance.srfidGetAvailableReadersList(&available_readers)
         apiInstance.srfidGetActiveReadersList(&active_readers)
         bfprint("setupSDK available_readers count: = \(available_readers?.count ?? 0)")
@@ -127,7 +129,8 @@ final class EventReceiver: NSObject, srfidISdkApiDelegate, ObservableObject {
     private func connect(readerID: Int32) {
         bfprint("connect: ID = \(readerID)")
         let password = "ascii password"
-        let result = apiInstance.srfidEstablishAsciiConnection(readerID, aPassword: password)
+        //let test = ZT_APP_CFG_READER_ASCII_PASSWORD
+        let result = apiInstance.srfidEstablishAsciiConnection(readerID, aPassword: nil)
         if result == SRFID_RESULT_SUCCESS {
             self.isDeviceConnectedZebra = true
             bfprint("ASCII connection has been established")
