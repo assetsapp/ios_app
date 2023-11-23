@@ -62,7 +62,7 @@ struct SettingsViewContent: View {
     @State var startScanningZebra: Bool = false
     @State var selectedZebraDevice: RFIDDevice = .empty
     @State var connectZebraToReader: Bool = false
-        
+    @State var disconnectZebraDevice: Bool = false
     @StateObject var viewModelZebra: EventReceiver = EventReceiver()
     
     let timer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
@@ -208,16 +208,16 @@ struct SettingsViewContent: View {
                         Text("Battery: \(viewModelZebra.batteryLevel)")
                         HStack {
                             Spacer()
-                            Button(action: { disconnectDevice = true }) {
+                            Button(action: { disconnectZebraDevice = true }) {
                                 Text("Disconnect Device")
                                     .foregroundColor(.red)
                             }
                         }
                     }
-                    .alert(isPresented: $disconnectDevice) {
+                    .alert(isPresented: $disconnectZebraDevice) {
                         Alert(
                             title: Text("Disconnect from reader"),
-                            message: Text("You'll disconnect from \(connectedDeviceName) "),
+                            message: Text("You'll disconnect from \(selectedZebraDevice.name) "),
                             primaryButton: .default(Text("OK")) {
                                 viewModelZebra.endCommunication(readerID: selectedZebraDevice.id)
                             },
