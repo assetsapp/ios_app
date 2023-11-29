@@ -44,7 +44,25 @@ final class EventReceiver: NSObject, srfidISdkApiDelegate, ObservableObject {
     private var available_readers: NSMutableArray? = NSMutableArray()
     private var active_readers: NSMutableArray? = NSMutableArray()
     
+    
     private let apiInstance: srfidISdkApi = srfidSdkFactory.createRfidSdkApiInstance()
+    
+    func rapidRead() {
+        let start_trigger_cfg: srfidStartTriggerConfig = srfidStartTriggerConfig()
+        let stop_trigger_cfg: srfidStopTriggerConfig = srfidStopTriggerConfig()
+        let report_cfg: srfidReportConfig = srfidReportConfig()
+        let access_cfg: srfidAccessConfig = srfidAccessConfig()
+        let error_response: NSString? = nil
+        
+        start_trigger_cfg.setStartOnHandheldTrigger(false)
+        start_trigger_cfg.setStartDelay(0)
+        start_trigger_cfg.setRepeatMonitoring(false)
+        
+        stop_trigger_cfg.setStopOnHandheldTrigger(false)
+        stop_trigger_cfg.setStopOnTimeout(false)
+        stop_trigger_cfg.setStopOnTagCount(false)
+        
+    }
     
     override init() {
         super.init()
@@ -56,6 +74,8 @@ final class EventReceiver: NSObject, srfidISdkApiDelegate, ObservableObject {
         apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_READ | SRFID_EVENT_MASK_STATUS))
         apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_BATTERY | SRFID_EVENT_MASK_TRIGGER))
         apiInstance.srfidSetOperationalMode(Int32(SRFID_OPMODE_MFI))
+        apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_READ))
+        apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_STATUS))
         
         apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_READER_APPEARANCE | SRFID_EVENT_READER_DISAPPEARANCE))
         apiInstance.srfidEnableAvailableReadersDetection(true)
@@ -133,6 +153,7 @@ final class EventReceiver: NSObject, srfidISdkApiDelegate, ObservableObject {
         if result == SRFID_RESULT_SUCCESS {
             self.isDeviceConnectedZebra = true
             bfprint("ASCII connection has been established")
+            batteryStatus(readerID: readerID)
             getCapabilities(readerID: readerID)
         } else if SRFID_RESULT_WRONG_ASCII_PASSWORD == result {
             bfprint("Incorrect ASCII connection password")
@@ -176,7 +197,7 @@ final class EventReceiver: NSObject, srfidISdkApiDelegate, ObservableObject {
     func srfidEventBatteryNotity(_ readerID: Int32, aBatteryEvent batteryEvent: srfidBatteryEvent!) {
         bfprint("Battery status event received from RFID reader with ID = \(readerID)")
         bfprint("Battery level: \(batteryEvent.getPowerLevel())")
-        batteryLevel = "Battery level: \(batteryEvent.getPowerLevel())"
+        batteryLevel = "\(batteryEvent.getPowerLevel())"
         bfprint("Charging: \(batteryEvent.getIsCharging() == false ? "NO" : "SI")")
         bfprint("Event cause: \(batteryEvent.getCause() ?? "")")
     }
