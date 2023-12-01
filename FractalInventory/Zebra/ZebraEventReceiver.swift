@@ -47,21 +47,58 @@ final class EventReceiver: NSObject, srfidISdkApiDelegate, ObservableObject {
     
     private let apiInstance: srfidISdkApi = srfidSdkFactory.createRfidSdkApiInstance()
     
-    func rapidRead() {
-        let start_trigger_cfg: srfidStartTriggerConfig = srfidStartTriggerConfig()
-        let stop_trigger_cfg: srfidStopTriggerConfig = srfidStopTriggerConfig()
+    func rapidRead(readerID: Int32) {
+        var start_trigger_cfg: srfidStartTriggerConfig? = srfidStartTriggerConfig()
+        var stop_trigger_cfg: srfidStopTriggerConfig? = srfidStopTriggerConfig()
         let report_cfg: srfidReportConfig = srfidReportConfig()
         let access_cfg: srfidAccessConfig = srfidAccessConfig()
-        let error_response: NSString? = nil
+        var error_response: NSString? = nil
         
-        start_trigger_cfg.setStartOnHandheldTrigger(false)
-        start_trigger_cfg.setStartDelay(0)
-        start_trigger_cfg.setRepeatMonitoring(false)
+        start_trigger_cfg?.setStartOnHandheldTrigger(false)
+        start_trigger_cfg?.setStartDelay(0)
+        start_trigger_cfg?.setRepeatMonitoring(false)
         
-        stop_trigger_cfg.setStopOnHandheldTrigger(false)
-        stop_trigger_cfg.setStopOnTimeout(false)
-        stop_trigger_cfg.setStopOnTagCount(false)
+        stop_trigger_cfg?.setStopOnHandheldTrigger(false)
+        stop_trigger_cfg?.setStopOnTimeout(false)
+        stop_trigger_cfg?.setStopOnTagCount(false)
+        stop_trigger_cfg?.setStopOnInventoryCount(false)
+        stop_trigger_cfg?.setStopOnAccessCount(false)
+        var result = apiInstance.srfidGetStartTriggerConfiguration(readerID, aStartTriggeConfig: &start_trigger_cfg, aStatusMessage: &error_response)
+        if result == SRFID_RESULT_SUCCESS {
+            print("Start trigger configuration has been set")
+        } else {
+            print("Failed to set start trigger parameters")
+        }
+        result = apiInstance.srfidGetStopTriggerConfiguration(readerID, aStopTriggeConfig: &stop_trigger_cfg, aStatusMessage: &error_response)
+        if result == SRFID_RESULT_SUCCESS {
+            print("Stop trigger configuration has been set")
+        } else {
+            print("Failed to set stop trigger parameters")
+        }
+        error_response = nil
+        report_cfg.setIncPC(true)
+        report_cfg.setIncPhase(true)
+        report_cfg.setIncChannelIndex(true)
+        report_cfg.setIncRSSI(true)
+        report_cfg.setIncTagSeenCount(false)
+        report_cfg.setIncFirstSeenTime(false)
+        report_cfg.setIncLastSeenTime(false)
         
+        access_cfg.setPower(270)
+        access_cfg.setDoSelect(false)
+        
+        result = apiInstance.srfidStartRapidRead(readerID, aReportConfig: report_cfg, aAccessConfig: access_cfg, aStatusMessage: &error_response)
+        if result == SRFID_RESULT_SUCCESS {
+            print("Request succeed")
+            let seconds = 60.0
+            DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
+                self.apiInstance.srfidStopRapidRead(readerID, aStatusMessage: nil)
+            }
+        } else if result == SRFID_RESULT_RESPONSE_ERROR {
+            print("Error response from RFID reader: \(error_response ?? "")")
+        } else {
+            print("Request failed")
+        }
     }
     
     override init() {
@@ -148,13 +185,14 @@ final class EventReceiver: NSObject, srfidISdkApiDelegate, ObservableObject {
     
     private func connect(readerID: Int32) {
         bfprint("connect: ID = \(readerID)")
-        let password = "ascii password"
+        //let password = "ascii password"
         let result = apiInstance.srfidEstablishAsciiConnection(readerID, aPassword: nil)
         if result == SRFID_RESULT_SUCCESS {
             self.isDeviceConnectedZebra = true
             bfprint("ASCII connection has been established")
             batteryStatus(readerID: readerID)
             getCapabilities(readerID: readerID)
+            rapidRead(readerID: readerID)
         } else if SRFID_RESULT_WRONG_ASCII_PASSWORD == result {
             bfprint("Incorrect ASCII connection password")
         } else {
@@ -175,11 +213,13 @@ final class EventReceiver: NSObject, srfidISdkApiDelegate, ObservableObject {
     }
     
     func srfidEventReadNotify(_ readerID: Int32, aTagData tagData: srfidTagData!) {
-        
+        print("Tag data received from RFID reader with ID = \(readerID)")
+        print("Tag id: \(tagData.getTagId() ?? "")")
     }
     
     func srfidEventStatusNotify(_ readerID: Int32, aEvent event: SRFID_EVENT_STATUS, aNotification notificationData: Any!) {
-        
+        let status = event == SRFID_EVENT_STATUS_OPERATION_START ? "started" : "stopped"
+        print("Radio operation has \(status)")
     }
     
     func srfidEventProximityNotify(_ readerID: Int32, aProximityPercent proximityPercent: Int32) {
