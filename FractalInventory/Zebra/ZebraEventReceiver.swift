@@ -35,7 +35,6 @@ extension RFIDDevice {
 }
 
 final class EventReceiver: NSObject, srfidISdkApiDelegate, ObservableObject {
-     
     @Published var listDevices: [RFIDDevice] = []
     @Published var batteryLevel: String = ""
     @Published var serialNumber: String = ""
@@ -129,14 +128,6 @@ final class EventReceiver: NSObject, srfidISdkApiDelegate, ObservableObject {
         bfprint("setupSDK available_readers count: = \(available_readers?.count ?? 0)")
         bfprint("setupSDK active_readers count: = \(active_readers?.count ?? 0)")
         bfprint("setupSDK End")
-//        if let device = srfidReaderInfo.init() {
-//
-//            device.setReaderID(1)
-//            device.setReaderName("demo")
-//            device.setActive(true)
-//
-//            updateList(readers: NSMutableArray(array: [device]))
-//        }
     }
     
     private func updateList(readers: NSMutableArray?) {
