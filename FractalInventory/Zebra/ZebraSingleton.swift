@@ -49,6 +49,8 @@ class ZebraSingleton: NSObject {
         apiInstance.srfidGetActiveReadersList(&active_readers)
         bfprint("setupSDK available_readers count: = \(available_readers?.count ?? 0)")
         bfprint("setupSDK active_readers count: = \(active_readers?.count ?? 0)")
+        updateList(readers: available_readers)
+        updateList(readers: active_readers)
         bfprint("setupSDK End")
     }
     func rapidRead(readerID: Int32) {
@@ -232,9 +234,18 @@ extension ZebraSingleton: ObservableObject {
 }
 extension ZebraSingleton: srfidISdkApiDelegate {
     func srfidEventReaderAppeared(_ availableReader: srfidReaderInfo!) {
+        listDevices.removeAll()
+        bfprint("RFID reader has appeared: ID = \(availableReader.getReaderID()) name = \(availableReader.getReaderName() ?? "")")
+        apiInstance.srfidGetAvailableReadersList(&available_readers)
+        apiInstance.srfidGetActiveReadersList(&active_readers)
+        bfprint("available_readers count: = \(available_readers?.count ?? 0)")
+        bfprint("active_readers count: = \(active_readers?.count ?? 0)")
+        updateList(readers: available_readers)
+        updateList(readers: active_readers)
     }
     
     func srfidEventReaderDisappeared(_ readerID: Int32) {
+        bfprint("RFID reader has disappeared: ID = \(readerID)")
     }
     
     func srfidEventCommunicationSessionEstablished(_ activeReader: srfidReaderInfo!) {
