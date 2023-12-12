@@ -1,28 +1,34 @@
 //
-//  ZebraEventReceiver.swift
+//  ZebraSingleton.swift
 //  FractalInventory
 //
-//  Created by Miguel Mexicano Herrera on 06/11/23.
+//  Created by Miguel Mexicano Herrera on 12/12/23.
 //
+
+import Foundation
 import BugfenderSDK
-import SwiftUI
-final class EventReceiverTest: NSObject, srfidISdkApiDelegate, ObservableObject {
+class ZebraSingleton: NSObject {
+    static var shared: ZebraSingleton = {
+        let instance = ZebraSingleton()
+        return instance
+    }()
+    private let apiInstance: srfidISdkApi = srfidSdkFactory.createRfidSdkApiInstance()
+    private var available_readers: NSMutableArray? = NSMutableArray()
+    private var active_readers: NSMutableArray? = NSMutableArray()
     @Published var listDevices: [RFIDDevice] = []
     @Published var batteryLevel: String = ""
     @Published var serialNumber: String = ""
+    @Published var antenaPower: String = ""
     @Published var isDeviceConnectedZebra: Bool = false
-    private var available_readers: NSMutableArray? = NSMutableArray()
-    private var active_readers: NSMutableArray? = NSMutableArray()
-    private let apiInstance: srfidISdkApi = srfidSdkFactory.createRfidSdkApiInstance()
-    var currentReaderID: Int32 = -1
-
-    override init() {
+    @Published var selectedZebraDevice: RFIDDevice = .empty
+    @Published var currentReaderID: Int32 = -1
+    
+    private override init() {
         super.init()
         apiInstance.srfidSetDelegate(self)
         setupSDK()
     }
-    
-    func setupSDK() {        
+    func setupSDK() {
         apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_READ | SRFID_EVENT_MASK_STATUS))
         apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_BATTERY | SRFID_EVENT_MASK_TRIGGER))
         apiInstance.srfidSetOperationalMode(Int32(SRFID_OPMODE_MFI))
@@ -45,7 +51,6 @@ final class EventReceiverTest: NSObject, srfidISdkApiDelegate, ObservableObject 
         bfprint("setupSDK active_readers count: = \(active_readers?.count ?? 0)")
         bfprint("setupSDK End")
     }
-    
     func rapidRead(readerID: Int32) {
         var start_trigger_cfg: srfidStartTriggerConfig? = srfidStartTriggerConfig()
         var stop_trigger_cfg: srfidStopTriggerConfig? = srfidStopTriggerConfig()
@@ -99,7 +104,6 @@ final class EventReceiverTest: NSObject, srfidISdkApiDelegate, ObservableObject 
             print("Request failed")
         }
     }
-    
     private func updateList(readers: NSMutableArray?) {
         (readers ?? []).forEach { item in
             if let device = item as? srfidReaderInfo {
@@ -115,22 +119,6 @@ final class EventReceiverTest: NSObject, srfidISdkApiDelegate, ObservableObject 
                 bfprint("srfidReaderInfo nil")
             }
         }
-    }
-    
-    func srfidEventReaderAppeared(_ availableReader: srfidReaderInfo!) {
-        
-        listDevices.removeAll()
-        
-        bfprint("RFID reader has appeared: ID = \(availableReader.getReaderID()) name = \(availableReader.getReaderName() ?? "")")
-        apiInstance.srfidGetAvailableReadersList(&available_readers)
-        apiInstance.srfidGetActiveReadersList(&active_readers)
-        bfprint("available_readers count: = \(available_readers?.count ?? 0)")
-        bfprint("active_readers count: = \(active_readers?.count ?? 0)")
-        updateList(readers: available_readers)
-        updateList(readers: active_readers)
-    }
-    func srfidEventReaderDisappeared(_ readerID: Int32) {
-        bfprint("RFID reader has disappeared: ID = \(readerID)")
     }
     func establishCommunication(readerID: Int32) {
         bfprint("establishCommunication: ID = \(readerID)")
@@ -151,57 +139,14 @@ final class EventReceiverTest: NSObject, srfidISdkApiDelegate, ObservableObject 
             batteryStatus(readerID: readerID)
             getCapabilities(readerID: readerID)
             rapidRead(readerID: readerID)
+            currentReaderID = readerID
+            antenaConfiguration(readerID: readerID)
         } else if SRFID_RESULT_WRONG_ASCII_PASSWORD == result {
             bfprint("Incorrect ASCII connection password")
         } else {
             bfprint("Failed to establish ASCII connection")
         }
     }
-    
-    func srfidEventCommunicationSessionEstablished(_ activeReader: srfidReaderInfo!) {
-        let readerID = activeReader.getReaderID()
-        bfprint("RFID reader has connected: ID = \(readerID) name = \(activeReader.getReaderName() ?? "")")
-        self.connect(readerID: readerID)
-    }
-    
-    func srfidEventCommunicationSessionTerminated(_ readerID: Int32) {
-        bfprint("RFID reader has disconnected: ID = \(readerID)")
-        self.isDeviceConnectedZebra = false
-        serialNumber = ""
-        batteryLevel = ""
-        // TODO: Limpiar otras variables serialNumber y battery
-    }
-    
-    func srfidEventReadNotify(_ readerID: Int32, aTagData tagData: srfidTagData!) {
-        print("Tag data received from RFID reader with ID = \(readerID)")
-        print("Tag id: \(tagData.getTagId() ?? "")")
-    }
-    
-    func srfidEventStatusNotify(_ readerID: Int32, aEvent event: SRFID_EVENT_STATUS, aNotification notificationData: Any!) {
-        let status = event == SRFID_EVENT_STATUS_OPERATION_START ? "started" : "stopped"
-        print("Radio operation has \(status)")
-    }
-    
-    func srfidEventProximityNotify(_ readerID: Int32, aProximityPercent proximityPercent: Int32) {
-        
-    }
-    
-    func srfidEventMultiProximityNotify(_ readerID: Int32, aTagData tagData: srfidTagData!) {
-        
-    }
-    
-    func srfidEventTriggerNotify(_ readerID: Int32, aTriggerEvent triggerEvent: SRFID_TRIGGEREVENT) {
-        
-    }
-    
-    func srfidEventBatteryNotity(_ readerID: Int32, aBatteryEvent batteryEvent: srfidBatteryEvent!) {
-        bfprint("Battery status event received from RFID reader with ID = \(readerID)")
-        bfprint("Battery level: \(batteryEvent.getPowerLevel())")
-        batteryLevel = "\(batteryEvent.getPowerLevel())"
-        bfprint("Charging: \(batteryEvent.getIsCharging() == false ? "NO" : "SI")")
-        bfprint("Event cause: \(batteryEvent.getCause() ?? "")")
-    }
-    
     func getCapabilities(readerID: Int32) {
         var capabilities: srfidReaderCapabilitiesInfo? = srfidReaderCapabilitiesInfo()
         var error_response: NSString?
@@ -281,5 +226,54 @@ final class EventReceiverTest: NSObject, srfidISdkApiDelegate, ObservableObject 
             bfprint("getProfile: Request failed")
         }
         return nil
+    }
+}
+extension ZebraSingleton: ObservableObject {
+}
+extension ZebraSingleton: srfidISdkApiDelegate {
+    func srfidEventReaderAppeared(_ availableReader: srfidReaderInfo!) {
+    }
+    
+    func srfidEventReaderDisappeared(_ readerID: Int32) {
+    }
+    
+    func srfidEventCommunicationSessionEstablished(_ activeReader: srfidReaderInfo!) {
+        let readerID = activeReader.getReaderID()
+        bfprint("RFID reader has connected: ID = \(readerID) name = \(activeReader.getReaderName() ?? "")")
+        self.connect(readerID: readerID)
+    }
+    
+    func srfidEventCommunicationSessionTerminated(_ readerID: Int32) {
+        bfprint("RFID reader has disconnected: ID = \(readerID)")
+        self.isDeviceConnectedZebra = false
+        serialNumber = ""
+        batteryLevel = ""
+    }
+    
+    func srfidEventReadNotify(_ readerID: Int32, aTagData tagData: srfidTagData!) {
+        print("Tag data received from RFID reader with ID = \(readerID)")
+        print("Tag id: \(tagData.getTagId() ?? "")")
+    }
+    
+    func srfidEventStatusNotify(_ readerID: Int32, aEvent event: SRFID_EVENT_STATUS, aNotification notificationData: Any!) {
+        let status = event == SRFID_EVENT_STATUS_OPERATION_START ? "started" : "stopped"
+        print("Radio operation has \(status)")
+    }
+    
+    func srfidEventProximityNotify(_ readerID: Int32, aProximityPercent proximityPercent: Int32) {
+    }
+    
+    func srfidEventMultiProximityNotify(_ readerID: Int32, aTagData tagData: srfidTagData!) {
+    }
+    
+    func srfidEventTriggerNotify(_ readerID: Int32, aTriggerEvent triggerEvent: SRFID_TRIGGEREVENT) {
+    }
+    
+    func srfidEventBatteryNotity(_ readerID: Int32, aBatteryEvent batteryEvent: srfidBatteryEvent!) {
+        bfprint("Battery status event received from RFID reader with ID = \(readerID)")
+        bfprint("Battery level: \(batteryEvent.getPowerLevel())")
+        batteryLevel = "\(batteryEvent.getPowerLevel())"
+        bfprint("Charging: \(batteryEvent.getIsCharging() == false ? "NO" : "SI")")
+        bfprint("Event cause: \(batteryEvent.getCause() ?? "")")
     }
 }

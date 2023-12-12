@@ -60,10 +60,8 @@ struct SettingsViewContent: View {
         }
     }
     @State var startScanningZebra: Bool = false
-    @State var selectedZebraDevice: RFIDDevice = .empty
     @State var connectZebraToReader: Bool = false
     @State var disconnectZebraDevice: Bool = false
-    @StateObject var viewModelZebra: EventReceiver = EventReceiver()
     
     let timer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
     let devName = "CS108ReaderF76D81"
@@ -158,15 +156,15 @@ struct SettingsViewContent: View {
                                 startScannigZebra()
                             } else {
                                 stopScanningZebra()
-                                viewModelZebra.listDevices = []
+                                ZebraSingleton.shared.listDevices = []
                             }
                         })
                     if (startScanningZebra) {
                         Text("Bellow will appear available devices")
                         List {
-                            ForEach(Array(viewModelZebra.listDevices.enumerated()), id: \.offset) { index, device in
+                            ForEach(Array(ZebraSingleton.shared.listDevices.enumerated()), id: \.offset) { index, device in
                                 Button(action: {
-                                    selectedZebraDevice = device
+                                    ZebraSingleton.shared.selectedZebraDevice = device
                                     // if device.type == .available {
                                         connectZebraToReader = true
                                     // }
@@ -178,34 +176,33 @@ struct SettingsViewContent: View {
                         }
                     }
                 }
-                .disabled(viewModelZebra.isDeviceConnectedZebra)
+                .disabled(ZebraSingleton.shared.isDeviceConnectedZebra)
                 .alert(isPresented: $connectZebraToReader ) {
                     Alert(
                         title: Text("Connect to reader"),
-                        message: Text("You'll connect to \(selectedZebraDevice.id)"),
+                        message: Text("You'll connect to \(ZebraSingleton.shared.selectedZebraDevice.id)"),
                         primaryButton: .default(Text("OK")) {
                             startScanningZebra = false
-                            viewModelZebra.establishCommunication(readerID: selectedZebraDevice.id)
-                            
+                            ZebraSingleton.shared.establishCommunication(readerID: ZebraSingleton.shared.selectedZebraDevice.id)
                         },
                         secondaryButton: .default(Text("Cancel")) {
                             startScanningZebra = false
-                            selectedZebraDevice = .empty
+                            ZebraSingleton.shared.selectedZebraDevice = .empty
                             connectZebraToReader = false
                         }
                     )
                 }
-                .onChange(of: viewModelZebra.isDeviceConnectedZebra, perform: { value in
+                .onChange(of: ZebraSingleton.shared.isDeviceConnectedZebra, perform: { value in
                     if value {
                        
                     }
                 })
                 
-                if (viewModelZebra.isDeviceConnectedZebra) {
+                if (ZebraSingleton.shared.isDeviceConnectedZebra) {
                     Section(header: Text("Zebra RFID Handle connected")) {
-                        Text("Device: \(selectedZebraDevice.name)")
-                        Text("SN: \(viewModelZebra.serialNumber)")
-                        Text("Battery: \(viewModelZebra.batteryLevel)")
+                        Text("Device: \(ZebraSingleton.shared.selectedZebraDevice.name)")
+                        Text("SN: \(ZebraSingleton.shared.serialNumber)")
+                        Text("Battery: \(ZebraSingleton.shared.batteryLevel)")
                         HStack {
                             Spacer()
                             Button(action: { disconnectZebraDevice = true }) {
@@ -217,9 +214,9 @@ struct SettingsViewContent: View {
                     .alert(isPresented: $disconnectZebraDevice) {
                         Alert(
                             title: Text("Disconnect from reader"),
-                            message: Text("You'll disconnect from \(selectedZebraDevice.name) "),
+                            message: Text("You'll disconnect from \(ZebraSingleton.shared.selectedZebraDevice.name) "),
                             primaryButton: .default(Text("OK")) {
-                                viewModelZebra.endCommunication(readerID: selectedZebraDevice.id)
+                                ZebraSingleton.shared.endCommunication(readerID: ZebraSingleton.shared.selectedZebraDevice.id)
                             },
                             secondaryButton: .default(Text("Cancel")) {
                                 disconnectDevice = false
@@ -311,7 +308,7 @@ struct SettingsViewContent: View {
             }
     }
     func startScannigZebra() {
-        viewModelZebra.setupSDK()
+        ZebraSingleton.shared.setupSDK()
     }
     func stopScanningZebra() {
     }
