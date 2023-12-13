@@ -136,12 +136,12 @@ class ZebraSingleton: NSObject {
         //let password = "ascii password"
         let result = apiInstance.srfidEstablishAsciiConnection(readerID, aPassword: nil)
         if result == SRFID_RESULT_SUCCESS {
+            currentReaderID = readerID
             self.isDeviceConnectedZebra = true
             bfprint("ASCII connection has been established")
             batteryStatus(readerID: readerID)
             getCapabilities(readerID: readerID)
-            rapidRead(readerID: readerID)
-            currentReaderID = readerID
+            //rapidRead(readerID: readerID)
             antenaConfiguration(readerID: readerID)
         } else if SRFID_RESULT_WRONG_ASCII_PASSWORD == result {
             bfprint("Incorrect ASCII connection password")
