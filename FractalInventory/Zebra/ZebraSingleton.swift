@@ -49,8 +49,6 @@ class ZebraSingleton: NSObject {
         apiInstance.srfidGetActiveReadersList(&active_readers)
         bfprint("setupSDK available_readers count: = \(available_readers?.count ?? 0)")
         bfprint("setupSDK active_readers count: = \(active_readers?.count ?? 0)")
-        updateList(readers: available_readers)
-        updateList(readers: active_readers)
         bfprint("setupSDK End")
     }
     func rapidRead(readerID: Int32) {
