@@ -188,7 +188,7 @@ class ZebraSingleton: NSObject {
         }
     }
     func antenaConfiguration(readerID: Int32) {
-        var antenna_cfg: srfidAntennaConfiguration?
+        var antenna_cfg: srfidAntennaConfiguration? = srfidAntennaConfiguration()
         var error_response: NSString?
         let result = apiInstance.srfidGetAntennaConfiguration(readerID, aAntennaConfiguration: &antenna_cfg, aStatusMessage: &error_response)
         if SRFID_RESULT_SUCCESS == result {
