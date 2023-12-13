@@ -18,7 +18,7 @@ class ZebraSingleton: NSObject {
     @Published var listDevices: [RFIDDevice] = []
     @Published var batteryLevel: String = ""
     @Published var serialNumber: String = ""
-    @Published var antenaPower: String = ""
+    @Published var antenaPower: Double = 0
     @Published var isDeviceConnectedZebra: Bool = false
     @Published var selectedZebraDevice: RFIDDevice = .empty
     @Published var currentReaderID: Int32 = -1
@@ -200,6 +200,7 @@ class ZebraSingleton: NSObject {
             let antenaTari = antenna_cfg.getTari()
             let prefilters = antenna_cfg.getDoSelect()
             bfprint("antenaConfiguration: Antenna power level: \(power/10.0)")
+            antenaPower = power/10.0
             bfprint("antenaConfiguration: Antenna RF mode index: \(linkProfileIdx)")
             bfprint("antenaConfiguration: Antenna tari: \(antenaTari)")
             bfprint("antenaConfiguration: Antenna pre-filters application \(prefilters == false ? "No" : "Si")")
