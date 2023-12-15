@@ -120,7 +120,6 @@
 		76F5AB2026CA2245001B8B89 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 76F5AB1F26CA2245001B8B89 /* Assets.xcassets */; };
 		76F5AB2326CA2245001B8B89 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 76F5AB2226CA2245001B8B89 /* Preview Assets.xcassets */; };
 		76F5AB2B26CB2C79001B8B89 /* LogInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F5AB2A26CB2C79001B8B89 /* LogInView.swift */; };
-		F203F3972AF9DE580037D45B /* ZebraEventReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = F203F3962AF9DE580037D45B /* ZebraEventReceiver.swift */; };
 		F203F3C82AF9DEED0037D45B /* merge.sh in Resources */ = {isa = PBXBuildFile; fileRef = F203F3C42AF9DEEC0037D45B /* merge.sh */; };
 		F203F3C92AF9DEED0037D45B /* libintegratedsdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F203F3C52AF9DEEC0037D45B /* libintegratedsdk.a */; };
 		F203F3CA2AF9DEED0037D45B /* libsymbolrfid-sdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F203F3C62AF9DEEC0037D45B /* libsymbolrfid-sdk.a */; };
@@ -291,7 +290,6 @@
 		76F5AB2426CA2245001B8B89 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		76F5AB2A26CB2C79001B8B89 /* LogInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInView.swift; sourceTree = "<group>"; };
 		A6100A6A96CC0C8F133CC38C /* Pods_FractalInventory.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FractalInventory.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		F203F3962AF9DE580037D45B /* ZebraEventReceiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZebraEventReceiver.swift; sourceTree = "<group>"; };
 		F203F39A2AF9DEEC0037D45B /* RfidAccessConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidAccessConfig.h; sourceTree = "<group>"; };
 		F203F39B2AF9DEEC0037D45B /* RfidSdkDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidSdkDefs.h; sourceTree = "<group>"; };
 		F203F39C2AF9DEEC0037D45B /* RfidSingulationConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidSingulationConfig.h; sourceTree = "<group>"; };
@@ -906,7 +904,6 @@
 		F203F3CC2AF9DF8D0037D45B /* Zebra */ = {
 			isa = PBXGroup;
 			children = (
-				F203F3962AF9DE580037D45B /* ZebraEventReceiver.swift */,
 				F203F3CD2AF9DFCD0037D45B /* ZebraProtocols.swift */,
 				F203F3D12AFA91610037D45B /* ZebraValues.swift */,
 				F21691BC2B28CD3D00BB64AD /* ZebraSingleton.swift */,
@@ -1192,7 +1189,6 @@
 				76B39964272637F4000A363A /* AssetPhoto.swift in Sources */,
 				7663FE2327617D1E001C1578 /* LoadImage.swift in Sources */,
 				F21691BF2B28CDE200BB64AD /* ZebraModel.swift in Sources */,
-				F203F3972AF9DE580037D45B /* ZebraEventReceiver.swift in Sources */,
 				7655820726DC808100F6C973 /* MQTTLog.m in Sources */,
 				7655820A26DC808100F6C973 /* MQTTSessionManager.m in Sources */,
 				767F77B92761626400FD905B /* WebViewStateModel.swift in Sources */,
