@@ -122,15 +122,17 @@ class ZebraSingleton: NSObject {
             }
         }
     }
+    /// Establecer la comunicacion con un RFID
     func establishCommunication(readerID: Int32) {
         bfprint("establishCommunication: ID = \(readerID)")
         apiInstance.srfidEstablishCommunicationSession(readerID)
     }
+    /// Terminar la comunicacion con un RFID
     func endCommunication(readerID: Int32) {
         bfprint("endCommunication: ID = \(readerID)")
         apiInstance.srfidTerminateCommunicationSession(readerID)
     }
-    
+    /// Conectar con un RFID
     private func connect(readerID: Int32) {
         bfprint("connect: ID = \(readerID)")
         //let password = "ascii password"
@@ -139,7 +141,7 @@ class ZebraSingleton: NSObject {
             currentReaderID = readerID
             self.isDeviceConnectedZebra = true
             bfprint("ASCII connection has been established")
-            batteryStatus(readerID: readerID)
+            requestBatteryStatus(readerID: readerID)
             antenaCapabilities = getCapabilities(readerID: readerID)
             //rapidRead(readerID: readerID)
             antenaConfiguration = antenaConfiguration(readerID: readerID)
@@ -182,7 +184,8 @@ class ZebraSingleton: NSObject {
         }
         return nil
     }
-    func batteryStatus(readerID: Int32) {
+    /// Solicitar el estatus de la bateria.
+    func requestBatteryStatus(readerID: Int32) {
         let result = apiInstance.srfidRequestBatteryStatus(readerID)
         if SRFID_RESULT_SUCCESS == result {
             bfprint("batteryStatus: Request succeed")
@@ -259,12 +262,13 @@ extension ZebraSingleton: srfidISdkApiDelegate {
         bfprint("RFID reader has connected: ID = \(readerID) name = \(activeReader.getReaderName() ?? "")")
         self.connect(readerID: readerID)
     }
-    
+    /// Funcion que notifica el fin de la session.
     func srfidEventCommunicationSessionTerminated(_ readerID: Int32) {
         bfprint("RFID reader has disconnected: ID = \(readerID)")
         self.isDeviceConnectedZebra = false
         serialNumber = ""
         batteryLevel = ""
+        currentReaderID = -1
     }
     
     func srfidEventReadNotify(_ readerID: Int32, aTagData tagData: srfidTagData!) {
