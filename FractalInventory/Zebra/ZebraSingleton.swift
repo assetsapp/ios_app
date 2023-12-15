@@ -22,6 +22,8 @@ class ZebraSingleton: NSObject {
     @Published var isDeviceConnectedZebra: Bool = false
     @Published var selectedZebraDevice: RFIDDevice = .empty
     @Published var currentReaderID: Int32 = -1
+    @Published var antenaConfiguration: srfidAntennaConfiguration?
+    @Published var antenaCapabilities: srfidReaderCapabilitiesInfo?
     
     private override init() {
         super.init()
@@ -138,22 +140,23 @@ class ZebraSingleton: NSObject {
             self.isDeviceConnectedZebra = true
             bfprint("ASCII connection has been established")
             batteryStatus(readerID: readerID)
-            getCapabilities(readerID: readerID)
+            antenaCapabilities = getCapabilities(readerID: readerID)
             //rapidRead(readerID: readerID)
-            antenaConfiguration(readerID: readerID)
+            antenaConfiguration = antenaConfiguration(readerID: readerID)
         } else if SRFID_RESULT_WRONG_ASCII_PASSWORD == result {
             bfprint("Incorrect ASCII connection password")
         } else {
             bfprint("Failed to establish ASCII connection")
         }
     }
-    func getCapabilities(readerID: Int32) {
+    /// Funcion para obtener los atributos de una Antena RFID
+    func getCapabilities(readerID: Int32) -> srfidReaderCapabilitiesInfo? {
         var capabilities: srfidReaderCapabilitiesInfo? = srfidReaderCapabilitiesInfo()
         var error_response: NSString?
         let result: SRFID_RESULT = apiInstance.srfidGetReaderCapabilitiesInfo(readerID, aReaderCapabilitiesInfo: &capabilities, aStatusMessage: &error_response)
         if SRFID_RESULT_SUCCESS == result {
             guard let capabilities = capabilities else {
-                return
+                return nil
             }
             serialNumber = "Serial number: \(capabilities.getSerialNumber() ?? "")"
             bfprint("Serial number: \(capabilities.getSerialNumber() ?? "")")
@@ -167,6 +170,7 @@ class ZebraSingleton: NSObject {
             bfprint("Select filters number: \(capabilities.getSelectFilterNum())")
             bfprint("Max access sequence: \(capabilities.getMaxAccessSequence())")
             bfprint("Power level: min = \(capabilities.getMinPower()); max = \(capabilities.getMaxPower()); step = \(capabilities.getPowerStep())")
+            return capabilities
         } else if SRFID_RESULT_RESPONSE_ERROR == result {
             bfprint("getCapabilities: Error response from RFID reader: \(error_response ?? "")")
         } else if SRFID_RESULT_RESPONSE_TIMEOUT == result {
@@ -176,6 +180,7 @@ class ZebraSingleton: NSObject {
         } else {
             bfprint("getCapabilities: Request failed")
         }
+        return nil
     }
     func batteryStatus(readerID: Int32) {
         let result = apiInstance.srfidRequestBatteryStatus(readerID)
@@ -185,13 +190,13 @@ class ZebraSingleton: NSObject {
             bfprint("batteryStatus: Request failed")
         }
     }
-    func antenaConfiguration(readerID: Int32) {
+    func antenaConfiguration(readerID: Int32) -> srfidAntennaConfiguration? {
         var antenna_cfg: srfidAntennaConfiguration? = srfidAntennaConfiguration()
         var error_response: NSString?
         let result = apiInstance.srfidGetAntennaConfiguration(readerID, aAntennaConfiguration: &antenna_cfg, aStatusMessage: &error_response)
         if SRFID_RESULT_SUCCESS == result {
             guard let antenna_cfg = antenna_cfg else {
-                return
+                return nil
             }
             let power: Double = Double(antenna_cfg.getPower())
             let linkProfileIdx = antenna_cfg.getLinkProfileIdx()
@@ -202,6 +207,7 @@ class ZebraSingleton: NSObject {
             bfprint("antenaConfiguration: Antenna RF mode index: \(linkProfileIdx)")
             bfprint("antenaConfiguration: Antenna tari: \(antenaTari)")
             bfprint("antenaConfiguration: Antenna pre-filters application \(prefilters == false ? "No" : "Si")")
+            return antenna_cfg
         } else if SRFID_RESULT_RESPONSE_ERROR == result {
             bfprint("antenaConfiguration: Error response from RFID reader: \(error_response ?? "")")
         } else if SRFID_RESULT_RESPONSE_TIMEOUT == result {
@@ -211,6 +217,7 @@ class ZebraSingleton: NSObject {
         } else {
             bfprint("antenaConfiguration: Request failed")
         }
+        return nil
     }
     /// Metodo para obtener el perfil
     /// RfMode, Min Tari, Max Tari, step Tari

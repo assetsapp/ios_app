@@ -84,6 +84,15 @@ struct IdentifyView: View {
             }
         }
     }
+    
+    func getPowerLevel() {
+        /// Validar si existe un dispositivo Zebra conectado
+        if ZebraSingleton.shared.currentReaderID != -1 {
+            
+        } else {
+            
+        }
+    }
 }
 
 struct IdentifyReadings: View {
@@ -91,7 +100,7 @@ struct IdentifyReadings: View {
     @Binding var isInventoryStarted: Bool
     @Binding var inventoryButton: String
     @Binding var barcodeMode: Bool
-    @State var powerLevel: Double = 30
+    @State var powerLevel: Double = (ZebraSingleton.shared.currentReaderID != -1) ? 100 : -1
     var _onInvetory: () -> Void
     var epclist: EpcsArray = EpcsArray()
     
