@@ -22,8 +22,8 @@ class ZebraSingleton: NSObject {
     @Published var isDeviceConnectedZebra: Bool = false
     @Published var selectedZebraDevice: RFIDDevice = .empty
     @Published var currentReaderID: Int32 = -1
-    @Published var antenaConfiguration: srfidAntennaConfiguration?
-    @Published var antenaCapabilities: srfidReaderCapabilitiesInfo?
+    @Published var antennaConfiguration: srfidAntennaConfiguration?
+    @Published var antennaCapabilities: srfidReaderCapabilitiesInfo?
     
     private override init() {
         super.init()
@@ -132,12 +132,24 @@ class ZebraSingleton: NSObject {
             print("Request failed")
         }
     }
-    
+    // MARK: Funciones para obtener información del dispositivo
+    /// Obtener el Nivel de Poder de la Antena
+    func getPowerLevel() -> Int {
+        /// Validar si existe un dispositivo Zebra conectado
+        let currentID = currentReaderID
+        if  currentID != -1 {
+            let antennaConfiguration = antennaConfiguration
+            let capabilities = antennaCapabilities
+            let currentPower = antennaConfiguration?.getPower()
+            let minPower = capabilities?.getMinPower()
+            let maxPower = capabilities?.getMaxPower() ?? 0
+            let step = capabilities?.getPowerStep()
+            return Int(maxPower)
+        } else {
+            return 30
+        }
+    }
     // MARK: Funciones para modificar Antena
-    
-    
-    
-    
     /// Establecer la comunicacion con un RFID
     func establishCommunication(readerID: Int32) {
         bfprint("establishCommunication: ID = \(readerID)")
@@ -158,9 +170,9 @@ class ZebraSingleton: NSObject {
             self.isDeviceConnectedZebra = true
             bfprint("ASCII connection has been established")
             requestBatteryStatus(readerID: readerID)
-            antenaCapabilities = getCapabilities(readerID: readerID)
+            antennaCapabilities = getCapabilities(readerID: readerID)
             //rapidRead(readerID: readerID)
-            antenaConfiguration = antenaConfiguration(readerID: readerID)
+            antennaConfiguration = antenaConfiguration(readerID: readerID)
         } else if SRFID_RESULT_WRONG_ASCII_PASSWORD == result {
             bfprint("Incorrect ASCII connection password")
         } else {
@@ -240,7 +252,7 @@ class ZebraSingleton: NSObject {
     }
     func updateAntenaConfiguration(power: Int) {
         let readerID = currentReaderID
-        var antenaNewConfiguration = antenaConfiguration
+        let antenaNewConfiguration = antennaConfiguration
         antenaNewConfiguration?.setPower(Int16(power))
         var error_response: NSString?
         let result = apiInstance.srfidSetAntennaConfiguration(readerID, aAntennaConfiguration: antenaNewConfiguration, aStatusMessage: &error_response)

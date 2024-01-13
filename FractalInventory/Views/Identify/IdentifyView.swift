@@ -84,33 +84,16 @@ struct IdentifyView: View {
             }
         }
     }
-    /// Obtener el Nivel de Poder del Device
-    func getPowerLevel() -> Int {
-        /// Validar si existe un dispositivo Zebra conectado
-        let currentID = ZebraSingleton.shared.currentReaderID
-        if  currentID != -1 {
-            let antenaConfiguration = ZebraSingleton.shared.antenaConfiguration
-            let capabilities = ZebraSingleton.shared.antenaCapabilities
-            let currentPower = antenaConfiguration?.getPower()
-            let minPower = capabilities?.getMinPower()
-            let maxPower = capabilities?.getMaxPower() ?? 0
-            let step = capabilities?.getPowerStep()
-            return Int(maxPower)
-        } else {
-            return 30
-        }
-    }
     func updateAntenaRFID() {
         
     }
 }
-
 struct IdentifyReadings: View {
     @ObservedObject var cslvalues: CSLValues
     @Binding var isInventoryStarted: Bool
     @Binding var inventoryButton: String
     @Binding var barcodeMode: Bool
-    @State var powerLevel: Double = (ZebraSingleton.shared.currentReaderID != -1) ? 100 : -1
+    @State var powerLevel: Double = (ZebraSingleton.shared.currentReaderID != -1) ? 100 : 30
     var _onInvetory: () -> Void
     var epclist: EpcsArray = EpcsArray()
     
