@@ -93,7 +93,7 @@ struct IdentifyReadings: View {
     @Binding var isInventoryStarted: Bool
     @Binding var inventoryButton: String
     @Binding var barcodeMode: Bool
-    @State var powerLevel: Double = (ZebraSingleton.shared.currentReaderID != -1) ? 100 : 30
+    @State var powerLevel: Double = ZebraSingleton.shared.getPowerLevel()
     var _onInvetory: () -> Void
     var epclist: EpcsArray = EpcsArray()
     
@@ -117,7 +117,7 @@ struct IdentifyReadings: View {
                     })
                     .disabled(cslvalues.isTriggerApplied)
                 VStack {
-                    Slider(value: $powerLevel, in: 0...30, step: 1)
+                    Slider(value: $powerLevel, in: 0...ZebraSingleton.shared.getPowerLevel(), step: 1)
                         .accentColor(Color.green)
                         .onChange(of: powerLevel, perform: { power in
                             CSLRfidAppEngine.shared().reader.selectAntennaPort(0)

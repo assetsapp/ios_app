@@ -134,20 +134,24 @@ class ZebraSingleton: NSObject {
     }
     // MARK: Funciones para obtener información del dispositivo
     /// Obtener el Nivel de Poder de la Antena
-    func getPowerLevel() -> Int {
+    func getPowerLevel() -> Double {
         /// Validar si existe un dispositivo Zebra conectado
         let currentID = currentReaderID
         if  currentID != -1 {
             let antennaConfiguration = antennaConfiguration
-            let capabilities = antennaCapabilities
             let currentPower = antennaConfiguration?.getPower()
-            let minPower = capabilities?.getMinPower()
-            let maxPower = capabilities?.getMaxPower() ?? 0
-            let step = capabilities?.getPowerStep()
-            return Int(maxPower)
+            return Double(currentPower ?? 0)
         } else {
             return 30
         }
+    }
+    /// Obtener las capacidades de la antena
+    func getCapabilities() -> Double {
+        let capabilities = antennaCapabilities
+        //let minPower = capabilities?.getMinPower()
+        let maxPower = capabilities?.getMaxPower() ?? 0
+        //let step = capabilities?.getPowerStep()
+        return Double(maxPower)
     }
     // MARK: Funciones para modificar Antena
     /// Establecer la comunicacion con un RFID
