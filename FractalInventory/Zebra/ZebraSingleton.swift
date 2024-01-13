@@ -145,6 +145,15 @@ class ZebraSingleton: NSObject {
             return 30
         }
     }
+    /// Obtener el Maximo nivel de Poder de la Antena
+    func getMaxPower() -> Double {
+        if currentReaderID != -1 {
+            let capabilities = getCapabilities()
+            return Double(capabilities.maxPower)
+        } else {
+            return 30
+        }
+    }
     /// Obtener las capacidades de la antena
     func getCapabilities() -> RFIDCapabilities {
         let capabilities = antennaCapabilities
@@ -255,12 +264,14 @@ class ZebraSingleton: NSObject {
         }
         return nil
     }
-    func updateAntenaConfiguration(power: Double) {
+    /// Función para actualizar la potencia de la antena
+    /// - Parameter power: power de la antena en dBm
+    func updateAntennaConfiguration(power: Double) {
         let readerID = currentReaderID
-        let antenaNewConfiguration = antennaConfiguration
-        antenaNewConfiguration?.setPower(Int16(power))
+        let antennaNewConfiguration = antennaConfiguration
+        antennaNewConfiguration?.setPower(Int16(power))
         var error_response: NSString?
-        let result = apiInstance.srfidSetAntennaConfiguration(readerID, aAntennaConfiguration: antenaNewConfiguration, aStatusMessage: &error_response)
+        let result = apiInstance.srfidSetAntennaConfiguration(readerID, aAntennaConfiguration: antennaNewConfiguration, aStatusMessage: &error_response)
         if result == SRFID_RESULT_SUCCESS {
             print("Update Success")
         }
