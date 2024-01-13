@@ -254,7 +254,7 @@ class ZebraSingleton: NSObject {
         }
         return nil
     }
-    func updateAntenaConfiguration(power: Int) {
+    func updateAntenaConfiguration(power: Double) {
         let readerID = currentReaderID
         let antenaNewConfiguration = antennaConfiguration
         antenaNewConfiguration?.setPower(Int16(power))

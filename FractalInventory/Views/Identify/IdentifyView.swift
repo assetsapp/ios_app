@@ -89,6 +89,7 @@ struct IdentifyView: View {
     }
 }
 struct IdentifyReadings: View {
+    let defaultValue = 30
     @ObservedObject var cslvalues: CSLValues
     @Binding var isInventoryStarted: Bool
     @Binding var inventoryButton: String
@@ -120,6 +121,7 @@ struct IdentifyReadings: View {
                     Slider(value: $powerLevel, in: 0...ZebraSingleton.shared.getPowerLevel(), step: 1)
                         .accentColor(Color.green)
                         .onChange(of: powerLevel, perform: { power in
+                            ZebraSingleton.shared.updateAntenaConfiguration(power: power)
                             CSLRfidAppEngine.shared().reader.selectAntennaPort(0)
                             CSLRfidAppEngine.shared().reader.setPower(power)
                         })
