@@ -30,3 +30,8 @@ extension RFIDDevice {
         RFIDDevice(id: 0, name: "", type: .active)
     }
 }
+struct RFIDCapabilities {
+    let maxPower: Int
+    let minPower: Int
+    let steps: Int
+}

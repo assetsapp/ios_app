@@ -146,12 +146,13 @@ class ZebraSingleton: NSObject {
         }
     }
     /// Obtener las capacidades de la antena
-    func getCapabilities() -> Double {
+    func getCapabilities() -> RFIDCapabilities {
         let capabilities = antennaCapabilities
-        //let minPower = capabilities?.getMinPower()
+        let minPower = capabilities?.getMinPower() ?? 0
         let maxPower = capabilities?.getMaxPower() ?? 0
-        //let step = capabilities?.getPowerStep()
-        return Double(maxPower)
+        let step = capabilities?.getPowerStep() ?? 0
+        let rfidCapabilities = RFIDCapabilities(maxPower: Int(maxPower), minPower: Int(minPower), steps: Int(step))
+        return rfidCapabilities
     }
     // MARK: Funciones para modificar Antena
     /// Establecer la comunicacion con un RFID
