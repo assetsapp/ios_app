@@ -24,13 +24,13 @@ class ZebraSingleton: NSObject {
     @Published var currentReaderID: Int32 = -1
     @Published var antennaConfiguration: srfidAntennaConfiguration?
     @Published var antennaCapabilities: srfidReaderCapabilitiesInfo?
-    
+    // MARK: Inicialización y setup
     private override init() {
         super.init()
         apiInstance.srfidSetDelegate(self)
         setupSDK()
     }
-    /// configuracion inicial del dispositivo
+    /// Configuración inicial del dispositivo
     func setupSDK() {
         apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_READ | SRFID_EVENT_MASK_STATUS))
         apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_BATTERY | SRFID_EVENT_MASK_TRIGGER))
@@ -54,12 +54,13 @@ class ZebraSingleton: NSObject {
         bfprint("setupSDK active_readers count: = \(active_readers?.count ?? 0)")
         bfprint("setupSDK End")
     }
-    
     // MARK: Funciones para Listar Devices
     /// Funcion para saber si hay un dispositivo conectado
     func isAvailable() -> Bool {
         return currentReaderID != -1
     }
+    /// Actualizar lista de dispositivos
+    /// - Parameter readers: listas de dispositivos disponibles y activos.
     private func updateList(readers: NSMutableArray?) {
         (readers ?? []).forEach { item in
             if let device = item as? srfidReaderInfo {
@@ -77,8 +78,40 @@ class ZebraSingleton: NSObject {
         }
     }
     // MARK: Funciones para Conectar
-    
+    /// Establecer la comunicación con un RFID
+    func establishCommunication(readerID: Int32) {
+        bfprint("establishCommunication: ID = \(readerID)")
+        apiInstance.srfidEstablishCommunicationSession(readerID)
+    }
+    /// Conectar con un RFID
+    /// - Parameter readerID: id del dispositivo a conectar.
+    private func connect(readerID: Int32) {
+        bfprint("connect: ID = \(readerID)")
+        //let password = "ascii password"
+        let result = apiInstance.srfidEstablishAsciiConnection(readerID, aPassword: nil)
+        if result == SRFID_RESULT_SUCCESS {
+            currentReaderID = readerID
+            self.isDeviceConnectedZebra = true
+            bfprint("ASCII connection has been established")
+            requestBatteryStatus(readerID: readerID)
+            antennaCapabilities = getCapabilities(readerID: readerID)
+            //rapidRead(readerID: readerID)
+            antennaConfiguration = antenaConfiguration(readerID: readerID)
+        } else if SRFID_RESULT_WRONG_ASCII_PASSWORD == result {
+            bfprint("Incorrect ASCII connection password")
+        } else {
+            bfprint("Failed to establish ASCII connection")
+        }
+    }
+    // MARK: Funciones para Desconectar
+    /// Terminar la comunicación con un RFID
+    func endCommunication(readerID: Int32) {
+        bfprint("endCommunication: ID = \(readerID)")
+        apiInstance.srfidTerminateCommunicationSession(readerID)
+    }
     //MARK: Funciones de Lectura
+    /// Lectura Rapida
+    /// - Parameter readerID: id del dispositivo para lectura rápida.
     func rapidRead(readerID: Int32) {
         var start_trigger_cfg: srfidStartTriggerConfig? = srfidStartTriggerConfig()
         var stop_trigger_cfg: srfidStopTriggerConfig? = srfidStopTriggerConfig()
@@ -132,6 +165,16 @@ class ZebraSingleton: NSObject {
             print("Request failed")
         }
     }
+    // MARK: Funciones para solicitar información del dispositivo
+    /// Solicitar el estatus de la bateria.
+    func requestBatteryStatus(readerID: Int32) {
+        let result = apiInstance.srfidRequestBatteryStatus(readerID)
+        if SRFID_RESULT_SUCCESS == result {
+            bfprint("batteryStatus: Request succeed")
+        } else {
+            bfprint("batteryStatus: Request failed")
+        }
+    }
     // MARK: Funciones para obtener información del dispositivo
     /// Obtener el Nivel de Poder de la Antena
     func getPowerLevel() -> Double {
@@ -162,36 +205,6 @@ class ZebraSingleton: NSObject {
         let step = capabilities?.getPowerStep() ?? 0
         let rfidCapabilities = RFIDCapabilities(maxPower: Int(maxPower), minPower: Int(minPower), steps: Int(step))
         return rfidCapabilities
-    }
-    // MARK: Funciones para modificar Antena
-    /// Establecer la comunicacion con un RFID
-    func establishCommunication(readerID: Int32) {
-        bfprint("establishCommunication: ID = \(readerID)")
-        apiInstance.srfidEstablishCommunicationSession(readerID)
-    }
-    /// Terminar la comunicacion con un RFID
-    func endCommunication(readerID: Int32) {
-        bfprint("endCommunication: ID = \(readerID)")
-        apiInstance.srfidTerminateCommunicationSession(readerID)
-    }
-    /// Conectar con un RFID
-    private func connect(readerID: Int32) {
-        bfprint("connect: ID = \(readerID)")
-        //let password = "ascii password"
-        let result = apiInstance.srfidEstablishAsciiConnection(readerID, aPassword: nil)
-        if result == SRFID_RESULT_SUCCESS {
-            currentReaderID = readerID
-            self.isDeviceConnectedZebra = true
-            bfprint("ASCII connection has been established")
-            requestBatteryStatus(readerID: readerID)
-            antennaCapabilities = getCapabilities(readerID: readerID)
-            //rapidRead(readerID: readerID)
-            antennaConfiguration = antenaConfiguration(readerID: readerID)
-        } else if SRFID_RESULT_WRONG_ASCII_PASSWORD == result {
-            bfprint("Incorrect ASCII connection password")
-        } else {
-            bfprint("Failed to establish ASCII connection")
-        }
     }
     /// Funcion para obtener los atributos de una Antena RFID
     func getCapabilities(readerID: Int32) -> srfidReaderCapabilitiesInfo? {
@@ -226,15 +239,7 @@ class ZebraSingleton: NSObject {
         }
         return nil
     }
-    /// Solicitar el estatus de la bateria.
-    func requestBatteryStatus(readerID: Int32) {
-        let result = apiInstance.srfidRequestBatteryStatus(readerID)
-        if SRFID_RESULT_SUCCESS == result {
-            bfprint("batteryStatus: Request succeed")
-        } else {
-            bfprint("batteryStatus: Request failed")
-        }
-    }
+    // MARK: Funciones para modificar Antena
     func antenaConfiguration(readerID: Int32) -> srfidAntennaConfiguration? {
         var antenna_cfg: srfidAntennaConfiguration? = srfidAntennaConfiguration()
         var error_response: NSString?
@@ -266,14 +271,19 @@ class ZebraSingleton: NSObject {
     }
     /// Función para actualizar la potencia de la antena
     /// - Parameter power: power de la antena en dBm
-    func updateAntennaConfiguration(power: Double) {
+    func updateAntennaPower(power: Double) {
         let readerID = currentReaderID
         let antennaNewConfiguration = antennaConfiguration
         antennaNewConfiguration?.setPower(Int16(power))
         var error_response: NSString?
         let result = apiInstance.srfidSetAntennaConfiguration(readerID, aAntennaConfiguration: antennaNewConfiguration, aStatusMessage: &error_response)
-        if result == SRFID_RESULT_SUCCESS {
+        switch result {
+        case SRFID_RESULT_SUCCESS:
             print("Update Success")
+        case SRFID_RESULT_RESPONSE_ERROR:
+            print("Error response from RFID reader: \(error_response ?? "")")
+        default:
+            break
         }
     }
     /// Metodo para obtener el perfil

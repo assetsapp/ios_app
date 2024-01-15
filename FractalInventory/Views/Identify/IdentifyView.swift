@@ -120,7 +120,7 @@ struct IdentifyReadings: View {
                     Slider(value: $powerLevel, in: 0...ZebraSingleton.shared.getMaxPower(), step: 1)
                         .accentColor(Color.green)
                         .onChange(of: powerLevel, perform: { power in
-                            ZebraSingleton.shared.updateAntennaConfiguration(power: power)
+                            ZebraSingleton.shared.updateAntennaPower(power: power)
                             CSLRfidAppEngine.shared().reader.selectAntennaPort(0)
                             CSLRfidAppEngine.shared().reader.setPower(power)
                         })
