@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftUI
-
 struct CSLDelegates: UIViewControllerRepresentable {
     let vc = CSLViewModel()
     @ObservedObject var cslvalues: CSLValues
