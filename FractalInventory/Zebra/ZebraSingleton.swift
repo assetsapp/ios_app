@@ -4,7 +4,7 @@
 //
 //  Created by Miguel Mexicano Herrera on 12/12/23.
 //
-
+/// Nota: Los NSMutableArrays siempre deben inicializarse para obtener el valor
 import Foundation
 import BugfenderSDK
 class ZebraSingleton: NSObject {
@@ -224,6 +224,19 @@ class ZebraSingleton: NSObject {
         }
     }
     // MARK: Funciones para obtener información del dispositivo
+    func getPreFilters(readerID: Int32) -> [srfidPreFilter]? {
+        var preFilters: NSMutableArray? = NSMutableArray()
+        var error_response: NSString?
+        let result = apiInstance.srfidGetPreFilters(readerID, aPreFilters: &preFilters, aStatusMessage: &error_response)
+        if result == SRFID_RESULT_SUCCESS {
+            guard let preFilters = preFilters as? [srfidPreFilter] else {
+                return nil
+            }
+            return preFilters
+        } else {
+            return nil
+        }
+    }
     /// Obtener el Nivel de Poder de la Antena
     func getPowerLevel() -> Double {
         /// Validar si existe un dispositivo Zebra conectado
@@ -291,7 +304,7 @@ class ZebraSingleton: NSObject {
     /// - Parameter readerID: id del Lector
     /// - Returns: retorna el perfil del RFID
     func getProfile(readerID: Int32) -> srfidLinkProfile? {
-        var profiles: NSMutableArray?
+        var profiles: NSMutableArray? = NSMutableArray()
         var error_response: NSString?
         let result = apiInstance.srfidGetSupportedLinkProfiles(readerID, aLinkProfilesList: &profiles, aStatusMessage: &error_response)
         if SRFID_RESULT_SUCCESS == result {
@@ -303,6 +316,39 @@ class ZebraSingleton: NSObject {
             bfprint("getProfile: Request failed")
         }
         return nil
+    }
+    func getBeepConfiguration(readerID: Int32) {
+        var beeper_cfg: SRFID_BEEPERCONFIG = SRFID_BEEPERCONFIG(0)
+        var error_response: NSString?
+        let result = apiInstance.srfidGetBeeperConfig(readerID, aBeeperConfig: &beeper_cfg, aStatusMessage: &error_response)
+        if result == SRFID_RESULT_SUCCESS {
+            switch beeper_cfg {
+            case SRFID_BEEPERCONFIG_HIGH:
+                print("Beeper: high volume")
+            case SRFID_BEEPERCONFIG_LOW:
+                print("Beeper: low volume")
+            case SRFID_BEEPERCONFIG_MEDIUM:
+                print("Beeper: medium volume")
+            case SRFID_BEEPERCONFIG_QUIET:
+                print("Beeper: disabled")
+            default:
+                break
+            }
+        } else {
+            print("Failed to receive beeper parameters")
+        }
+    }
+    func updateBeepConfiguration(readerID: Int32, aBeeperConfig: SRFID_BEEPERCONFIG) {
+        var error_response: NSString?
+        let result = apiInstance.srfidSetBeeperConfig(readerID, aBeeperConfig: aBeeperConfig, aStatusMessage: &error_response)
+        switch result {
+        case SRFID_RESULT_SUCCESS:
+            print("Beeper configuration has been set")
+        case SRFID_RESULT_RESPONSE_ERROR:
+            print("Error response from RFID reader \(error_response ?? "")")
+        default:
+            print("Failed to set beeper configuration")
+        }
     }
     /// Función para obtener la configuración de la antena.
     /// - Parameter readerID: Id del lector.
