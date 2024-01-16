@@ -175,6 +175,54 @@ class ZebraSingleton: NSObject {
             bfprint("batteryStatus: Request failed")
         }
     }
+    func reportConfiguration(readerID: Int32) -> srfidTagReportConfig?  {
+        var report_cfg: srfidTagReportConfig? = srfidTagReportConfig()
+        var error_response: NSString?
+        let result = apiInstance.srfidGetTagReportConfiguration(readerID, aTagReportConfig: &report_cfg, aStatusMessage: &error_response)
+        switch result {
+        case SRFID_RESULT_SUCCESS:
+            guard let report_cfg = report_cfg else {
+                return nil
+            }
+            let incPC: String = report_cfg.getIncPC() == false ? "off" : "on"
+            print("PC field: \(incPC) ")
+            let IncPhase: String = report_cfg.getIncPhase() == false ? "off" : "on"
+            print("Phase field: \(IncPhase) ")
+            let IncChannelIdx: String = report_cfg.getIncChannelIdx() == false ? "off" : "on"
+            print("Channel index field: \(IncChannelIdx) ")
+            let IncRSSI: String = report_cfg.getIncRSSI() == false ? "off" : "on"
+            print("RSSI field: \(IncRSSI) ")
+            let IncTagSeenCount: String = report_cfg.getIncTagSeenCount() == false ? "off" : "on"
+            print("Tag seen count field: \(IncTagSeenCount) ")
+            let IncFirstSeenTime: String = report_cfg.getIncFirstSeenTime() == false ? "off" : "on"
+            print("Tag seen count field: \(IncFirstSeenTime) ")
+            let IncLastSeenTime: String = report_cfg.getIncLastSeenTime() == false ? "off" : "on"
+            print("Tag seen count field: \(IncLastSeenTime) ")
+            return report_cfg
+        default:
+            print("Failed to receive tag report parameters")
+            return nil
+        }
+    }
+    func regulatoryConfiguration(readerID: Int32) {
+        var regulatory_cfg: srfidRegulatoryConfig? = srfidRegulatoryConfig()
+        var error_response: NSString?
+        let result = apiInstance.srfidGetRegulatoryConfig(readerID, aRegulatoryConfig: &regulatory_cfg, aStatusMessage: &error_response)
+        if result == SRFID_RESULT_SUCCESS {
+            guard let regulatory_cfg = regulatory_cfg else {
+                return
+            }
+            let regionCode = regulatory_cfg.getRegionCode()
+            print("Código de region: \(regionCode ?? "")")
+            let hopping_cfg = regulatory_cfg.getHoppingConfig()
+            print("Hopping is: \(hopping_cfg == SRFID_HOPPINGCONFIG_DISABLED ? "off" : "on")")
+            if let channels = regulatory_cfg.getEnabledChannelsList() {
+                print("canales: \(channels)")
+            }
+        } else {
+            print("Failed to receive regulatory parameters")
+        }
+    }
     // MARK: Funciones para obtener información del dispositivo
     /// Obtener el Nivel de Poder de la Antena
     func getPowerLevel() -> Double {
@@ -239,7 +287,26 @@ class ZebraSingleton: NSObject {
         }
         return nil
     }
-    // MARK: Funciones para modificar Antena
+    /// Función para obtener el perfil RfMode, Min Tari, Max Tari, step Tari
+    /// - Parameter readerID: id del Lector
+    /// - Returns: retorna el perfil del RFID
+    func getProfile(readerID: Int32) -> srfidLinkProfile? {
+        var profiles: NSMutableArray?
+        var error_response: NSString?
+        let result = apiInstance.srfidGetSupportedLinkProfiles(readerID, aLinkProfilesList: &profiles, aStatusMessage: &error_response)
+        if SRFID_RESULT_SUCCESS == result {
+            if let profiles = profiles, profiles.count > 0 {
+                let profile = profiles.lastObject as? srfidLinkProfile
+                return profile
+            }
+        } else {
+            bfprint("getProfile: Request failed")
+        }
+        return nil
+    }
+    /// Función para obtener la configuración de la antena.
+    /// - Parameter readerID: Id del lector.
+    /// - Returns: Configuración del la antena.
     func antenaConfiguration(readerID: Int32) -> srfidAntennaConfiguration? {
         var antenna_cfg: srfidAntennaConfiguration? = srfidAntennaConfiguration()
         var error_response: NSString?
@@ -269,6 +336,25 @@ class ZebraSingleton: NSObject {
         }
         return nil
     }
+    // MARK: Funciones para modificar Antena
+    func updateReportConfiguration(readerID: Int32, report_cfg: srfidTagReportConfig) {
+        var error_response: NSString?
+        let result = apiInstance.srfidSetTagReportConfiguration(readerID, aTagReportConfig: report_cfg, aStatusMessage: &error_response)
+        if result == SRFID_RESULT_SUCCESS {
+            print("Tag report configuration has been set")
+        } else {
+            print("Failed to set tag report parameters")
+        }
+    }
+    func updateRegulatoryConfiguration(readerID: Int32, regulatory_cfg: srfidRegulatoryConfig) {
+        var error_response: NSString?
+        let result = apiInstance.srfidSetRegulatoryConfig(readerID, aRegulatoryConfig: regulatory_cfg, aStatusMessage: &error_response)
+        if result == SRFID_RESULT_SUCCESS {
+            print("Tag report configuration has been set")
+        } else {
+            print("Error response from RFID reader: \(error_response ?? "")")
+        }
+    }
     /// Función para actualizar la potencia de la antena
     /// - Parameter power: power de la antena en dBm
     func updateAntennaPower(power: Double) {
@@ -285,22 +371,6 @@ class ZebraSingleton: NSObject {
         default:
             break
         }
-    }
-    /// Metodo para obtener el perfil
-    /// RfMode, Min Tari, Max Tari, step Tari
-    func getProfile(readerID: Int32) -> srfidLinkProfile? {
-        var profiles: NSMutableArray?
-        var error_response: NSString?
-        let result = apiInstance.srfidGetSupportedLinkProfiles(readerID, aLinkProfilesList: &profiles, aStatusMessage: &error_response)
-        if SRFID_RESULT_SUCCESS == result {
-            if let profiles = profiles, profiles.count > 0 {
-                let profile = profiles.lastObject as? srfidLinkProfile
-                return profile
-            }
-        } else {
-            bfprint("getProfile: Request failed")
-        }
-        return nil
     }
 }
 extension ZebraSingleton: ObservableObject {
