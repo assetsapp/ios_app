@@ -122,8 +122,6 @@
 		76F5AB2B26CB2C79001B8B89 /* LogInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F5AB2A26CB2C79001B8B89 /* LogInView.swift */; };
 		F203F3C82AF9DEED0037D45B /* merge.sh in Resources */ = {isa = PBXBuildFile; fileRef = F203F3C42AF9DEEC0037D45B /* merge.sh */; };
 		F203F3C92AF9DEED0037D45B /* libintegratedsdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F203F3C52AF9DEEC0037D45B /* libintegratedsdk.a */; };
-		F203F3CA2AF9DEED0037D45B /* libsymbolrfid-sdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F203F3C62AF9DEEC0037D45B /* libsymbolrfid-sdk.a */; };
-		F203F3CB2AF9DEED0037D45B /* libsymbolbt-sdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F203F3C72AF9DEEC0037D45B /* libsymbolbt-sdk.a */; };
 		F203F3CE2AF9DFCD0037D45B /* ZebraProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = F203F3CD2AF9DFCD0037D45B /* ZebraProtocols.swift */; };
 		F203F3D02AF9E2280037D45B /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F203F3CF2AF9E2280037D45B /* ExternalAccessory.framework */; };
 		F203F3D22AFA91610037D45B /* ZebraValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = F203F3D12AFA91610037D45B /* ZebraValues.swift */; };
@@ -400,8 +398,6 @@
 				F203F3C92AF9DEED0037D45B /* libintegratedsdk.a in Frameworks */,
 				765581BF26DC715F00F6C973 /* CoreBluetooth.framework in Frameworks */,
 				51912303D9BAD715244BA88E /* Pods_FractalInventory.framework in Frameworks */,
-				F203F3CB2AF9DEED0037D45B /* libsymbolbt-sdk.a in Frameworks */,
-				F203F3CA2AF9DEED0037D45B /* libsymbolrfid-sdk.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
