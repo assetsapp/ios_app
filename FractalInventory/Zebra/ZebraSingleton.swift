@@ -30,14 +30,15 @@ class ZebraSingleton: NSObject {
         apiInstance.srfidSetDelegate(self)
         setupSDK()
     }
-    /// Configuración inicial del dispositivo
-    func setupSDK() {
-        apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_READ | SRFID_EVENT_MASK_STATUS))
-        apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_BATTERY | SRFID_EVENT_MASK_TRIGGER))
-        apiInstance.srfidSetOperationalMode(Int32(SRFID_OPMODE_MFI))
+    func subscribeReadEvent() {
         apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_READ))
         apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_STATUS))
-        
+    }
+    /// Configuración inicial del dispositivo
+    func setupSDK() {
+        subscribeReadEvent()
+        apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_BATTERY | SRFID_EVENT_MASK_TRIGGER))
+        apiInstance.srfidSetOperationalMode(Int32(SRFID_OPMODE_MFI))
         apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_READER_APPEARANCE | SRFID_EVENT_READER_DISAPPEARANCE))
         apiInstance.srfidEnableAvailableReadersDetection(true)
         
@@ -164,6 +165,76 @@ class ZebraSingleton: NSObject {
         } else {
             print("Request failed")
         }
+    }
+    func startInventory(readerID: Int32) {
+        subscribeReadEvent()
+        var error_response: NSString? = nil
+        /// Start
+        let start_trigger_cfg = startTriggerInventory()
+        var result = apiInstance.srfidSetStartTriggerConfiguration(readerID, aStartTriggeConfig: start_trigger_cfg, aStatusMessage: &error_response)
+        if result == SRFID_RESULT_SUCCESS {
+            print("Start trigger configuration has been set")
+        } else {
+            print("Failed to set start trigger parameters")
+        }
+        /// Stop
+        var stop_trigger_cfg = stopTriggerInventory()
+        result = apiInstance.srfidGetStopTriggerConfiguration(readerID, aStopTriggeConfig: &stop_trigger_cfg, aStatusMessage: &error_response)
+        if result == SRFID_RESULT_SUCCESS {
+            print("Stop trigger configuration has been set")
+        } else {
+            print("Failed to set stop trigger parameters")
+        }
+        /// Report Configuration
+        let report_cfg = reportConfigurationInventory()
+        /// Access Configuration
+        let access_cfg: srfidAccessConfig = srfidAccessConfig()
+        access_cfg.setPower(270)
+        access_cfg.setDoSelect(false)
+        /// Start inventory
+        result = apiInstance.srfidStartInventory(readerID, aMemoryBank: SRFID_MEMORYBANK_EPC, aReportConfig: report_cfg, aAccessConfig: access_cfg, aStatusMessage: &error_response)
+        switch result {
+        case SRFID_RESULT_SUCCESS:
+            print("Request succeed")
+            let seconds = 60.0
+            DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
+                self.apiInstance.srfidStopRapidRead(readerID, aStatusMessage: nil)
+            }
+        case SRFID_RESULT_RESPONSE_ERROR:
+            print("Error response from RFID reader: \(error_response ?? "")")
+        default:
+            print("Request failed")
+        }
+    }
+    func stopTriggerInventory() -> srfidStopTriggerConfig? {
+        let stop_trigger_cfg: srfidStopTriggerConfig = srfidStopTriggerConfig()
+        stop_trigger_cfg.setStopOnHandheldTrigger(true)
+        stop_trigger_cfg.setTriggerType(SRFID_TRIGGERTYPE_RELEASE)
+        stop_trigger_cfg.setStopOnTimeout(true)
+        stop_trigger_cfg.setStopTimout(25*1000)
+        stop_trigger_cfg.setStopOnTagCount(false)
+        stop_trigger_cfg.setStopOnInventoryCount(false)
+        stop_trigger_cfg.setStopOnAccessCount(false)
+        return stop_trigger_cfg
+    }
+    func startTriggerInventory() -> srfidStartTriggerConfig {
+        let start_trigger_cfg: srfidStartTriggerConfig = srfidStartTriggerConfig()
+        start_trigger_cfg.setStartOnHandheldTrigger(true)
+        start_trigger_cfg.setTriggerType(SRFID_TRIGGERTYPE_PRESS)
+        start_trigger_cfg.setStartDelay(0)
+        start_trigger_cfg.setRepeatMonitoring(true)
+        return start_trigger_cfg
+    }
+    func reportConfigurationInventory() -> srfidReportConfig {
+        let report_cfg: srfidReportConfig = srfidReportConfig()
+        report_cfg.setIncPC(false)
+        report_cfg.setIncPhase(false)
+        report_cfg.setIncChannelIndex(true)
+        report_cfg.setIncRSSI(true)
+        report_cfg.setIncTagSeenCount(false)
+        report_cfg.setIncFirstSeenTime(false)
+        report_cfg.setIncLastSeenTime(false)
+        return report_cfg
     }
     // MARK: Funciones para solicitar información del dispositivo
     /// Solicitar el estatus de la bateria.
@@ -450,12 +521,18 @@ extension ZebraSingleton: srfidISdkApiDelegate {
         batteryLevel = ""
         currentReaderID = -1
     }
-    
+    /// Función para indicar lectura de un RFID
     func srfidEventReadNotify(_ readerID: Int32, aTagData tagData: srfidTagData!) {
         print("Tag data received from RFID reader with ID = \(readerID)")
         print("Tag id: \(tagData.getTagId() ?? "")")
+        /// Inventory
+        ///let bank: SRFID_MEMORYBANK = tagData.getMemoryBank()
+//        switch bank {
+//        case SRFID_MEMORYBANK_NONE:
+//
+//        }
     }
-    
+    /// Función que indica que el RFID empezó a funcionar
     func srfidEventStatusNotify(_ readerID: Int32, aEvent event: SRFID_EVENT_STATUS, aNotification notificationData: Any!) {
         let status = event == SRFID_EVENT_STATUS_OPERATION_START ? "started" : "stopped"
         print("Radio operation has \(status)")
