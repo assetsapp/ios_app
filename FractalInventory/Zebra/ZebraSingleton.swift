@@ -7,7 +7,7 @@
 /// Nota: Los NSMutableArrays siempre deben inicializarse para obtener el valor
 import Foundation
 import BugfenderSDK
-class ZebraSingleton: NSObject {
+final class ZebraSingleton: NSObject {
     static var shared: ZebraSingleton = {
         let instance = ZebraSingleton()
         return instance
@@ -24,6 +24,9 @@ class ZebraSingleton: NSObject {
     @Published var currentReaderID: Int32 = -1
     @Published var antennaConfiguration: srfidAntennaConfiguration?
     @Published var antennaCapabilities: srfidReaderCapabilitiesInfo?
+    
+    var onTagAdded: ((String) -> Void) = { _ in }
+    
     // MARK: Inicialización y setup
     private override init() {
         super.init()
@@ -525,6 +528,9 @@ extension ZebraSingleton: srfidISdkApiDelegate {
     func srfidEventReadNotify(_ readerID: Int32, aTagData tagData: srfidTagData!) {
         print("Tag data received from RFID reader with ID = \(readerID)")
         print("Tag id: \(tagData.getTagId() ?? "")")
+        //tags.append(tagData.getTagId() ?? "")
+        
+        onTagAdded(tagData.getTagId() ?? "")
         /// Inventory
         ///let bank: SRFID_MEMORYBANK = tagData.getMemoryBank()
 //        switch bank {

@@ -8,14 +8,11 @@
 import SwiftUI
 
 struct DashboardView: View {
-    @ObservedObject var zebraValues: ZebraValues
-    @ObservedObject var cslvalues: CSLValues
     @Binding var isUserLoggedOut: Bool
     
     var body: some View {
         NavigationView {
-            
-            Main(zebraValues: zebraValues, cslvalues: cslvalues, isUserLoggedOut: $isUserLoggedOut)
+            Main(isUserLoggedOut: $isUserLoggedOut)
                 .navigationBarTitle("Home")
                 .navigationBarHidden(true)
         }
@@ -31,8 +28,7 @@ struct DashboardView: View {
 }
 
 struct Main: View {
-    @ObservedObject var zebraValues: ZebraValues
-    @ObservedObject var cslvalues: CSLValues
+    @EnvironmentObject var cslvalues: CSLValues
     @State var sideMenuOpen: Bool = false
     @Binding var isUserLoggedOut: Bool
     
@@ -49,7 +45,7 @@ struct Main: View {
                 }
                 Spacer()
                 ScrollView(.vertical, showsIndicators: false) {
-                    Dashboard(cslvalues: cslvalues, zebraValues: zebraValues, sideMenuOpen: $sideMenuOpen, isUserLoggedOut: $isUserLoggedOut)
+                    Dashboard(cslvalues: cslvalues, sideMenuOpen: $sideMenuOpen, isUserLoggedOut: $isUserLoggedOut)
                 }
                 
             }
@@ -59,7 +55,7 @@ struct Main: View {
                     sideMenuOpen = false
                 }
             }
-            Menu(zebraValues: zebraValues, cslvalues: cslvalues, isMenuOpen: $sideMenuOpen, isUserLoggedOut: $isUserLoggedOut)
+            Menu(cslvalues: cslvalues, isMenuOpen: $sideMenuOpen, isUserLoggedOut: $isUserLoggedOut)
         }
     }
     
@@ -67,7 +63,6 @@ struct Main: View {
 
 struct Dashboard: View {
     @ObservedObject var cslvalues: CSLValues
-    @ObservedObject var zebraValues: ZebraValues
     @Binding var sideMenuOpen: Bool
     @Binding var isUserLoggedOut: Bool
     @State var selectedEmployee: EmployeeModel = EmployeeModel(_id: "", name: "", lastName: "", email: "")
@@ -201,7 +196,6 @@ struct Card: View {
 }
 
 struct Menu: View {
-    @ObservedObject var zebraValues: ZebraValues
     @ObservedObject var cslvalues: CSLValues
     @Binding var isMenuOpen: Bool
     @Binding var isUserLoggedOut: Bool
@@ -372,6 +366,6 @@ struct Row: View {
 
 struct SideMenu_Previews: PreviewProvider {
     static var previews: some View {
-        DashboardView(zebraValues: ZebraValues(), cslvalues: CSLValues(), isUserLoggedOut: .constant(false))
+        DashboardView(isUserLoggedOut: .constant(false))
     }
 }

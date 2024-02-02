@@ -9,16 +9,28 @@ import SwiftUI
 
 struct IdentifyView: View {
     @ObservedObject var cslvalues: CSLValues
+    @ObservedObject var zebraSingleton: ZebraSingleton = ZebraSingleton.shared
     @State private var inventoryButton: String = "Start"
     @State private var isInventoryStarted: Bool = false
     @State private var barcodeMode: Bool = false
     @State private var navigateToValidateView: Bool = false
     @State var showFirstReadModal: Bool = false
+    @State var tagsList: [String] = []
     
     var body: some View {
         
         VStack {
-            IdentifyReadings(cslvalues: cslvalues, isInventoryStarted: $isInventoryStarted, inventoryButton: $inventoryButton, barcodeMode: $barcodeMode, _onInvetory: onInventory)
+            IdentifyReadings(
+                isTriggerApplied: cslvalues.isTriggerApplied,
+                isInventoryStarted: $isInventoryStarted,
+                inventoryButton: $inventoryButton,
+                barcodeMode: $barcodeMode,
+                _onInvetory: onInventory,
+                tagsList: $tagsList,
+                onClear: {
+                    CSLHelper.onClear(cslvalues: cslvalues)
+                }
+            )
             
             NavigationLink(destination: ValidatedView(cslvalues: cslvalues), isActive: $navigateToValidateView) {
                 EmptyView()
@@ -27,6 +39,11 @@ struct IdentifyView: View {
             Spacer()
         }
         .onAppear {
+            let id = zebraSingleton.currentReaderID
+            zebraSingleton.startInventory(readerID: id)
+            zebraSingleton.onTagAdded = { tag in
+                self.tagsList.append(tag)
+            }
         }
         .onChange(of: cslvalues.isTriggerApplied) { isTriggerApplied in
             print("TRIGGER IN INVENTORY!!!!! \(String(isTriggerApplied))")
@@ -89,13 +106,17 @@ struct IdentifyView: View {
     }
 }
 struct IdentifyReadings: View {
-    @ObservedObject var cslvalues: CSLValues
+    // @ObservedObject var cslvalues: CSLValues
+    let isTriggerApplied: Bool
     @Binding var isInventoryStarted: Bool
     @Binding var inventoryButton: String
     @Binding var barcodeMode: Bool
     @State var powerLevel: Double = ZebraSingleton.shared.getPowerLevel()
     var _onInvetory: () -> Void
-    var epclist: EpcsArray = EpcsArray()
+    // var epclist: EpcsArray = EpcsArray()
+    
+    @Binding var tagsList: [String]
+    let onClear: (() -> Void)
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -115,7 +136,7 @@ struct IdentifyReadings: View {
                     .onChange(of: isInventoryStarted, perform: { scan in
                         _onInvetory()
                     })
-                    .disabled(cslvalues.isTriggerApplied)
+                    .disabled(isTriggerApplied)
                 VStack {
                     Slider(value: $powerLevel, in: 0...ZebraSingleton.shared.getMaxPower(), step: 1)
                         .accentColor(Color.green)
@@ -128,18 +149,21 @@ struct IdentifyReadings: View {
                     Text("Power Level: \(powerLevel, specifier: "%.0f")")
                 }
                 HStack {
-                    Button(action: { CSLHelper.onClear(cslvalues: cslvalues) }) {
+                    Button(action: onClear) {
                         Text("Clear")
                     }
                     Spacer()
-                    Text("Total: \(cslvalues.readings.count)")
+                    Text("Total: \(tagsList.count)")
                 }
                 .padding(.top)
                 ScrollView {
-                    ForEach(cslvalues.readings, id: \.self) { tag in
-                        HStack {
-                            IdentifyReadingSubview(cslvalues: cslvalues, reading: EpcModel(epc: tag.epc, rssi: tag.rssi, timestamp: tag.timestamp))
-                            Spacer()
+                    LazyVStack {
+                        ForEach(tagsList, id: \.self) { tag in
+                            HStack {
+                                Text(tag)
+                                // IdentifyReadingCell(cslvalues: cslvalues, reading: EpcModel(epc: tag.epc, rssi: tag.rssi, timestamp: tag.timestamp))
+                                Spacer()
+                            }
                         }
                     }
                 }
