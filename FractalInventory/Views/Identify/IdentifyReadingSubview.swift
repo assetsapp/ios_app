@@ -8,10 +8,9 @@
 import SwiftUI
 
 struct IdentifyReadingSubview: View {
-    @ObservedObject var cslvalues: CSLValues
     @State var reading: EpcModel
     @State var isIpad: Bool = UIScreen.main.bounds.width > 400
-    
+    let remove: () -> Void
     var body: some View {
         VStack {
             HStack {
@@ -37,7 +36,7 @@ struct IdentifyReadingSubview: View {
                 .padding(.leading, isIpad ? 20 : 0)
                 Spacer()
                 
-                Button(action: { cslvalues.removeEpc(epc: reading.epc) }) {
+                Button(action: remove) {
                     Image(systemName: "trash")
                         .renderingMode(.original)
                         .resizable()
@@ -52,7 +51,7 @@ struct IdentifyReadingSubview: View {
 
 struct IdentifyReadingSubview_Previews: PreviewProvider {
     static var previews: some View {
-        IdentifyReadingSubview(cslvalues: CSLValues(), reading: EpcModel(epc: "ABCDEF0123456789123456AB", rssi: "99.21", timestamp: "04/09/2021 23:14:45"))
+        IdentifyReadingSubview(reading: EpcModel(epc: "ABCDEF0123456789123456AB", rssi: "99.21", timestamp: "04/09/2021 23:14:45"), remove: {})
             .previewLayout(.sizeThatFits)
     }
 }

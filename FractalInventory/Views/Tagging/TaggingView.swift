@@ -31,6 +31,8 @@ struct TaggingView: View {
     @State var isTryingSaveEmptyPresent: Bool = false
     @State var savedAssetsCount: Int = 0
     let workModeManager = WorkModeManager()
+    let zebraSingleton = ZebraSingleton.shared
+    @State var zebraTagList: [String] = []
     
     @State var imageSelected: UIImage = UIImage(systemName: "photo")!
     @State var isNewImageSelected: Bool = false
@@ -59,6 +61,10 @@ struct TaggingView: View {
                 }
             case .offline:
                 break
+            }
+            zebraSingleton.startInventory()
+            zebraSingleton.onTagAdded = { tag in
+                self.zebraTagList.append(tag)
             }
         }
         .onDisappear {
@@ -475,7 +481,7 @@ struct MainView: View {
             
             VStack(alignment: .leading) {
                 HStack(alignment: .center) {
-                    Text("EPC Readings (\(cslvalues.readings.count)):")
+                    Text("EPC Readings (\(epcReadings()):")
                         .foregroundColor(.secondary)
                     Spacer()
                     Rectangle()
@@ -574,6 +580,15 @@ struct MainView: View {
     }
     
     // MARK: FUNCTIONS
+    func epcReadings() -> Int {
+        let zebraSingleton = ZebraSingleton.shared
+        if zebraSingleton.isAvailable() {
+            return 2
+        } else {
+            return cslvalues.readings.count
+        }
+    }
+    
     func getFilteredEpcs(epcarray: [EpcModel]) -> [EpcModel] {
         if (isSingle) {
             if (epcarray.count > 0) {

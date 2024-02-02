@@ -59,7 +59,7 @@ final class ZebraSingleton: NSObject {
         bfprint("setupSDK End")
     }
     // MARK: Funciones para Listar Devices
-    /// Funcion para saber si hay un dispositivo conectado
+    /// Función para saber si hay un dispositivo conectado
     func isAvailable() -> Bool {
         return currentReaderID != -1
     }
@@ -168,6 +168,9 @@ final class ZebraSingleton: NSObject {
         } else {
             print("Request failed")
         }
+    }
+    func startInventory() {
+        startInventory(readerID: currentReaderID)
     }
     func startInventory(readerID: Int32) {
         subscribeReadEvent()
@@ -493,7 +496,7 @@ final class ZebraSingleton: NSObject {
         }
     }
 }
-extension ZebraSingleton: ObservableObject {
+extension ZebraSingleton {
 }
 extension ZebraSingleton: srfidISdkApiDelegate {
     func srfidEventReaderAppeared(_ availableReader: srfidReaderInfo!) {
