@@ -115,7 +115,6 @@ struct IdentifyReadings: View {
     @State var powerLevel: Double = ZebraSingleton.shared.getPowerLevel()
     var _onInvetory: () -> Void
     // var epclist: EpcsArray = EpcsArray()
-    
     @Binding var zebraTagList: [String]
     let onClear: (() -> Void)
     
@@ -142,9 +141,7 @@ struct IdentifyReadings: View {
                     Slider(value: $powerLevel, in: 0...zebraSingleton.getMaxPower(), step: 1)
                         .accentColor(Color.green)
                         .onChange(of: powerLevel, perform: { power in
-                            ZebraSingleton.shared.updateAntennaPower(power: power)
-                            CSLRfidAppEngine.shared().reader.selectAntennaPort(0)
-                            CSLRfidAppEngine.shared().reader.setPower(power)
+                            updateAntenaPower(power: power)
                         })
                         .disabled(inventoryButton == "Stop")
                     Text("Power Level: \(powerLevel, specifier: "%.0f")")
@@ -205,6 +202,14 @@ struct IdentifyReadings: View {
             return cslvalues.readings.count
         } else {
             return zebraTagList.count
+        }
+    }
+    private func updateAntenaPower(power: Double) {
+        if zebraSingleton.isAvailable() {
+            zebraSingleton.updateAntennaPower(power: power)
+        } else {
+            CSLRfidAppEngine.shared().reader.selectAntennaPort(0)
+            CSLRfidAppEngine.shared().reader.setPower(power)
         }
     }
 }

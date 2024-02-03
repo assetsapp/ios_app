@@ -42,7 +42,7 @@ struct TaggingView: View {
     var body: some View {
         VStack {
             ScrollView(.vertical, showsIndicators: false) {
-                CardView(cslvalues: cslvalues, reference: $reference, location: $location, isSingle: $isSingle, inventoryButton: $inventoryButton, isInventoryStarted: $isInventoryStarted, barcodeMode: $barcodeMode, customFields: $customFields, _onInvetory: onInventory, validateEPC: validateEPC, customFieldsValues: $customFieldsValues, serialNumber: $serialNumber, locationPath: $locationPath, isRemoveExistingModalResult: $isRemoveExistingModalResult, removedExistingCount: $removedExistingCount, isSavedAssetsPresent: $isSavedAssetsPresent, savedAssetsCount: $savedAssetsCount, imageSelected: $imageSelected, isNewImageSelected: $isNewImageSelected, assignedEmployee: $assignedEmployee)
+                CardView(cslvalues: cslvalues, reference: $reference, location: $location, isSingle: $isSingle, inventoryButton: $inventoryButton, isInventoryStarted: $isInventoryStarted, barcodeMode: $barcodeMode, customFields: $customFields, _onInvetory: onInventory, validateEPC: validateEPC, customFieldsValues: $customFieldsValues, serialNumber: $serialNumber, locationPath: $locationPath, isRemoveExistingModalResult: $isRemoveExistingModalResult, removedExistingCount: $removedExistingCount, isSavedAssetsPresent: $isSavedAssetsPresent, savedAssetsCount: $savedAssetsCount, imageSelected: $imageSelected, isNewImageSelected: $isNewImageSelected, assignedEmployee: $assignedEmployee, zebraTagList: $zebraTagList)
             }
         }
         .onAppear {
@@ -346,6 +346,7 @@ struct CardView: View {
     @State var customFieldsImages: [AssetPhoto] = []
     @State var customFieldsImagesData: [ImageCustomField] = []
     @Binding var assignedEmployee: EmployeeModel
+    @Binding var zebraTagList: [String]
     
     var body: some View {
         
@@ -371,7 +372,7 @@ struct CardView: View {
             .padding(.leading, 50)
             .padding(.top, 5)
             
-            MainView(location: $location, cslvalues: cslvalues, isSingle: $isSingle, inventoryButton: $inventoryButton, isInventoryStarted: $isInventoryStarted, barcodeMode: $barcodeMode, serialNumber: $serialNumber, locationPath: $locationPath, isRemoveExistingModalResult: $isRemoveExistingModalResult, removedExistingCount: $removedExistingCount, isSavedAssetsPresent: $isSavedAssetsPresent, savedAssetsCount: $savedAssetsCount, _onInvetory: _onInvetory, validateEPC: validateEPC, assignedEmployee: $assignedEmployee)
+            MainView(location: $location, cslvalues: cslvalues, isSingle: $isSingle, inventoryButton: $inventoryButton, isInventoryStarted: $isInventoryStarted, barcodeMode: $barcodeMode, serialNumber: $serialNumber, locationPath: $locationPath, isRemoveExistingModalResult: $isRemoveExistingModalResult, removedExistingCount: $removedExistingCount, isSavedAssetsPresent: $isSavedAssetsPresent, savedAssetsCount: $savedAssetsCount, _onInvetory: _onInvetory, validateEPC: validateEPC, assignedEmployee: $assignedEmployee, zebraTagList: $zebraTagList)
         }
     }
 }
@@ -398,6 +399,8 @@ struct MainView: View {
     var validateEPC: ([EpcModel]) -> Void
     @Binding var assignedEmployee: EmployeeModel
     @State var showEmployeesModal: Bool = false
+    let zebraSingleton = ZebraSingleton.shared
+    @Binding var zebraTagList: [String]
     
     var body: some View {
         VStack {
@@ -450,6 +453,9 @@ struct MainView: View {
                         .padding(.top, -3)
                 }
                 .padding(.top)
+            }
+            .onAppear() {
+                zebraSingleton.updateAntennaPower(power: 10)
             }
             .onChange(of: cslvalues.singleBarcode) { barcode in
                 serialNumber += barcode
@@ -530,11 +536,10 @@ struct MainView: View {
                         })
                     }
                     VStack {
-                        Slider(value: $powerLevel, in: 0...30, step: 1)
+                        Slider(value: $powerLevel, in: 0...zebraSingleton.getMaxPower(), step: 1)
                             .accentColor(Color.green)
                             .onChange(of: powerLevel, perform: { power in
-                                CSLRfidAppEngine.shared().reader.selectAntennaPort(0)
-                                CSLRfidAppEngine.shared().reader.setPower(power)
+                                updateAntenaPower(power: power)
                             })
                             .disabled(inventoryButton == "Stop")
                         Text("Power Level: \(powerLevel, specifier: "%.0f")")
@@ -542,7 +547,7 @@ struct MainView: View {
                     .padding(.top)
                     .padding(.bottom)
                     ScrollView {
-                        ForEach(getFilteredEpcs(epcarray: cslvalues.readings), id: \.self) { tag in
+                        ForEach(getReadings(), id: \.self) { tag in
                             HStack {
                                 VStack(alignment: .leading) {
                                     Text(tag.epc)
@@ -580,15 +585,29 @@ struct MainView: View {
     }
     
     // MARK: FUNCTIONS
-    func epcReadings() -> Int {
-        let zebraSingleton = ZebraSingleton.shared
+    private func updateAntenaPower(power: Double) {
         if zebraSingleton.isAvailable() {
-            return 2
+            zebraSingleton.updateAntennaPower(power: power)
+        } else {
+            CSLRfidAppEngine.shared().reader.selectAntennaPort(0)
+            CSLRfidAppEngine.shared().reader.setPower(power)
+        }
+    }
+    func epcReadings() -> Int {
+        if zebraSingleton.isAvailable() {
+            return zebraTagList.count
         } else {
             return cslvalues.readings.count
         }
     }
-    
+    func getReadings() -> [EpcModel] {
+        if zebraSingleton.isAvailable() {
+            let epc = zebraTagList.map({EpcModel(epc: $0, rssi: "", timestamp: "")})
+            return getFilteredEpcs(epcarray: epc)
+        } else {
+            return getFilteredEpcs(epcarray: cslvalues.readings)
+        }
+    }
     func getFilteredEpcs(epcarray: [EpcModel]) -> [EpcModel] {
         if (isSingle) {
             if (epcarray.count > 0) {
