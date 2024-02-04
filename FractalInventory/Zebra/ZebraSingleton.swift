@@ -496,7 +496,7 @@ final class ZebraSingleton: NSObject {
         }
     }
 }
-extension ZebraSingleton {
+extension ZebraSingleton: ObservableObject {
 }
 extension ZebraSingleton: srfidISdkApiDelegate {
     func srfidEventReaderAppeared(_ availableReader: srfidReaderInfo!) {

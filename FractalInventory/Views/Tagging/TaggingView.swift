@@ -31,7 +31,7 @@ struct TaggingView: View {
     @State var isTryingSaveEmptyPresent: Bool = false
     @State var savedAssetsCount: Int = 0
     let workModeManager = WorkModeManager()
-    let zebraSingleton = ZebraSingleton.shared
+    @StateObject var zebraSingleton = ZebraSingleton.shared
     @State var zebraTagList: [String] = []
     
     @State var imageSelected: UIImage = UIImage(systemName: "photo")!
@@ -99,6 +99,7 @@ struct TaggingView: View {
             })
         }
         )
+        .environmentObject(zebraSingleton)
     }
     
     func onInventory() {
@@ -399,12 +400,11 @@ struct MainView: View {
     var validateEPC: ([EpcModel]) -> Void
     @Binding var assignedEmployee: EmployeeModel
     @State var showEmployeesModal: Bool = false
-    let zebraSingleton = ZebraSingleton.shared
+    @EnvironmentObject var zebraSingleton: ZebraSingleton
     @Binding var zebraTagList: [String]
     
     var body: some View {
         VStack {
-            
             VStack(alignment: .leading) {
                 Text("Asset will be created in:")
                     .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
