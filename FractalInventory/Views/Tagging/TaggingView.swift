@@ -64,7 +64,9 @@ struct TaggingView: View {
             }
             zebraSingleton.startInventory()
             zebraSingleton.onTagAdded = { tag in
-                self.zebraTagList.append(tag)
+                if zebraTagList.first(where: { $0 == tag}) == nil {
+                    zebraTagList.append(tag)
+                }
             }
         }
         .onDisappear {

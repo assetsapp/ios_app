@@ -42,7 +42,9 @@ struct IdentifyView: View {
         .onAppear {
             zebraSingleton.startInventory()
             zebraSingleton.onTagAdded = { tag in
-                self.zebraTagList.append(tag)
+                if zebraTagList.first(where: { $0 == tag}) == nil {
+                    zebraTagList.append(tag)
+                }
             }
         }
         .onChange(of: cslvalues.isTriggerApplied) { isTriggerApplied in
