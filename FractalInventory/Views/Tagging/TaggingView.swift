@@ -85,11 +85,12 @@ struct TaggingView: View {
             Button("Save") { isSaveModalPresent = true }
             .padding(.leading, 10)
             .alert(isPresented: $isSaveModalPresent, content: {
-                if cslvalues.readings.count > 0 {
+                let readings = getReadings()
+                if readings.count > 0 {
                     return Alert(
                         title: Text("Save Asset"),
                         message: Text("Do you want to proceed?"),
-                        primaryButton: .default(Text("OK"), action: { onSave(epcsarray: cslvalues.readings) }),
+                        primaryButton: .default(Text("OK"), action: { onSave(epcsarray: readings) }),
                         secondaryButton: .cancel(Text("Cancel"))
                     )
                 } else {
@@ -103,7 +104,13 @@ struct TaggingView: View {
         )
         .environmentObject(zebraSingleton)
     }
-    
+    func getReadings() -> [EpcModel] {
+        if zebraSingleton.isAvailable() {
+            return zebraTagList.map({EpcModel(epc: $0, rssi: "", timestamp: "")})
+        } else {
+            return cslvalues.readings
+        }
+    }
     func onInventory() {
         if inventoryButton == "Start" {
             if !CSLHelper.isDeviceConnected() {

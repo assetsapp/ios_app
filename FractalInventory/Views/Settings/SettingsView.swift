@@ -19,7 +19,7 @@ struct Settings {
 
 struct SettingsView: View {
     @ObservedObject var cslvalues: CSLValues
-    //@ObservedObject var zebraValues: ZebraValues
+    @StateObject var zebraSingleton = ZebraSingleton.shared
     @Binding var isUserLoggedOut: Bool
     
     
@@ -30,10 +30,12 @@ struct SettingsView: View {
         }
         .navigationBarTitle("Settings", displayMode: .inline)
         .navigationViewStyle(StackNavigationViewStyle())
+        .environmentObject(zebraSingleton)
     }
 }
 
 struct SettingsViewContent: View {
+    @EnvironmentObject var zebraSingleton: ZebraSingleton
     @ObservedObject var cslvalues: CSLValues
     @State var deviceFoundCount: Int = -1
     @State var deviceListName: [String] = []
@@ -156,15 +158,15 @@ struct SettingsViewContent: View {
                                 startScannigZebra()
                             } else {
                                 stopScanningZebra()
-                                ZebraSingleton.shared.listDevices = []
+                                zebraSingleton.listDevices = []
                             }
                         })
                     if (startScanningZebra) {
                         Text("Bellow will appear available devices")
                         List {
-                            ForEach(Array(ZebraSingleton.shared.listDevices.enumerated()), id: \.offset) { index, device in
+                            ForEach(Array(zebraSingleton.listDevices.enumerated()), id: \.offset) { index, device in
                                 Button(action: {
-                                    ZebraSingleton.shared.selectedZebraDevice = device
+                                    zebraSingleton.selectedZebraDevice = device
                                     // if device.type == .available {
                                         connectZebraToReader = true
                                     // }
@@ -176,29 +178,29 @@ struct SettingsViewContent: View {
                         }
                     }
                 }
-                .disabled(ZebraSingleton.shared.isDeviceConnectedZebra)
+                .disabled(zebraSingleton.isDeviceConnectedZebra)
                 .alert(isPresented: $connectZebraToReader ) {
                     Alert(
                         title: Text("Connect to reader"),
-                        message: Text("You'll connect to \(ZebraSingleton.shared.selectedZebraDevice.id)"),
+                        message: Text("You'll connect to \(zebraSingleton.selectedZebraDevice.id)"),
                         primaryButton: .default(Text("OK")) {
                             startScanningZebra = false
-                            ZebraSingleton.shared.establishCommunication(readerID: ZebraSingleton.shared.selectedZebraDevice.id)
+                            zebraSingleton.establishCommunication(readerID: zebraSingleton.selectedZebraDevice.id)
                         },
                         secondaryButton: .default(Text("Cancel")) {
                             startScanningZebra = false
-                            ZebraSingleton.shared.selectedZebraDevice = .empty
+                            zebraSingleton.selectedZebraDevice = .empty
                             connectZebraToReader = false
                         }
                     )
                 }
-                .onChange(of: ZebraSingleton.shared.isDeviceConnectedZebra, perform: { value in
+                .onChange(of: zebraSingleton.isDeviceConnectedZebra, perform: { value in
                     if value {
                        
                     }
                 })
                 
-                if (ZebraSingleton.shared.isDeviceConnectedZebra) {
+                if (zebraSingleton.isDeviceConnectedZebra) {
                     Section(header: Text("Zebra RFID Handle connected")) {
                         Text("Device: \(ZebraSingleton.shared.selectedZebraDevice.name)")
                         Text("SN: \(ZebraSingleton.shared.serialNumber)")

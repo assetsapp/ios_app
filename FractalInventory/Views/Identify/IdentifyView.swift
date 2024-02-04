@@ -9,7 +9,7 @@ import SwiftUI
 
 struct IdentifyView: View {
     @ObservedObject var cslvalues: CSLValues
-    let zebraSingleton: ZebraSingleton = ZebraSingleton.shared
+    @StateObject var zebraSingleton: ZebraSingleton = ZebraSingleton.shared
     @State private var inventoryButton: String = "Start"
     @State private var isInventoryStarted: Bool = false
     @State private var barcodeMode: Bool = false
