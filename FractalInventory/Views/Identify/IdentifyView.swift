@@ -73,6 +73,7 @@ struct IdentifyView: View {
             })
         }
         )
+        .environmentObject(zebraSingleton)
         
     }
     
@@ -108,13 +109,13 @@ struct IdentifyView: View {
     }
 }
 struct IdentifyReadings: View {
-    let zebraSingleton: ZebraSingleton = ZebraSingleton.shared
+    @EnvironmentObject var zebraSingleton: ZebraSingleton
     @ObservedObject var cslvalues: CSLValues
     let isTriggerApplied: Bool
     @Binding var isInventoryStarted: Bool
     @Binding var inventoryButton: String
     @Binding var barcodeMode: Bool
-    @State var powerLevel: Double = ZebraSingleton.shared.getPowerLevel()
+    @State var powerLevel: Double = 30
     var _onInvetory: () -> Void
     // var epclist: EpcsArray = EpcsArray()
     @Binding var zebraTagList: [String]
@@ -190,6 +191,9 @@ struct IdentifyReadings: View {
             .frame(width: UIScreen.main.bounds.width - 40)
             .background(Color(.systemGray6))
             .cornerRadius(10)
+        }
+        .onAppear {
+            powerLevel = zebraSingleton.getMaxPower()
         }
         .padding(.horizontal, 40)
         .padding(.top)
