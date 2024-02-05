@@ -398,6 +398,7 @@ struct MainView: View {
     @State var isKeeping: Bool = false
     @Binding var serialNumber: String
     @State var powerLevel: Double = 10
+    @State var maxPowerLevel: Double = 30
     @Binding var locationPath: String
     @State var isRemoveExistingModalPresent: Bool = false
     @Binding var isRemoveExistingModalResult: Bool
@@ -464,6 +465,7 @@ struct MainView: View {
                 .padding(.top)
             }
             .onAppear() {
+                maxPowerLevel = zebraSingleton.getMaxPower()
                 zebraSingleton.updateAntennaPower(power: 10)
             }
             .onChange(of: cslvalues.singleBarcode) { barcode in
@@ -545,7 +547,7 @@ struct MainView: View {
                         })
                     }
                     VStack {
-                        Slider(value: $powerLevel, in: 0...zebraSingleton.getMaxPower(), step: 1)
+                        Slider(value: $powerLevel, in: 0...maxPowerLevel, step: 1)
                             .accentColor(Color.green)
                             .onChange(of: powerLevel, perform: { power in
                                 updateAntenaPower(power: power)

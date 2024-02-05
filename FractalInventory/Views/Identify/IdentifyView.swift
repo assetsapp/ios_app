@@ -116,6 +116,7 @@ struct IdentifyReadings: View {
     @Binding var inventoryButton: String
     @Binding var barcodeMode: Bool
     @State var powerLevel: Double = 30
+    @State var maxPowerLevel: Double = 30
     var _onInvetory: () -> Void
     // var epclist: EpcsArray = EpcsArray()
     @Binding var zebraTagList: [String]
@@ -141,7 +142,7 @@ struct IdentifyReadings: View {
                     })
                     .disabled(isTriggerApplied)
                 VStack {
-                    Slider(value: $powerLevel, in: 0...zebraSingleton.getMaxPower(), step: 1)
+                    Slider(value: $powerLevel, in: 0...maxPowerLevel, step: 1)
                         .accentColor(Color.green)
                         .onChange(of: powerLevel, perform: { power in
                             updateAntenaPower(power: power)
@@ -193,7 +194,9 @@ struct IdentifyReadings: View {
             .cornerRadius(10)
         }
         .onAppear {
-            powerLevel = zebraSingleton.getMaxPower()
+            let maxPower = zebraSingleton.getMaxPower()
+            powerLevel = maxPower
+            maxPowerLevel = maxPower
         }
         .padding(.horizontal, 40)
         .padding(.top)
