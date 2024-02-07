@@ -26,7 +26,6 @@ class CSLValues: ObservableObject {
     @Published var isLoading: Bool
     @Published var showNonConnected: Bool
     @Published var appVersion: String
-    let dateFormatter = DateFormatter()
 
     init() {
         self.batteryLevel = 0
@@ -64,10 +63,5 @@ class CSLValues: ObservableObject {
         if let index = readings.firstIndex(where: { $0.epc == epc }) {
             readings.remove(at: index)
         }
-    }
-    
-    func getFullDate() -> String {
-        dateFormatter.dateFormat = "dd/MM/y H:m:ss.SSS"
-        return dateFormatter.string(from: Date())
     }
 }

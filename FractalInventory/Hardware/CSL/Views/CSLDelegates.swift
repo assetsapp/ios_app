@@ -50,7 +50,7 @@ struct CSLDelegates: UIViewControllerRepresentable {
                     let _rssi = tag?.rssi ?? 0
                     if !self.cslvalues.readings.contains(where: { $0.epc == _epc }) && _epc != "" && _epc.count == 24 {
                         CSLRfidAppEngine.shared().soundAlert(1005)
-                        self.cslvalues.addEpc(reading: EpcModel(epc: _epc, rssi: String(_rssi), timestamp: self.cslvalues.getFullDate()))
+                        self.cslvalues.addEpc(reading: EpcModel(epc: _epc, rssi: String(_rssi), timestamp: Utils.getFullDate()))
                     }
                 })
             }
@@ -83,7 +83,7 @@ struct CSLDelegates: UIViewControllerRepresentable {
                 if self.cslvalues.isSingleBarcode {
                     self.cslvalues.singleBarcode = _barcode
                 } else {
-                    self.cslvalues.addEpc(reading: EpcModel(epc: _barcode, rssi: "", timestamp: self.cslvalues.getFullDate()))
+                    self.cslvalues.addEpc(reading: EpcModel(epc: _barcode, rssi: "", timestamp: Utils.getFullDate()))
                 }
                 print("Value >> \(_barcode)")
             })
