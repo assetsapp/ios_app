@@ -25,7 +25,7 @@ final class ZebraSingleton: NSObject {
     @Published var antennaConfiguration: srfidAntennaConfiguration?
     @Published var antennaCapabilities: srfidReaderCapabilitiesInfo?
     
-    var onTagAdded: ((String) -> Void) = { _ in }
+    var onTagAdded: ((EpcModel) -> Void) = { _ in }
     
     // MARK: Inicialización y setup
     private override init() {
@@ -531,9 +531,9 @@ extension ZebraSingleton: srfidISdkApiDelegate {
     func srfidEventReadNotify(_ readerID: Int32, aTagData tagData: srfidTagData!) {
         print("Tag data received from RFID reader with ID = \(readerID)")
         print("Tag id: \(tagData.getTagId() ?? "")")
-        //tags.append(tagData.getTagId() ?? "")
-        
-        onTagAdded(tagData.getTagId() ?? "")
+        let tagId = tagData.getTagId() ?? ""
+        let epc = EpcModel(epc: tagId, rssi: "", timestamp: Utils.getFullDate())
+        onTagAdded(epc)
         /// Inventory
         ///let bank: SRFID_MEMORYBANK = tagData.getMemoryBank()
 //        switch bank {

@@ -42,7 +42,7 @@ struct IdentifyView: View {
         .onAppear {
             zebraSingleton.startInventory()
             zebraSingleton.onTagAdded = { tag in
-                if zebraTagList.first(where: { $0 == tag}) == nil {
+                if zebraTagList.first(where: { $0 == tag.epc}) == nil {
                     zebraTagList.append(tag)
                 }
             }
