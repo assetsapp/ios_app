@@ -126,6 +126,7 @@
 		F203F3D02AF9E2280037D45B /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F203F3CF2AF9E2280037D45B /* ExternalAccessory.framework */; };
 		F21691BD2B28CD3D00BB64AD /* ZebraSingleton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F21691BC2B28CD3D00BB64AD /* ZebraSingleton.swift */; };
 		F21691BF2B28CDE200BB64AD /* ZebraModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F21691BE2B28CDE200BB64AD /* ZebraModel.swift */; };
+		F23C778B2B74117300A1A903 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23C778A2B74117300A1A903 /* Utils.swift */; };
 		F2F813572AF3219F00FCD753 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2F813562AF3219F00FCD753 /* Constants.swift */; };
 /* End PBXBuildFile section */
 
@@ -337,6 +338,7 @@
 		F203F3CF2AF9E2280037D45B /* ExternalAccessory.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExternalAccessory.framework; path = System/Library/Frameworks/ExternalAccessory.framework; sourceTree = SDKROOT; };
 		F21691BC2B28CD3D00BB64AD /* ZebraSingleton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZebraSingleton.swift; sourceTree = "<group>"; };
 		F21691BE2B28CDE200BB64AD /* ZebraModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZebraModel.swift; sourceTree = "<group>"; };
+		F23C778A2B74117300A1A903 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		F2F813562AF3219F00FCD753 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		F2F8138C2AF3493C00FCD753 /* libsymbolrfid-sdk.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libsymbolrfid-sdk.a"; path = "symbolrfid-sdk/libsymbolrfid-sdk.a"; sourceTree = "<group>"; };
 		F2F8138F2AF3496200FCD753 /* RfidAccessConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidAccessConfig.h; sourceTree = "<group>"; };
@@ -802,6 +804,7 @@
 		76F5AB1A26CA2242001B8B89 /* FractalInventory */ = {
 			isa = PBXGroup;
 			children = (
+				F23C778C2B74117D00A1A903 /* Utils */,
 				F203F3CC2AF9DF8D0037D45B /* Zebra */,
 				F2F813552AF3210000FCD753 /* Constants */,
 				765581C426DC805B00F6C973 /* Hardware */,
@@ -903,6 +906,14 @@
 				F21691BE2B28CDE200BB64AD /* ZebraModel.swift */,
 			);
 			path = Zebra;
+			sourceTree = "<group>";
+		};
+		F23C778C2B74117D00A1A903 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				F23C778A2B74117300A1A903 /* Utils.swift */,
+			);
+			path = Utils;
 			sourceTree = "<group>";
 		};
 		F2F813552AF3210000FCD753 /* Constants */ = {
@@ -1105,6 +1116,7 @@
 				F21691BD2B28CD3D00BB64AD /* ZebraSingleton.swift in Sources */,
 				36AA9E142806A66B00434A98 /* WMConstants.swift in Sources */,
 				767C671E2756F4E100A5AA3E /* AssetView.swift in Sources */,
+				F23C778B2B74117300A1A903 /* Utils.swift in Sources */,
 				7655823526DC80C600F6C973 /* CSLBleReader.m in Sources */,
 				7655822226DC808100F6C973 /* CSLRfidAppEngine.m in Sources */,
 				76D1EAEC27620EF100EE85B8 /* Loading.swift in Sources */,
