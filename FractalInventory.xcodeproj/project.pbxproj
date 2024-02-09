@@ -1343,7 +1343,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"FractalInventory/Preview Content\"";
-				DEVELOPMENT_TEAM = MC2W678MVZ;
+				DEVELOPMENT_TEAM = RGSJ4N94B8;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1360,7 +1360,7 @@
 					"$(PROJECT_DIR)/zebra-sdk",
 					"$(PROJECT_DIR)/symbolrfid-sdk",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = nut.com.moobile.FractalInventory;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tagventory.zebra;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "FractalInventory/Hardware/CSL/Bridge/FractalInventory-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -1377,7 +1377,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"FractalInventory/Preview Content\"";
-				DEVELOPMENT_TEAM = MC2W678MVZ;
+				DEVELOPMENT_TEAM = RGSJ4N94B8;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1394,7 +1394,7 @@
 					"$(PROJECT_DIR)/zebra-sdk",
 					"$(PROJECT_DIR)/symbolrfid-sdk",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = nut.com.moobile.FractalInventory;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tagventory.zebra;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "FractalInventory/Hardware/CSL/Bridge/FractalInventory-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;

@@ -32,7 +32,7 @@ struct TaggingView: View {
     @State var savedAssetsCount: Int = 0
     let workModeManager = WorkModeManager()
     @StateObject var zebraSingleton = ZebraSingleton.shared
-    @State var zebraTagList: [String] = []
+    @State var zebraTagList: [EpcModel] = []
     
     @State var imageSelected: UIImage = UIImage(systemName: "photo")!
     @State var isNewImageSelected: Bool = false
@@ -64,7 +64,7 @@ struct TaggingView: View {
             }
             zebraSingleton.startInventory()
             zebraSingleton.onTagAdded = { tag in
-                if zebraTagList.first(where: { $0 == tag}) == nil {
+                if zebraTagList.first(where: { $0.epc == tag.epc}) == nil {
                     zebraTagList.append(tag)
                 }
             }
@@ -106,7 +106,7 @@ struct TaggingView: View {
     }
     func getReadings() -> [EpcModel] {
         if zebraSingleton.isAvailable() {
-            return zebraTagList.map({EpcModel(epc: $0, rssi: "", timestamp: "")})
+            return zebraTagList
         } else {
             return cslvalues.readings
         }
@@ -356,7 +356,7 @@ struct CardView: View {
     @State var customFieldsImages: [AssetPhoto] = []
     @State var customFieldsImagesData: [ImageCustomField] = []
     @Binding var assignedEmployee: EmployeeModel
-    @Binding var zebraTagList: [String]
+    @Binding var zebraTagList: [EpcModel]
     
     var body: some View {
         
@@ -411,7 +411,7 @@ struct MainView: View {
     @Binding var assignedEmployee: EmployeeModel
     @State var showEmployeesModal: Bool = false
     @EnvironmentObject var zebraSingleton: ZebraSingleton
-    @Binding var zebraTagList: [String]
+    @Binding var zebraTagList: [EpcModel]
     
     var body: some View {
         VStack {
@@ -613,8 +613,7 @@ struct MainView: View {
     }
     func getReadings() -> [EpcModel] {
         if zebraSingleton.isAvailable() {
-            let epc = zebraTagList.map({EpcModel(epc: $0, rssi: "", timestamp: "")})
-            return getFilteredEpcs(epcarray: epc)
+            return getFilteredEpcs(epcarray: zebraTagList)
         } else {
             return getFilteredEpcs(epcarray: cslvalues.readings)
         }
