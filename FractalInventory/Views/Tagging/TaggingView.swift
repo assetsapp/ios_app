@@ -61,7 +61,6 @@ struct TaggingView: View {
             case .offline:
                 break
             }
-            zebraSingleton.startInventory()
             zebraSingleton.onTagAdded = { tag in
                 self.cslvalues.addEpc(reading: tag)
             }

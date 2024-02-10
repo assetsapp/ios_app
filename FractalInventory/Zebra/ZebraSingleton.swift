@@ -24,6 +24,7 @@ final class ZebraSingleton: NSObject {
     @Published var currentReaderID: Int32 = -1
     @Published var antennaConfiguration: srfidAntennaConfiguration?
     @Published var antennaCapabilities: srfidReaderCapabilitiesInfo?
+    var isScanning: Bool = false
     
     var onTagAdded: ((EpcModel) -> Void) = { _ in }
     
@@ -90,16 +91,12 @@ final class ZebraSingleton: NSObject {
     /// Conectar con un RFID
     /// - Parameter readerID: id del dispositivo a conectar.
     private func connect(readerID: Int32) {
-        bfprint("connect: ID = \(readerID)")
-        //let password = "ascii password"
         let result = apiInstance.srfidEstablishAsciiConnection(readerID, aPassword: nil)
         if result == SRFID_RESULT_SUCCESS {
             currentReaderID = readerID
             self.isDeviceConnectedZebra = true
-            bfprint("ASCII connection has been established")
             requestBatteryStatus(readerID: readerID)
             antennaCapabilities = getCapabilities(readerID: readerID)
-            //rapidRead(readerID: readerID)
             antennaConfiguration = antenaConfiguration(readerID: readerID)
         } else if SRFID_RESULT_WRONG_ASCII_PASSWORD == result {
             bfprint("Incorrect ASCII connection password")
@@ -232,6 +229,55 @@ final class ZebraSingleton: NSObject {
         return start_trigger_cfg
     }
     func reportConfigurationInventory() -> srfidReportConfig {
+        let report_cfg: srfidReportConfig = srfidReportConfig()
+        report_cfg.setIncPC(false)
+        report_cfg.setIncPhase(false)
+        report_cfg.setIncChannelIndex(true)
+        report_cfg.setIncRSSI(true)
+        report_cfg.setIncTagSeenCount(false)
+        report_cfg.setIncFirstSeenTime(false)
+        report_cfg.setIncLastSeenTime(false)
+        return report_cfg
+    }
+    func startScanning(readerID: Int32) {
+        let start_trigger_cfg = srfidStartTriggerConfig()
+        let stop_trigger_cfg = srfidStopTriggerConfig()
+        let report_cfg: srfidReportConfig = srfidReportConfig()
+        let access_cfg: srfidAccessConfig = srfidAccessConfig()
+        var error_response: NSString?
+        var result = apiInstance.srfidStartRapidRead(readerID, aReportConfig: report_cfg, aAccessConfig: access_cfg, aStatusMessage: &error_response)
+        switch result {
+        case SRFID_RESULT_SUCCESS:
+            print("Request succeed")
+            isScanning = true
+        case SRFID_RESULT_RESPONSE_ERROR:
+            print("Error response from RFID reader: \(error_response ?? "")")
+            isScanning = false
+        default:
+            print("Request failed")
+            isScanning = false
+        }
+    }
+    func stopTriggerScanning() -> srfidStopTriggerConfig? {
+        let stop_trigger_cfg: srfidStopTriggerConfig = srfidStopTriggerConfig()
+        stop_trigger_cfg.setStopOnHandheldTrigger(true)
+        stop_trigger_cfg.setTriggerType(SRFID_TRIGGERTYPE_RELEASE)
+        stop_trigger_cfg.setStopOnTimeout(true)
+        stop_trigger_cfg.setStopTimout(25*1000)
+        stop_trigger_cfg.setStopOnTagCount(false)
+        stop_trigger_cfg.setStopOnInventoryCount(false)
+        stop_trigger_cfg.setStopOnAccessCount(false)
+        return stop_trigger_cfg
+    }
+    func startTriggerScanning() -> srfidStartTriggerConfig {
+        let start_trigger_cfg: srfidStartTriggerConfig = srfidStartTriggerConfig()
+        start_trigger_cfg.setStartOnHandheldTrigger(true)
+        start_trigger_cfg.setTriggerType(SRFID_TRIGGERTYPE_PRESS)
+        start_trigger_cfg.setStartDelay(0)
+        start_trigger_cfg.setRepeatMonitoring(true)
+        return start_trigger_cfg
+    }
+    func reportConfigurationScanning() -> srfidReportConfig {
         let report_cfg: srfidReportConfig = srfidReportConfig()
         report_cfg.setIncPC(false)
         report_cfg.setIncPhase(false)
@@ -554,6 +600,23 @@ extension ZebraSingleton: srfidISdkApiDelegate {
     }
     
     func srfidEventTriggerNotify(_ readerID: Int32, aTriggerEvent triggerEvent: SRFID_TRIGGEREVENT) {
+        switch triggerEvent {
+        case SRFID_TRIGGEREVENT_PRESSED:
+            print("Presionado")
+            if !isScanning {
+                startScanning(readerID: readerID)
+            }
+        case SRFID_TRIGGEREVENT_RELEASED:
+            print("Liberado")
+            self.apiInstance.srfidStopRapidRead(readerID, aStatusMessage: nil)
+            isScanning = false
+        case SRFID_TRIGGEREVENT_SCAN_PRESSED:
+            print("Scan Presionado")
+        case SRFID_TRIGGEREVENT_SCAN_RELEASED:
+            print("Scan Liberado")
+        default:
+            print("Trigger Event: \(triggerEvent)")
+        }
     }
     
     func srfidEventBatteryNotity(_ readerID: Int32, aBatteryEvent batteryEvent: srfidBatteryEvent!) {
