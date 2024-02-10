@@ -537,7 +537,7 @@ struct MainView: View {
                         Slider(value: $powerLevel, in: 0...maxPowerLevel, step: 1)
                             .accentColor(Color.green)
                             .onChange(of: powerLevel, perform: { power in
-                                updateAntenaPower(power: power)
+                                Utils.updateAntennaPower(power: power)
                             })
                             .disabled(inventoryButton == "Stop")
                         Text("Power Level: \(powerLevel, specifier: "%.0f")")
@@ -583,14 +583,6 @@ struct MainView: View {
     }
     
     // MARK: FUNCTIONS
-    private func updateAntenaPower(power: Double) {
-        if zebraSingleton.isAvailable() {
-            zebraSingleton.updateAntennaPower(power: power)
-        } else {
-            CSLRfidAppEngine.shared().reader.selectAntennaPort(0)
-            CSLRfidAppEngine.shared().reader.setPower(power)
-        }
-    }
     func getFilteredEpcs(epcarray: [EpcModel]) -> [EpcModel] {
         if (isSingle) {
             if (epcarray.count > 0) {

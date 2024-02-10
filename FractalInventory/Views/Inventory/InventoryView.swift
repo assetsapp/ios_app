@@ -194,8 +194,7 @@ struct InventoryView: View {
                                 Slider(value: $powerLevel, in: 0...maxPowerLevel, step: 1)
                                     .accentColor(Color.green)
                                     .onChange(of: powerLevel, perform: { power in
-                                        CSLRfidAppEngine.shared().reader.selectAntennaPort(0)
-                                        CSLRfidAppEngine.shared().reader.setPower(power)
+                                        Utils.updateAntennaPower(power: power)
                                     })
                                     .disabled(inventoryButton == "Stop")
                                 Text("Power Level: \(powerLevel, specifier: "%.0f")")
