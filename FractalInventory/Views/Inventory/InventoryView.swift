@@ -251,8 +251,8 @@ struct InventoryView: View {
                 self.cslvalues.addEpc(reading: tag)
             }
             let maxPower = zebraSingleton.getMaxPower()
-            powerLevel = maxPower
             maxPowerLevel = maxPower
+            zebraSingleton.updateAntennaPower(power: 30)
         }
         .onDisappear {
             if inventorySession != "" {
