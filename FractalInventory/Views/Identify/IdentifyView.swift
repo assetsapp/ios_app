@@ -39,9 +39,7 @@ struct IdentifyView: View {
         .onAppear {
             zebraSingleton.startInventory()
             zebraSingleton.onTagAdded = { tag in
-                if cslvalues.readings.first(where: { $0.epc == tag.epc }) == nil {
-                    cslvalues.readings.append(tag)
-                }
+                self.cslvalues.addEpc(reading: tag)
             }
         }
         .onChange(of: cslvalues.isTriggerApplied) { isTriggerApplied in
@@ -100,9 +98,6 @@ struct IdentifyView: View {
                 }
             }
         }
-    }
-    func updateAntenaRFID() {
-        
     }
 }
 struct IdentifyReadings: View {
