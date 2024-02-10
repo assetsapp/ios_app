@@ -40,6 +40,8 @@ struct InventoryView: View {
     @State var showResetModal: Bool = false
     @State var type: InventoryType = .root
     let workModeManager = WorkModeManager()
+    @StateObject var zebraSingleton: ZebraSingleton = ZebraSingleton.shared
+    @State var maxPowerLevel: Double = 30
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
     var body: some View {
@@ -189,7 +191,7 @@ struct InventoryView: View {
                     if showRFIDSection {
                         VStack {
                             VStack {
-                                Slider(value: $powerLevel, in: 0...30, step: 1)
+                                Slider(value: $powerLevel, in: 0...maxPowerLevel, step: 1)
                                     .accentColor(Color.green)
                                     .onChange(of: powerLevel, perform: { power in
                                         CSLRfidAppEngine.shared().reader.selectAntennaPort(0)
@@ -245,6 +247,16 @@ struct InventoryView: View {
         .onAppear {
             resetInventory()
             fetchInitialData()
+            zebraSingleton.startInventory()
+            zebraSingleton.onTagAdded = { tag in
+                if cslvalues.readings.first(where: { $0.epc == tag.epc }) == nil {
+                    cslvalues.readings.append(tag)
+                }
+                
+            }
+            let maxPower = zebraSingleton.getMaxPower()
+            powerLevel = maxPower
+            maxPowerLevel = maxPower
         }
         .onDisappear {
             if inventorySession != "" {
