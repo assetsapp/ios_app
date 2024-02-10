@@ -182,7 +182,7 @@ final class ZebraSingleton: NSObject {
         }
         /// Stop
         var stop_trigger_cfg = stopTriggerInventory()
-        result = apiInstance.srfidGetStopTriggerConfiguration(readerID, aStopTriggeConfig: &stop_trigger_cfg, aStatusMessage: &error_response)
+        result = apiInstance.srfidSetStopTriggerConfiguration(readerID, aStopTriggeConfig: stop_trigger_cfg, aStatusMessage: &error_response)
         if result == SRFID_RESULT_SUCCESS {
             print("Stop trigger configuration has been set")
         } else {
@@ -192,8 +192,8 @@ final class ZebraSingleton: NSObject {
         let report_cfg = reportConfigurationInventory()
         /// Access Configuration
         let access_cfg: srfidAccessConfig = srfidAccessConfig()
-        access_cfg.setPower(270)
-        access_cfg.setDoSelect(false)
+        access_cfg.setPower(80)
+        access_cfg.setDoSelect(true)
         /// Start inventory
         result = apiInstance.srfidStartInventory(readerID, aMemoryBank: SRFID_MEMORYBANK_EPC, aReportConfig: report_cfg, aAccessConfig: access_cfg, aStatusMessage: &error_response)
         switch result {
@@ -240,12 +240,24 @@ final class ZebraSingleton: NSObject {
         return report_cfg
     }
     func startScanning(readerID: Int32) {
-        let start_trigger_cfg = srfidStartTriggerConfig()
-        let stop_trigger_cfg = srfidStopTriggerConfig()
+        let start_trigger_cfg = startTriggerScanning()
+        var error_response: NSString?
+        var result = apiInstance.srfidSetStartTriggerConfiguration(readerID, aStartTriggeConfig: start_trigger_cfg, aStatusMessage: &error_response)
+        if result == SRFID_RESULT_SUCCESS {
+            print("Start trigger configuration has been set")
+        } else {
+            print("Failed to set start trigger parameters")
+        }
+        let stop_trigger_cfg = stopTriggerScanning()
+        result = apiInstance.srfidSetStopTriggerConfiguration(readerID, aStopTriggeConfig: stop_trigger_cfg, aStatusMessage: &error_response)
+        if result == SRFID_RESULT_SUCCESS {
+            print("Stop trigger configuration has been set")
+        } else {
+            print("Failed to set stop trigger parameters")
+        }
         let report_cfg: srfidReportConfig = srfidReportConfig()
         let access_cfg: srfidAccessConfig = srfidAccessConfig()
-        var error_response: NSString?
-        var result = apiInstance.srfidStartRapidRead(readerID, aReportConfig: report_cfg, aAccessConfig: access_cfg, aStatusMessage: &error_response)
+        result = apiInstance.srfidStartInventory(readerID, aMemoryBank: SRFID_MEMORYBANK_EPC, aReportConfig: report_cfg, aAccessConfig: access_cfg, aStatusMessage: &error_response)
         switch result {
         case SRFID_RESULT_SUCCESS:
             print("Request succeed")
@@ -534,7 +546,7 @@ final class ZebraSingleton: NSObject {
         let result = apiInstance.srfidSetAntennaConfiguration(readerID, aAntennaConfiguration: antennaNewConfiguration, aStatusMessage: &error_response)
         switch result {
         case SRFID_RESULT_SUCCESS:
-            print("Update Success")
+            print("Update PoweSuccess")
         case SRFID_RESULT_RESPONSE_ERROR:
             print("Error response from RFID reader: \(error_response ?? "")")
         default:
@@ -603,13 +615,13 @@ extension ZebraSingleton: srfidISdkApiDelegate {
         switch triggerEvent {
         case SRFID_TRIGGEREVENT_PRESSED:
             print("Presionado")
-            if !isScanning {
-                startScanning(readerID: readerID)
-            }
+            //if !isScanning {
+              //  startScanning(readerID: currentReaderID)
+            //}
         case SRFID_TRIGGEREVENT_RELEASED:
             print("Liberado")
-            self.apiInstance.srfidStopRapidRead(readerID, aStatusMessage: nil)
-            isScanning = false
+            //self.apiInstance.srfidStopRapidRead(currentReaderID, aStatusMessage: nil)
+            //isScanning = false
         case SRFID_TRIGGEREVENT_SCAN_PRESSED:
             print("Scan Presionado")
         case SRFID_TRIGGEREVENT_SCAN_RELEASED:

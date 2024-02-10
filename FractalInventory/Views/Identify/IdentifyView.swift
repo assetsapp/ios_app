@@ -37,6 +37,7 @@ struct IdentifyView: View {
             Spacer()
         }
         .onAppear {
+            zebraSingleton.startInventory()
             zebraSingleton.onTagAdded = { tag in
                 self.cslvalues.addEpc(reading: tag)
             }
