@@ -32,7 +32,6 @@ struct TaggingView: View {
     @State var savedAssetsCount: Int = 0
     let workModeManager = WorkModeManager()
     @StateObject var zebraSingleton = ZebraSingleton.shared
-    @State var zebraTagList: [EpcModel] = []
     
     @State var imageSelected: UIImage = UIImage(systemName: "photo")!
     @State var isNewImageSelected: Bool = false
@@ -42,7 +41,7 @@ struct TaggingView: View {
     var body: some View {
         VStack {
             ScrollView(.vertical, showsIndicators: false) {
-                CardView(cslvalues: cslvalues, reference: $reference, location: $location, isSingle: $isSingle, inventoryButton: $inventoryButton, isInventoryStarted: $isInventoryStarted, barcodeMode: $barcodeMode, customFields: $customFields, _onInvetory: onInventory, validateEPC: validateEPC, customFieldsValues: $customFieldsValues, serialNumber: $serialNumber, locationPath: $locationPath, isRemoveExistingModalResult: $isRemoveExistingModalResult, removedExistingCount: $removedExistingCount, isSavedAssetsPresent: $isSavedAssetsPresent, savedAssetsCount: $savedAssetsCount, imageSelected: $imageSelected, isNewImageSelected: $isNewImageSelected, assignedEmployee: $assignedEmployee, zebraTagList: $zebraTagList)
+                CardView(cslvalues: cslvalues, reference: $reference, location: $location, isSingle: $isSingle, inventoryButton: $inventoryButton, isInventoryStarted: $isInventoryStarted, barcodeMode: $barcodeMode, customFields: $customFields, _onInvetory: onInventory, validateEPC: validateEPC, customFieldsValues: $customFieldsValues, serialNumber: $serialNumber, locationPath: $locationPath, isRemoveExistingModalResult: $isRemoveExistingModalResult, removedExistingCount: $removedExistingCount, isSavedAssetsPresent: $isSavedAssetsPresent, savedAssetsCount: $savedAssetsCount, imageSelected: $imageSelected, isNewImageSelected: $isNewImageSelected, assignedEmployee: $assignedEmployee)
             }
         }
         .onAppear {
@@ -64,9 +63,10 @@ struct TaggingView: View {
             }
             zebraSingleton.startInventory()
             zebraSingleton.onTagAdded = { tag in
-                if zebraTagList.first(where: { $0.epc == tag.epc}) == nil {
-                    zebraTagList.append(tag)
+                if cslvalues.readings.first(where: { $0.epc == tag.epc }) == nil {
+                    cslvalues.readings.append(tag)
                 }
+                
             }
         }
         .onDisappear {
@@ -85,12 +85,11 @@ struct TaggingView: View {
             Button("Save") { isSaveModalPresent = true }
             .padding(.leading, 10)
             .alert(isPresented: $isSaveModalPresent, content: {
-                let readings = getReadings()
-                if readings.count > 0 {
+                if cslvalues.readings.count > 0 {
                     return Alert(
                         title: Text("Save Asset"),
                         message: Text("Do you want to proceed?"),
-                        primaryButton: .default(Text("OK"), action: { onSave(epcsarray: readings) }),
+                        primaryButton: .default(Text("OK"), action: { onSave(epcsarray: cslvalues.readings) }),
                         secondaryButton: .cancel(Text("Cancel"))
                     )
                 } else {
@@ -103,13 +102,6 @@ struct TaggingView: View {
         }
         )
         .environmentObject(zebraSingleton)
-    }
-    func getReadings() -> [EpcModel] {
-        if zebraSingleton.isAvailable() {
-            return zebraTagList
-        } else {
-            return cslvalues.readings
-        }
     }
     func onInventory() {
         if inventoryButton == "Start" {
@@ -356,7 +348,6 @@ struct CardView: View {
     @State var customFieldsImages: [AssetPhoto] = []
     @State var customFieldsImagesData: [ImageCustomField] = []
     @Binding var assignedEmployee: EmployeeModel
-    @Binding var zebraTagList: [EpcModel]
     
     var body: some View {
         
@@ -382,7 +373,7 @@ struct CardView: View {
             .padding(.leading, 50)
             .padding(.top, 5)
             
-            MainView(location: $location, cslvalues: cslvalues, isSingle: $isSingle, inventoryButton: $inventoryButton, isInventoryStarted: $isInventoryStarted, barcodeMode: $barcodeMode, serialNumber: $serialNumber, locationPath: $locationPath, isRemoveExistingModalResult: $isRemoveExistingModalResult, removedExistingCount: $removedExistingCount, isSavedAssetsPresent: $isSavedAssetsPresent, savedAssetsCount: $savedAssetsCount, _onInvetory: _onInvetory, validateEPC: validateEPC, assignedEmployee: $assignedEmployee, zebraTagList: $zebraTagList)
+            MainView(location: $location, cslvalues: cslvalues, isSingle: $isSingle, inventoryButton: $inventoryButton, isInventoryStarted: $isInventoryStarted, barcodeMode: $barcodeMode, serialNumber: $serialNumber, locationPath: $locationPath, isRemoveExistingModalResult: $isRemoveExistingModalResult, removedExistingCount: $removedExistingCount, isSavedAssetsPresent: $isSavedAssetsPresent, savedAssetsCount: $savedAssetsCount, _onInvetory: _onInvetory, validateEPC: validateEPC, assignedEmployee: $assignedEmployee)
         }
     }
 }
@@ -411,7 +402,6 @@ struct MainView: View {
     @Binding var assignedEmployee: EmployeeModel
     @State var showEmployeesModal: Bool = false
     @EnvironmentObject var zebraSingleton: ZebraSingleton
-    @Binding var zebraTagList: [EpcModel]
     
     var body: some View {
         VStack {
@@ -498,7 +488,7 @@ struct MainView: View {
             
             VStack(alignment: .leading) {
                 HStack(alignment: .center) {
-                    Text("EPC Readings (\(epcReadings()):")
+                    Text("EPC Readings (\(cslvalues.readings.count):")
                         .foregroundColor(.secondary)
                     Spacer()
                     Rectangle()
@@ -558,7 +548,7 @@ struct MainView: View {
                     .padding(.top)
                     .padding(.bottom)
                     ScrollView {
-                        ForEach(getReadings(), id: \.self) { tag in
+                        ForEach(getFilteredEpcs(epcarray: cslvalues.readings), id: \.self) { tag in
                             HStack {
                                 VStack(alignment: .leading) {
                                     Text(tag.epc)
@@ -602,20 +592,6 @@ struct MainView: View {
         } else {
             CSLRfidAppEngine.shared().reader.selectAntennaPort(0)
             CSLRfidAppEngine.shared().reader.setPower(power)
-        }
-    }
-    func epcReadings() -> Int {
-        if zebraSingleton.isAvailable() {
-            return zebraTagList.count
-        } else {
-            return cslvalues.readings.count
-        }
-    }
-    func getReadings() -> [EpcModel] {
-        if zebraSingleton.isAvailable() {
-            return getFilteredEpcs(epcarray: zebraTagList)
-        } else {
-            return getFilteredEpcs(epcarray: cslvalues.readings)
         }
     }
     func getFilteredEpcs(epcarray: [EpcModel]) -> [EpcModel] {
