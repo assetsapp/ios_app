@@ -15,10 +15,8 @@ struct IdentifyView: View {
     @State private var barcodeMode: Bool = false
     @State private var navigateToValidateView: Bool = false
     @State var showFirstReadModal: Bool = false
-    @State var zebraTagList: [EpcModel] = []
     
     var body: some View {
-        
         VStack {
             IdentifyReadings(
                 cslvalues: cslvalues,
@@ -27,7 +25,6 @@ struct IdentifyView: View {
                 inventoryButton: $inventoryButton,
                 barcodeMode: $barcodeMode,
                 _onInvetory: onInventory,
-                zebraTagList: $zebraTagList,
                 onClear: {
                     CSLHelper.onClear(cslvalues: cslvalues)
                 }
@@ -42,8 +39,8 @@ struct IdentifyView: View {
         .onAppear {
             zebraSingleton.startInventory()
             zebraSingleton.onTagAdded = { tag in
-                if zebraTagList.first(where: { $0.epc == tag.epc}) == nil {
-                    zebraTagList.append(tag)
+                if cslvalues.readings.first(where: { $0.epc == tag.epc }) == nil {
+                    cslvalues.readings.append(tag)
                 }
             }
         }
@@ -119,7 +116,6 @@ struct IdentifyReadings: View {
     @State var maxPowerLevel: Double = 30
     var _onInvetory: () -> Void
     // var epclist: EpcsArray = EpcsArray()
-    @Binding var zebraTagList: [EpcModel]
     let onClear: (() -> Void)
     
     var body: some View {
@@ -155,31 +151,17 @@ struct IdentifyReadings: View {
                         Text("Clear")
                     }
                     Spacer()
-                    Text("Total: \(getCount())")
+                    Text("Total: \(cslvalues.readings.count)")
                 }
                 .padding(.top)
                 ScrollView {
-                    if zebraSingleton.isAvailable() {
-                        LazyVStack {
-                            ForEach(zebraTagList, id: \.self) { tag in
-                                HStack {
-                                    IdentifyReadingSubview(reading: tag, remove: {
-                                        removeTag(tag: tag.epc)
-                                    })
-                                    Spacer()
-                                }
-                            }
-                        }
-                    } else {
-                        LazyVStack {
-                            ForEach(cslvalues.readings, id: \.self) { tag in
-                                HStack {
-                                    let epcModel = EpcModel(epc: tag.epc, rssi: tag.rssi, timestamp: tag.timestamp)
-                                    IdentifyReadingSubview(reading: epcModel, remove: {
-                                        cslvalues.removeEpc(epc: tag.epc)
-                                    })
-                                    Spacer()
-                                }
+                    LazyVStack {
+                        ForEach(cslvalues.readings, id: \.self) { tag in
+                            HStack {
+                                IdentifyReadingSubview(reading: tag, remove: {
+                                    cslvalues.removeEpc(epc: tag.epc)
+                                })
+                                Spacer()
                             }
                         }
                     }
@@ -200,18 +182,6 @@ struct IdentifyReadings: View {
         }
         .padding(.horizontal, 40)
         .padding(.top)
-    }
-    private func removeTag(tag: String) {
-        if let index = zebraTagList.firstIndex(where: { $0.epc == tag }) {
-            zebraTagList.remove(at: index)
-        }
-    }
-    private func getCount() -> Int {
-        if zebraSingleton.isAvailable() {
-            return cslvalues.readings.count
-        } else {
-            return zebraTagList.count
-        }
     }
     private func updateAntenaPower(power: Double) {
         if zebraSingleton.isAvailable() {
