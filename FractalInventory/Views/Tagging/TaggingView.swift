@@ -214,9 +214,9 @@ struct TaggingView: View {
                         }
                     case .failure(_ ):
                         print("error")
+                        cslvalues.isLoading = false
                     }
                 }
-                // in case of error this never close loader
             }
         }
     }
