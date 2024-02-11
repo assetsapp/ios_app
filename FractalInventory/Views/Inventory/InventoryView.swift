@@ -251,13 +251,13 @@ struct InventoryView: View {
         .onAppear {
             resetInventory()
             fetchInitialData()
+            zebraSingleton.startInventory(power: 270)
             zebraSingleton.onTagAdded = { tag in
+                print("ZebraTag: \(tag)")
                 self.cslvalues.addEpc(reading: tag)
             }
             let maxPower = zebraSingleton.getMaxPower()
             maxPowerLevel = maxPower
-            zebraSingleton.updateAntennaPower(power: 30)
-            zebraSingleton.startInventory(power: 30)
         }
         .onDisappear {
             if inventorySession != "" {
