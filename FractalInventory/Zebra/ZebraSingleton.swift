@@ -203,7 +203,7 @@ final class ZebraSingleton: NSObject {
         switch result {
         case SRFID_RESULT_SUCCESS:
             print("Request succeed")
-            let seconds = 60.0
+            let seconds = 120.0
             DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
                 self.apiInstance.srfidStopInventory(readerID, aStatusMessage: nil)
             }
@@ -591,8 +591,8 @@ extension ZebraSingleton: srfidISdkApiDelegate {
     }
     /// Función para indicar lectura de un RFID
     func srfidEventReadNotify(_ readerID: Int32, aTagData tagData: srfidTagData!) {
-        print("Tag data received from RFID reader with ID = \(readerID)")
-        print("Tag id: \(tagData.getTagId() ?? "")")
+        //print("Tag data received from RFID reader with ID = \(readerID)")
+        //print("Tag id: \(tagData.getTagId() ?? "")")
         let tagId = tagData.getTagId() ?? ""
         let epc = EpcModel(epc: tagId, rssi: "", timestamp: Utils.getFullDate())
         onTagAdded(epc)
@@ -618,12 +618,14 @@ extension ZebraSingleton: srfidISdkApiDelegate {
     func srfidEventTriggerNotify(_ readerID: Int32, aTriggerEvent triggerEvent: SRFID_TRIGGEREVENT) {
         switch triggerEvent {
         case SRFID_TRIGGEREVENT_PRESSED:
-            print("Presionado")
+            //print("Presionado")
+            break
             //if !isScanning {
               //  startScanning(readerID: currentReaderID)
             //}
         case SRFID_TRIGGEREVENT_RELEASED:
             print("Liberado")
+            break
             //self.apiInstance.srfidStopRapidRead(currentReaderID, aStatusMessage: nil)
             //isScanning = false
         case SRFID_TRIGGEREVENT_SCAN_PRESSED:
