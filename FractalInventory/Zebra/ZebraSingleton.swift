@@ -597,7 +597,8 @@ extension ZebraSingleton: srfidISdkApiDelegate {
         //print("Tag data received from RFID reader with ID = \(readerID)")
         //print("Tag id: \(tagData.getTagId() ?? "")")
         let tagId = tagData.getTagId() ?? ""
-        let epc = EpcModel(epc: tagId, rssi: "", timestamp: Utils.getFullDate())
+        let rssi = tagData.getPeakRSSI()
+        let epc = EpcModel(epc: tagId, rssi: String(rssi), timestamp: Utils.getFullDate())
         onTagAdded(epc)
         /// Inventory
         ///let bank: SRFID_MEMORYBANK = tagData.getMemoryBank()
