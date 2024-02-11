@@ -61,6 +61,7 @@ struct TaggingView: View {
             case .offline:
                 break
             }
+            zebraSingleton.startInventory(power: 10)
             zebraSingleton.onTagAdded = { tag in
                 self.cslvalues.addEpc(reading: tag)
             }
@@ -453,8 +454,6 @@ struct MainView: View {
             }
             .onAppear() {
                 maxPowerLevel = zebraSingleton.getMaxPower()
-                zebraSingleton.updateAntennaPower(power: 100)
-                zebraSingleton.startInventory(power: 100)
             }
             .onChange(of: cslvalues.singleBarcode) { barcode in
                 serialNumber += barcode
