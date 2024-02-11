@@ -251,7 +251,7 @@ struct InventoryView: View {
         .onAppear {
             resetInventory()
             fetchInitialData()
-            zebraSingleton.startInventory(power: 270)
+            zebraSingleton.startInventory(power: 30)
             zebraSingleton.onTagAdded = { tag in
                 print("ZebraTag: \(tag)")
                 self.cslvalues.addEpc(reading: tag)

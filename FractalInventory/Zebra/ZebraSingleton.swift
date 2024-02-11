@@ -25,7 +25,7 @@ final class ZebraSingleton: NSObject {
     @Published var antennaConfiguration: srfidAntennaConfiguration?
     @Published var antennaCapabilities: srfidReaderCapabilitiesInfo?
     var isScanning: Bool = false
-    
+    var currentPower: Int16 = 0
     var onTagAdded: ((EpcModel) -> Void) = { _ in }
     
     // MARK: Inicialización y setup
@@ -174,6 +174,8 @@ final class ZebraSingleton: NSObject {
         startInventory(readerID: currentReaderID, power: power)
     }
     func startInventory(readerID: Int32, power: Int16) {
+        isScanning = true
+        currentPower = power
         subscribeReadEvent()
         var error_response: NSString? = nil
         /// Start
@@ -203,9 +205,10 @@ final class ZebraSingleton: NSObject {
         switch result {
         case SRFID_RESULT_SUCCESS:
             print("Request succeed")
-            let seconds = 120.0
+            let seconds = 60.0
             DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
                 self.apiInstance.srfidStopInventory(readerID, aStatusMessage: nil)
+                self.isScanning = false
             }
         case SRFID_RESULT_RESPONSE_ERROR:
             print("Error response from RFID reader: \(error_response ?? "")")
@@ -618,11 +621,9 @@ extension ZebraSingleton: srfidISdkApiDelegate {
     func srfidEventTriggerNotify(_ readerID: Int32, aTriggerEvent triggerEvent: SRFID_TRIGGEREVENT) {
         switch triggerEvent {
         case SRFID_TRIGGEREVENT_PRESSED:
-            //print("Presionado")
-            break
-            //if !isScanning {
-              //  startScanning(readerID: currentReaderID)
-            //}
+            if !isScanning {
+                startInventory(power: currentPower)
+            }
         case SRFID_TRIGGEREVENT_RELEASED:
             print("Liberado")
             break
