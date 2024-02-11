@@ -26,6 +26,7 @@ struct AssetView: View {
     @State var showDuplicatedEPCModal: Bool = false
     @State var customFieldsImages: [AssetPhoto] = []
     @State var customFieldsImagesData: [ImageCustomField] = []
+    @StateObject var zebraSingleton = ZebraSingleton.shared
     let workModeManager = WorkModeManager()
     
     var body: some View {
@@ -83,12 +84,17 @@ struct AssetView: View {
             case .offline:
                 break 
             }
+            zebraSingleton.startInventory(power: 270)
+            zebraSingleton.onTagAdded = { tag in
+                self.cslvalues.addEpc(reading: tag)
+            }
         }
         .onChange(of: cslvalues.isTriggerApplied) { isTriggerApplied in
             if (!isInventoryStarted) {
                 onInventory()
             }
         }
+        .environmentObject(zebraSingleton)
     }
     
     func onInventory() {
@@ -344,7 +350,7 @@ struct AssetOtherFields: View {
     @State var powerLevel: Double = 10
     @State var maxPowerLevel: Double = 30
     @State var geigerLevel: Double = 0
-    @StateObject var zebraSingleton = ZebraSingleton.shared
+    @EnvironmentObject var zebraSingleton: ZebraSingleton
     var _onInvetory: () -> Void
     
     var body: some View {
@@ -490,6 +496,11 @@ struct AssetOtherFields: View {
                         })
                         .disabled(inventoryButton == "Stop")
                     Text("Power Level: \(powerLevel, specifier: "%.0f")")
+                    Button(action: {
+                        zebraSingleton.restartInventory(power: Int16(powerLevel))
+                    }) {
+                        Text("Update Power")
+                    }
                 }
                 .padding(.vertical)
             }
@@ -503,11 +514,6 @@ struct AssetOtherFields: View {
         }
         .onAppear {
             maxPowerLevel = zebraSingleton.getMaxPower()
-            zebraSingleton.updateAntennaPower(power: 100)
-            zebraSingleton.startInventory(power: 100)
-            zebraSingleton.onTagAdded = { tag in
-                self.cslvalues.addEpc(reading: tag)
-            }
         }
         .padding(.horizontal, 40)
     }
