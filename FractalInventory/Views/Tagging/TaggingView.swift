@@ -211,12 +211,12 @@ struct TaggingView: View {
                             case .failure(_ ):
                                 break
                             }
-                            cslvalues.isLoading = false
                         }
                     case .failure(_ ):
                         print("error")
-                        cslvalues.isLoading = false
+                        
                     }
+                    cslvalues.isLoading = false
                 }
             }
         }
@@ -238,11 +238,10 @@ struct TaggingView: View {
             case .success(_ ):
                 savedAssetsCount = 1
                 isSavedAssetsPresent = true
-                cslvalues.isLoading = false
             case .failure(let error):
                 print(error.localizedDescription)
-                cslvalues.isLoading = false
             }
+            cslvalues.isLoading = false
         }
     }
     
