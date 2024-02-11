@@ -84,7 +84,8 @@ struct AssetView: View {
             case .offline:
                 break 
             }
-            zebraSingleton.startInventory(power: 270)
+            cslvalues.readings = []
+            zebraSingleton.startInventory(power: 30)
             zebraSingleton.onTagAdded = { tag in
                 print("ZebraTag: \(tag)")
                 self.cslvalues.addEpc(reading: tag)
