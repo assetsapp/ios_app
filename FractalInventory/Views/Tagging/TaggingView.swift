@@ -453,6 +453,7 @@ struct MainView: View {
             .onAppear() {
                 maxPowerLevel = zebraSingleton.getMaxPower()
                 zebraSingleton.updateAntennaPower(power: 10)
+                zebraSingleton.startInventory(power: 10)
             }
             .onChange(of: cslvalues.singleBarcode) { barcode in
                 serialNumber += barcode

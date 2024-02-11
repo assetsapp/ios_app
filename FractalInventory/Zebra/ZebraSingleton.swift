@@ -166,10 +166,14 @@ final class ZebraSingleton: NSObject {
             print("Request failed")
         }
     }
-    func startInventory() {
-        startInventory(readerID: currentReaderID)
+    func restartInventory(power: Int16) {
+        apiInstance.srfidStopInventory(currentReaderID, aStatusMessage: nil)
+        startInventory(power: power)
     }
-    func startInventory(readerID: Int32) {
+    func startInventory(power: Int16) {
+        startInventory(readerID: currentReaderID, power: power)
+    }
+    func startInventory(readerID: Int32, power: Int16) {
         subscribeReadEvent()
         var error_response: NSString? = nil
         /// Start
@@ -192,7 +196,7 @@ final class ZebraSingleton: NSObject {
         let report_cfg = reportConfigurationInventory()
         /// Access Configuration
         let access_cfg: srfidAccessConfig = srfidAccessConfig()
-        access_cfg.setPower(80)
+        access_cfg.setPower(power)
         access_cfg.setDoSelect(true)
         /// Start inventory
         result = apiInstance.srfidStartInventory(readerID, aMemoryBank: SRFID_MEMORYBANK_EPC, aReportConfig: report_cfg, aAccessConfig: access_cfg, aStatusMessage: &error_response)
@@ -201,7 +205,7 @@ final class ZebraSingleton: NSObject {
             print("Request succeed")
             let seconds = 60.0
             DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
-                self.apiInstance.srfidStopRapidRead(readerID, aStatusMessage: nil)
+                self.apiInstance.srfidStopInventory(readerID, aStatusMessage: nil)
             }
         case SRFID_RESULT_RESPONSE_ERROR:
             print("Error response from RFID reader: \(error_response ?? "")")

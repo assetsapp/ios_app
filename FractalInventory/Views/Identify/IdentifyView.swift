@@ -37,7 +37,6 @@ struct IdentifyView: View {
             Spacer()
         }
         .onAppear {
-            zebraSingleton.startInventory()
             zebraSingleton.onTagAdded = { tag in
                 self.cslvalues.addEpc(reading: tag)
             }
@@ -140,6 +139,11 @@ struct IdentifyReadings: View {
                         })
                         .disabled(inventoryButton == "Stop")
                     Text("Power Level: \(powerLevel, specifier: "%.0f")")
+                    Button(action: {
+                        zebraSingleton.restartInventory(power: Int16(powerLevel))
+                    }) {
+                        Text("Update Power")
+                    }
                 }
                 HStack {
                     Button(action: onClear) {
@@ -174,6 +178,7 @@ struct IdentifyReadings: View {
             let maxPower = zebraSingleton.getMaxPower()
             powerLevel = maxPower
             maxPowerLevel = maxPower
+            zebraSingleton.startInventory(power: Int16(maxPower))
         }
         .padding(.horizontal, 40)
         .padding(.top)
