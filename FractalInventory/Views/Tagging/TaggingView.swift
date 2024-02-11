@@ -240,6 +240,7 @@ struct TaggingView: View {
                 cslvalues.isLoading = false
             case .failure(let error):
                 print(error.localizedDescription)
+                cslvalues.isLoading = false
             }
         }
     }
