@@ -198,6 +198,11 @@ struct InventoryView: View {
                                     })
                                     .disabled(inventoryButton == "Stop")
                                 Text("Power Level: \(powerLevel, specifier: "%.0f")")
+                                Button(action: {
+                                    zebraSingleton.restartInventory(power: Int16(powerLevel))
+                                }) {
+                                    Text("Update Power")
+                                }
                             }
                             Toggle("\(inventoryButton) RFID:", isOn: $isInventoryStarted)
                                 .toggleStyle(SwitchToggleStyle(tint: .blue))

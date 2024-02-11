@@ -452,8 +452,8 @@ struct MainView: View {
             }
             .onAppear() {
                 maxPowerLevel = zebraSingleton.getMaxPower()
-                zebraSingleton.updateAntennaPower(power: 10)
-                zebraSingleton.startInventory(power: 10)
+                zebraSingleton.updateAntennaPower(power: 100)
+                zebraSingleton.startInventory(power: 100)
             }
             .onChange(of: cslvalues.singleBarcode) { barcode in
                 serialNumber += barcode
@@ -541,6 +541,11 @@ struct MainView: View {
                             })
                             .disabled(inventoryButton == "Stop")
                         Text("Power Level: \(powerLevel, specifier: "%.0f")")
+                        Button(action: {
+                            zebraSingleton.restartInventory(power: Int16(powerLevel))
+                        }) {
+                            Text("Update Power")
+                        }
                     }
                     .padding(.top)
                     .padding(.bottom)

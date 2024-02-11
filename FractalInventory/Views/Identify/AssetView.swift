@@ -342,7 +342,9 @@ struct AssetOtherFields: View {
     @Binding var inventoryButton: String
     @Binding var isInventoryStarted: Bool
     @State var powerLevel: Double = 10
+    @State var maxPowerLevel: Double = 30
     @State var geigerLevel: Double = 0
+    @StateObject var zebraSingleton = ZebraSingleton.shared
     var _onInvetory: () -> Void
     
     var body: some View {
@@ -421,11 +423,10 @@ struct AssetOtherFields: View {
                             .padding()
                         
                         VStack {
-                            Slider(value: $powerLevel, in: 0...30, step: 1)
+                            Slider(value: $powerLevel, in: 0...maxPowerLevel, step: 1)
                                 .accentColor(Color.green)
                                 .onChange(of: powerLevel, perform: { power in
-                                    CSLRfidAppEngine.shared().reader.selectAntennaPort(0)
-                                    CSLRfidAppEngine.shared().reader.setPower(power)
+                                    Utils.updateAntennaPower(power: power)
                                 })
                                 .disabled(inventoryButton == "Stop")
                             Text("Power Level: \(powerLevel, specifier: "%.0f")")
@@ -482,11 +483,10 @@ struct AssetOtherFields: View {
                         }
                     }
                 VStack {
-                    Slider(value: $powerLevel, in: 0...30, step: 1)
+                    Slider(value: $powerLevel, in: 0...maxPowerLevel, step: 1)
                         .accentColor(Color.green)
                         .onChange(of: powerLevel, perform: { power in
-                            CSLRfidAppEngine.shared().reader.selectAntennaPort(0)
-                            CSLRfidAppEngine.shared().reader.setPower(power)
+                            Utils.updateAntennaPower(power: power)
                         })
                         .disabled(inventoryButton == "Stop")
                     Text("Power Level: \(powerLevel, specifier: "%.0f")")
@@ -500,6 +500,14 @@ struct AssetOtherFields: View {
         }
         .onChange(of: cslvalues.singleBarcode) { barcode in
             serialNumber += barcode
+        }
+        .onAppear {
+            maxPowerLevel = zebraSingleton.getMaxPower()
+            zebraSingleton.updateAntennaPower(power: 100)
+            zebraSingleton.startInventory(power: 100)
+            zebraSingleton.onTagAdded = { tag in
+                self.cslvalues.addEpc(reading: tag)
+            }
         }
         .padding(.horizontal, 40)
     }
