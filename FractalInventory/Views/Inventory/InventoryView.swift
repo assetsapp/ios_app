@@ -251,6 +251,7 @@ struct InventoryView: View {
         .onAppear {
             resetInventory()
             fetchInitialData()
+            cslvalues.readings = []
             zebraSingleton.startInventory(power: 30)
             zebraSingleton.onTagAdded = { tag in
                 print("ZebraTag: \(tag)")
