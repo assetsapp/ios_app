@@ -88,7 +88,9 @@ struct AssetView: View {
             zebraSingleton.startInventory(power: 30)
             zebraSingleton.onTagAdded = { tag in
                 print("ZebraTag: \(tag)")
-                self.cslvalues.addEpc(reading: tag)
+                if updateEPC {
+                    self.cslvalues.addEpc(reading: tag)
+                }
             }
         }
         .onChange(of: cslvalues.isTriggerApplied) { isTriggerApplied in
