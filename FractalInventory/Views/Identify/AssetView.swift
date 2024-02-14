@@ -89,7 +89,9 @@ struct AssetView: View {
             zebraSingleton.onTagAdded = { tag in
                 print("ZebraTag: \(tag)")
                 if updateEPC {
-                    self.cslvalues.addEpc(reading: tag)
+                    if tag.epc.count == 24 {
+                        self.cslvalues.addEpc(reading: tag)
+                    }
                 }
             }
         }

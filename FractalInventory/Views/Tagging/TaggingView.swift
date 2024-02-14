@@ -64,7 +64,9 @@ struct TaggingView: View {
             cslvalues.readings = []
             zebraSingleton.startInventory(power: 10)
             zebraSingleton.onTagAdded = { tag in
-                self.cslvalues.addEpc(reading: tag)
+                if tag.epc.count == 24 {
+                    self.cslvalues.addEpc(reading: tag)
+                }
             }
         }
         .onDisappear {

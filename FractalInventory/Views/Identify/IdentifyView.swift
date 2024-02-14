@@ -38,7 +38,9 @@ struct IdentifyView: View {
         }
         .onAppear {
             zebraSingleton.onTagAdded = { tag in
-                self.cslvalues.addEpc(reading: tag)
+                if tag.epc.count == 24 {
+                    self.cslvalues.addEpc(reading: tag)
+                }
             }
         }
         .onChange(of: cslvalues.isTriggerApplied) { isTriggerApplied in

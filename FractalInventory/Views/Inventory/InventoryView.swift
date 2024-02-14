@@ -254,8 +254,9 @@ struct InventoryView: View {
             cslvalues.readings = []
             zebraSingleton.startInventory(power: 30)
             zebraSingleton.onTagAdded = { tag in
-                print("ZebraTag: \(tag)")
-                self.cslvalues.addEpc(reading: tag)
+                if tag.epc.count == 24 {
+                    self.cslvalues.addEpc(reading: tag)
+                }
             }
             let maxPower = zebraSingleton.getMaxPower()
             maxPowerLevel = maxPower
