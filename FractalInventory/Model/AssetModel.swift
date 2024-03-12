@@ -209,10 +209,10 @@ struct AssetRespondeModel: Codable {
         self.name = try container.decodeIfPresent(String.self, forKey: .name)
         self.parent = try container.decodeIfPresent(String.self, forKey: .parent)
         self.imageURL = try container.decodeIfPresent(String.self, forKey: .imageURL)
-        do {
-            self.quantity = try container.decode(Int.self, forKey: .quantity)
-        } catch DecodingError.typeMismatch {
-            self.quantity = try Int(container.decode(String.self, forKey: .quantity))
+        if let quantity = try? container.decodeIfPresent(Int.self, forKey: .quantity) {
+            self.quantity = quantity
+        } else if let quantityS = try? container.decodeIfPresent(String.self, forKey: .quantity), let quantity = Int(quantityS) {
+            self.quantity = quantity
         }
         self.responsible = try container.decodeIfPresent(String.self, forKey: .responsible)
         self.purchase_date = try container.decodeIfPresent(String.self, forKey: .purchase_date)
