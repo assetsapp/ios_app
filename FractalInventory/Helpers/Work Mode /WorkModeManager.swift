@@ -155,10 +155,16 @@ class WorkModeManager {
         var errors: [WMError] = []
         
         dispatchGroup.enter()
-        DataManager().getAssetsToSync { result in
+        DataManager().getAssetsToSync { [weak self] result in
+            guard let self = self else {
+                return
+            }
             switch result {
             case .success(let assets):
-                self.starSync(assets: assets) { result in
+                self.starSync(assets: assets) { [weak self] result in
+                    guard let self = self else {
+                        return
+                    }
                     switch result {
                     case.success(let savedAssetsR):
                         print("Termino de sincronizar los Assets:", savedAssetsR.count)
@@ -181,11 +187,17 @@ class WorkModeManager {
         }
         
         dispatchGroup.enter()
-        DataManager().getAssetsToUpdate { result in
+        DataManager().getAssetsToUpdate { [weak self] result in
+            guard let self = self else {
+                return
+            }
             switch result {
             case .success(let assets):
                 print("Asses para actualizar \(assets.count)")
-                self.starUpdate(assets: assets) { result in
+                self.starUpdate(assets: assets) { [weak self] result in
+                    guard let self = self else {
+                        return
+                    }
                     switch result {
                     case.success(let updatedAssets):
                         print("Termino de actualizar los Assets:", updatedAssets.count)
