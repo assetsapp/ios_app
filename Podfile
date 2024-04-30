@@ -6,6 +6,7 @@ target 'FractalInventory' do
   
   pod 'MQTTClient'
   pod 'BugfenderSDK'
+  pod 'ConnectionLayer', '1.0.0'
   
   post_install do |installer|
     installer.generated_projects.each do |project|
