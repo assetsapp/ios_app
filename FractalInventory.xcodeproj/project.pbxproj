@@ -126,6 +126,7 @@
 		F203F3D02AF9E2280037D45B /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F203F3CF2AF9E2280037D45B /* ExternalAccessory.framework */; };
 		F21691BD2B28CD3D00BB64AD /* ZebraSingleton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F21691BC2B28CD3D00BB64AD /* ZebraSingleton.swift */; };
 		F21691BF2B28CDE200BB64AD /* ZebraModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F21691BE2B28CDE200BB64AD /* ZebraModel.swift */; };
+		F22090F12BE12F9F00C9BD6E /* InventoryAssetsRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F22090F02BE12F9F00C9BD6E /* InventoryAssetsRequest.swift */; };
 		F23C778B2B74117300A1A903 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23C778A2B74117300A1A903 /* Utils.swift */; };
 		F2F539002BC9BA9D00078FBF /* AssetsRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2F538FF2BC9BA9D00078FBF /* AssetsRequest.swift */; };
 		F2F813572AF3219F00FCD753 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2F813562AF3219F00FCD753 /* Constants.swift */; };
@@ -339,6 +340,7 @@
 		F203F3CF2AF9E2280037D45B /* ExternalAccessory.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExternalAccessory.framework; path = System/Library/Frameworks/ExternalAccessory.framework; sourceTree = SDKROOT; };
 		F21691BC2B28CD3D00BB64AD /* ZebraSingleton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZebraSingleton.swift; sourceTree = "<group>"; };
 		F21691BE2B28CDE200BB64AD /* ZebraModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZebraModel.swift; sourceTree = "<group>"; };
+		F22090F02BE12F9F00C9BD6E /* InventoryAssetsRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryAssetsRequest.swift; sourceTree = "<group>"; };
 		F23C778A2B74117300A1A903 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		F2F538FF2BC9BA9D00078FBF /* AssetsRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetsRequest.swift; sourceTree = "<group>"; };
 		F2F813562AF3219F00FCD753 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -924,6 +926,7 @@
 			isa = PBXGroup;
 			children = (
 				F2F538FF2BC9BA9D00078FBF /* AssetsRequest.swift */,
+				F22090F02BE12F9F00C9BD6E /* InventoryAssetsRequest.swift */,
 			);
 			path = Request;
 			sourceTree = "<group>";
@@ -1127,6 +1130,7 @@
 				7655821F26DC808100F6C973 /* CSLReaderFrequency.m in Sources */,
 				76546C7F26D7325400336C10 /* LocationsArray.swift in Sources */,
 				767C671727545EB200A5AA3E /* ValidatedView.swift in Sources */,
+				F22090F12BE12F9F00C9BD6E /* InventoryAssetsRequest.swift in Sources */,
 				7655820D26DC808100F6C973 /* MQTTMessage.m in Sources */,
 				76190AF52725151900AD0EE0 /* UserModel.swift in Sources */,
 				36E2880E28AE09C8009FCA60 /* Asset+CoreDataClass.swift in Sources */,

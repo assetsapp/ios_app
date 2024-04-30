@@ -8,7 +8,6 @@ import Foundation
 struct AssetsRequest: Codable {
     let query: AssetsModel
 }
-
 struct AssetsModel: Codable {
     let status: AssetsRequestStatus
 }
