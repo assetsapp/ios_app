@@ -7,9 +7,7 @@
 
 import Foundation
 struct InventoryAssetsRequest: Codable {
-    let query: InventoryAssetsModel
-}
-struct InventoryAssetsModel: Codable {
+    let location: String
     let children: String
     let locationName: String
     let inventoryName: String

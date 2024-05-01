@@ -7,7 +7,7 @@
 
 import Foundation
 import SwiftUI
-
+import ConnectionLayer
 struct AssetModel: Codable, Hashable {
     var _id: String
     var brand: String
@@ -232,36 +232,30 @@ class ApiAssets {
     @AppStorage(Settings.userTokenKey) var token = ""
     
     func getInventoryAssets(location: String, locationName: String, sessionId: String, inventoryName: String, type: InventoryType, completion: @escaping(Result<[AssetModel], Error>) -> Void) {
-        var urlComponent = URLComponents(string: "\(apiHost)/api/v1/app/\(apiDB)/assets/inventory/")!
-        urlComponent.queryItems = [
-            URLQueryItem(name: "location", value: location),
-            URLQueryItem(name: "children", value: type.rawValue),
-            URLQueryItem(name: "locationName", value: locationName),
-            URLQueryItem(name: "inventoryName", value: inventoryName),
-            URLQueryItem(name: "sessionId", value: sessionId)
-        ]
-        var request = URLRequest(url: urlComponent.url!)
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpMethod = "POST"
-        request.timeoutInterval = 999.0
-        
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        let connection = ConnectionLayer()
+        let endPoint = EndPoints.inventoryAssets.replacingOccurrences(of: "{apiDB}", with: apiDB)
+        let url = apiHost + endPoint
+        let headers: HTTPHeaders = HTTPHeaders([
+            HTTPHeaders.authorization(bearerToken: token),
+            HTTPHeaders.contentTypeJson,
+            HTTPHeaders.acceptJson
+        ])
+        let body = InventoryAssetsRequest(location: location, children: type.rawValue, locationName: locationName, inventoryName: inventoryName, sessionId: sessionId)
+        connection.connectionRequest(url: url, method: .post, headers: headers, data: body.toData) { data, error in
             if let error = error {
-                completion(.failure(error))
-            } else {
-                guard let data = data else {
-                    completion(.failure(WMError.inventoriesCouldNotBeDownloaded))
-                    return
-                }
-                do {
-                    let assets = try JSONDecoder().decode(AssetsApiModel.self, from: data)
-                    completion(.success(assets.response))
-                } catch {
-                    completion(.failure(error))
-                }
+                print(error)
+                completion(.failure(WMError.inventoriesCouldNotBeDownloaded))
             }
-        }.resume()
+            guard let data = data else {
+                completion(.failure(WMError.inventoriesCouldNotBeDownloaded))
+                return
+            }
+            if let assets = Utils.decode(AssetsApiModel.self, from: data, serviceName: "AccountListService") {
+                completion(.success(assets.response))
+            } else {
+                completion(.failure(WMError.inventoriesCouldNotBeDownloaded))
+            }
+        }
     }
     
     func getAssets(location: String, completion: @escaping([AssetModel]) -> ()) {
@@ -282,26 +276,28 @@ class ApiAssets {
     }
     
     func getAllAssets(completion: @escaping(Result<[AssetRespondeModel], Error>) -> Void) {
-        let sessionConfig = URLSessionConfiguration.default
-        sessionConfig.timeoutIntervalForRequest = 60.0
-        sessionConfig.timeoutIntervalForResource = 120.0
-        let session = URLSession(configuration: sessionConfig)
-        var urlComponent = URLComponents(string: "\(apiHost)/api/v1/\(apiDB)/assets/")!
-        urlComponent.queryItems = [
-            URLQueryItem(name: "query", value: "{\"status\":{\"$ne\":\"decommissioned\"}}")
-        ]
-        var request = URLRequest(url: urlComponent.url!)
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        
-        session.dataTask(with: request) { data, response, error in
-            guard let data = data else { completion(.failure(WMError.assetsCouldNotBeDownloaded)) ; return }
-            do {
-                let assets = try JSONDecoder().decode(AssetMainRespondeModel.self, from: data)
-                completion(.success(assets.response))
-            } catch let error {
-                completion(.failure(error))
+        let connection = ConnectionLayer()
+        let endPoint = EndPoints.allAssets.replacingOccurrences(of: "{apiDB}", with: apiDB)
+        let url = apiHost + endPoint
+        let headers: HTTPHeaders = HTTPHeaders([
+            HTTPHeaders.authorization(bearerToken: token),
+            HTTPHeaders.contentTypeJson,
+            HTTPHeaders.acceptJson
+        ])
+        let data = AssetsRequest(query: AssetsModel(status: AssetsRequestStatus(ne: "decommissioned")))  
+        connection.connectionRequest(url: url, method: .get, headers: headers, parameters: data.toDictionary) { data, error in
+            if let error = error {
+                print(error)
+                completion(.failure(WMError.assetsCouldNotBeDownloaded))
             }
-        }.resume()
+            guard let data = data else {
+                completion(.failure(WMError.assetsCouldNotBeDownloaded))
+                return
+            }
+            if let assets = Utils.decode(AssetMainRespondeModel.self, from: data, serviceName: "AccountListService") {
+                completion(.success(assets.response))
+            }
+        }
     }
     
     func getRealAssets(location: String, completion: @escaping([RealAssetModel]) -> ()) {
