@@ -58,6 +58,11 @@ struct InventoryView: View {
                                 Image(systemName: "chevron.\(showSession ? "up" : "down")")
                             }
                         }
+                        Button("Add EPC") {
+                            let epc = Utils.createEpcDummy()
+                            let epcModel = EpcModel(epc: epc, rssi: "", timestamp: Utils.getFullDate())
+                            self.cslvalues.addEpc(reading: epcModel)
+                        }
                         .padding(.top, 2)
                         if showSession {
                             HStack {

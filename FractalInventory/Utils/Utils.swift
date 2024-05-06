@@ -39,4 +39,8 @@ struct Utils {
         }
         return nil
     }
+    static func createEpcDummy(length: Int = 24) -> String {
+        let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        return String((0..<length).map{ _ in letters.randomElement()! })
+    }
 }
