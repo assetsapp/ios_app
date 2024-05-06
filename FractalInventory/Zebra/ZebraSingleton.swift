@@ -187,7 +187,7 @@ final class ZebraSingleton: NSObject {
             print("Failed to set start trigger parameters")
         }
         /// Stop
-        var stop_trigger_cfg = stopTriggerInventory()
+        let stop_trigger_cfg = stopTriggerInventory()
         result = apiInstance.srfidSetStopTriggerConfiguration(readerID, aStopTriggeConfig: stop_trigger_cfg, aStatusMessage: &error_response)
         if result == SRFID_RESULT_SUCCESS {
             print("Stop trigger configuration has been set")

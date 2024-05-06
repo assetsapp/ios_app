@@ -344,7 +344,7 @@ struct SettingsViewContent: View {
     
     private func startOfflineWorkingMode() {
         cslvalues.isLoading = true
-        workModeManager.startOfflineMode { result in
+        workModeManager.startOfflineMode { result in 
             cslvalues.isLoading = false
             switch result {
             case .success(let workMode):
