@@ -87,7 +87,10 @@ class WorkModeManager {
             dispatchGroup.leave()
         }
         
-        dispatchGroup.notify(queue: .main) {
+        dispatchGroup.notify(queue: .main) { [weak self] in
+            guard let self = self else {
+                return
+            }
             if inventories != nil || employees != nil {
                 self.processSync(inventories: inventories, employees: employees, errors: errors, completion: completion)
             } else {
@@ -161,7 +164,7 @@ class WorkModeManager {
             }
             switch result {
             case .success(let assets):
-                self.starSync(assets: assets) { [weak self] result in
+                self.startSync(assets: assets) { [weak self] result in
                     guard let self = self else {
                         return
                     }
@@ -194,7 +197,7 @@ class WorkModeManager {
             switch result {
             case .success(let assets):
                 print("Asses para actualizar \(assets.count)")
-                self.starUpdate(assets: assets) { [weak self] result in
+                self.startUpdate(assets: assets) { [weak self] result in
                     guard let self = self else {
                         return
                     }
@@ -218,26 +221,25 @@ class WorkModeManager {
             }
         }
         
-        dispatchGroup.notify(queue: .main) {
-            self.continueStartOnlineMode(savedAssets, and: errors, completion: completion)
+        dispatchGroup.notify(queue: .main) { [weak self] in
+            self?.continueStartOnlineMode(savedAssets, and: errors, completion: completion)
         }
     }
     
     private func continueStartOnlineMode(_ savedAssets: [Asset], and lastErrors: [WMError] ,completion: @escaping(Result<(workMode: WorkMode, savedAssets: [Asset]), WMError>) -> Void) {
         let dispatchGroup = DispatchGroup()
         var errors: [WMError] = lastErrors
-        var savedEmployees: [EmployeeModel] = []
-    
+        //var savedEmployees: [EmployeeModel] = []
         // empleados
         dispatchGroup.enter()
-        DataManager().getEmployeesToSync { result in
+        DataManager().getEmployeesToSync { [weak self] result in
             switch result {
             case .success(let employees):
-                self.starSync(employees: employees) { result in
+                self?.startSync(employees: employees) { result in
                     switch result {
                     case .success(let _savedEmployees):
                         print("Termino de actualizar los Empleados:", _savedEmployees.count)
-                        savedEmployees = _savedEmployees
+                        //savedEmployees = _savedEmployees
                     case .failure(let error):
                         switch error {
                         case .failedToSyncEmployees(_ , _):
@@ -257,10 +259,10 @@ class WorkModeManager {
         
         // empleados
         dispatchGroup.enter()
-        DataManager().getEmployeesToUpdate { result in
+        DataManager().getEmployeesToUpdate { [weak self] result in
             switch result {
             case .success(let employees):
-                self.startUpdateSync(employees: employees) { result in
+                self?.startUpdateSync(employees: employees) { result in
                     switch result {
                     case .success(let savedEmployees):
                         print("Termino de actualizar los Empleados asignados:", savedEmployees.count)
@@ -283,10 +285,10 @@ class WorkModeManager {
         
         //inventarios
         dispatchGroup.enter()
-        DataManager().getInventorySessionToSync { result in
+        DataManager().getInventorySessionToSync { [weak self] result in
             switch result {
             case .success(let inventorySessions):
-                self.starSync(inventorySessions: inventorySessions) { result in
+                self?.starSync(inventorySessions: inventorySessions) { result in
                     switch result {
                     case .success(let savedInventories):
                         print("Termino de actualizar los Inventarios:", savedInventories.count)
@@ -307,7 +309,10 @@ class WorkModeManager {
             }
         }
         
-        dispatchGroup.notify(queue: .main) {
+        dispatchGroup.notify(queue: .main) { [weak self] in
+            guard let self = self else {
+                return
+            }
             if errors.isEmpty {
                 self.deleteAllData()
                 self.workMode = .online
@@ -434,7 +439,7 @@ extension WorkModeManager {
 }
 
 extension WorkModeManager {
-    private func starSync(assets: [Asset], completion: @escaping(Result<[Asset], WMError>) -> Void) {
+    private func startSync(assets: [Asset], completion: @escaping(Result<[Asset], WMError>) -> Void) {
         let dispatchGroup = DispatchGroup()
         var savedAssets: [Asset] = []
         var errors:[WMError] = []
@@ -485,7 +490,7 @@ extension WorkModeManager {
         }
     }
     
-    private func starUpdate(assets: [Asset], completion: @escaping(Result<[Asset], WMError>) -> Void) {
+    private func startUpdate(assets: [Asset], completion: @escaping(Result<[Asset], WMError>) -> Void) {
         let dispatchGroup = DispatchGroup()
         var savedAssets: [Asset] = []
         var errors:[WMError] = []
@@ -538,7 +543,7 @@ extension WorkModeManager {
         }
     }
     
-    private func starSync(employees: [EmployeeModel], completion: @escaping(Result<[EmployeeModel], WMError>) -> Void) {
+    private func startSync(employees: [EmployeeModel], completion: @escaping(Result<[EmployeeModel], WMError>) -> Void) {
         let dispatchGroup = DispatchGroup()
         var savedEmployees: [EmployeeModel] = []
         var errors:[WMError] = []
@@ -619,7 +624,7 @@ extension WorkModeManager {
         
         for session in inventorySessions {
             dispatchGroup.enter()
-            print("starSync inventorySession: \(session.identifier), count: \(session.assets?.count)")
+            print("starSync inventorySession: \(session.identifier ?? ""), count: \(session.assets?.count ?? -1)")
             let inventorySessionFiltered = InventoryDataModel(inventorySession: session)
             sync(inventorySession: session) { result in
                 switch result {
