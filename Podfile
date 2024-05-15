@@ -1,11 +1,9 @@
 platform :ios, '14.0'
 
-
 target 'FractalInventory' do
   use_frameworks!
   
   pod 'MQTTClient'
-  pod 'BugfenderSDK'
   pod 'ConnectionLayer', '1.0.0'
   
   post_install do |installer|

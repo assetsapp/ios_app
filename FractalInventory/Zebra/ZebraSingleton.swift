@@ -6,7 +6,6 @@
 //
 /// Nota: Los NSMutableArrays siempre deben inicializarse para obtener el valor
 import Foundation
-import BugfenderSDK
 final class ZebraSingleton: NSObject {
     static var shared: ZebraSingleton = {
         let instance = ZebraSingleton()
@@ -50,14 +49,10 @@ final class ZebraSingleton: NSObject {
         apiInstance.srfidEnableAutomaticSessionReestablishment(true)
         apiInstance.srfidSubsribe(forEvents: Int32(SRFID_EVENT_MASK_BATTERY))
         
-        bfprint("setupSDK Start")
         available_readers = NSMutableArray()
         active_readers = NSMutableArray()
         apiInstance.srfidGetAvailableReadersList(&available_readers)
         apiInstance.srfidGetActiveReadersList(&active_readers)
-        bfprint("setupSDK available_readers count: = \(available_readers?.count ?? 0)")
-        bfprint("setupSDK active_readers count: = \(active_readers?.count ?? 0)")
-        bfprint("setupSDK End")
     }
     // MARK: Funciones para Listar Devices
     /// Función para saber si hay un dispositivo conectado
@@ -70,22 +65,22 @@ final class ZebraSingleton: NSObject {
         (readers ?? []).forEach { item in
             if let device = item as? srfidReaderInfo {
                 guard !listDevices.contains(where: { $0.id == device.getReaderID() }) else {
-                    bfprint("device exist: \(device.getReaderID())")
+                    print("device exist: \(device.getReaderID())")
                     return
                 }
                 listDevices.append(RFIDDevice(id: device.getReaderID(),
                                               name: device.getReaderName(),
                                               type: device.isActive() ? .active : .available))
-                bfprint("RFID reader is \(device.isActive() ? "active" : "available"): ID = \(device.getReaderID()) name = \(device.getReaderName() ?? "")")
+                print("RFID reader is \(device.isActive() ? "active" : "available"): ID = \(device.getReaderID()) name = \(device.getReaderName() ?? "")")
             } else {
-                bfprint("srfidReaderInfo nil")
+                print("srfidReaderInfo nil")
             }
         }
     }
     // MARK: Funciones para Conectar
     /// Establecer la comunicación con un RFID
     func establishCommunication(readerID: Int32) {
-        bfprint("establishCommunication: ID = \(readerID)")
+        print("establishCommunication: ID = \(readerID)")
         apiInstance.srfidEstablishCommunicationSession(readerID)
     }
     /// Conectar con un RFID
@@ -99,15 +94,15 @@ final class ZebraSingleton: NSObject {
             antennaCapabilities = getCapabilities(readerID: readerID)
             antennaConfiguration = antenaConfiguration(readerID: readerID)
         } else if SRFID_RESULT_WRONG_ASCII_PASSWORD == result {
-            bfprint("Incorrect ASCII connection password")
+            print("Incorrect ASCII connection password")
         } else {
-            bfprint("Failed to establish ASCII connection")
+            print("Failed to establish ASCII connection")
         }
     }
     // MARK: Funciones para Desconectar
     /// Terminar la comunicación con un RFID
     func endCommunication(readerID: Int32) {
-        bfprint("endCommunication: ID = \(readerID)")
+        print("endCommunication: ID = \(readerID)")
         apiInstance.srfidTerminateCommunicationSession(readerID)
     }
     //MARK: Funciones de Lectura
@@ -312,9 +307,9 @@ final class ZebraSingleton: NSObject {
     func requestBatteryStatus(readerID: Int32) {
         let result = apiInstance.srfidRequestBatteryStatus(readerID)
         if SRFID_RESULT_SUCCESS == result {
-            bfprint("batteryStatus: Request succeed")
+            print("batteryStatus: Request succeed")
         } else {
-            bfprint("batteryStatus: Request failed")
+            print("batteryStatus: Request failed")
         }
     }
     func reportConfiguration(readerID: Int32) -> srfidTagReportConfig?  {
@@ -419,26 +414,26 @@ final class ZebraSingleton: NSObject {
                 return nil
             }
             serialNumber = "Serial number: \(capabilities.getSerialNumber() ?? "")"
-            bfprint("Serial number: \(capabilities.getSerialNumber() ?? "")")
-            bfprint("Model: \(capabilities.getModel() ?? "")")
-            bfprint("Manufacturer: \(capabilities.getManufacturer() ?? "")")
-            bfprint("Manufacturing date: \(capabilities.getManufacturingDate() ?? "")")
-            bfprint("Scanner name: \(capabilities.getScannerName() ?? "")")
-            bfprint("Ascii version: \(capabilities.getAsciiVersion() ?? "")")
-            bfprint("Air version: \(capabilities.getAirProtocolVersion() ?? "")")
-            bfprint("Bluetooth address: \(capabilities.getBDAddress() ?? "")")
-            bfprint("Select filters number: \(capabilities.getSelectFilterNum())")
-            bfprint("Max access sequence: \(capabilities.getMaxAccessSequence())")
-            bfprint("Power level: min = \(capabilities.getMinPower()); max = \(capabilities.getMaxPower()); step = \(capabilities.getPowerStep())")
+            print("Serial number: \(capabilities.getSerialNumber() ?? "")")
+            print("Model: \(capabilities.getModel() ?? "")")
+            print("Manufacturer: \(capabilities.getManufacturer() ?? "")")
+            print("Manufacturing date: \(capabilities.getManufacturingDate() ?? "")")
+            print("Scanner name: \(capabilities.getScannerName() ?? "")")
+            print("Ascii version: \(capabilities.getAsciiVersion() ?? "")")
+            print("Air version: \(capabilities.getAirProtocolVersion() ?? "")")
+            print("Bluetooth address: \(capabilities.getBDAddress() ?? "")")
+            print("Select filters number: \(capabilities.getSelectFilterNum())")
+            print("Max access sequence: \(capabilities.getMaxAccessSequence())")
+            print("Power level: min = \(capabilities.getMinPower()); max = \(capabilities.getMaxPower()); step = \(capabilities.getPowerStep())")
             return capabilities
         } else if SRFID_RESULT_RESPONSE_ERROR == result {
-            bfprint("getCapabilities: Error response from RFID reader: \(error_response ?? "")")
+            print("getCapabilities: Error response from RFID reader: \(error_response ?? "")")
         } else if SRFID_RESULT_RESPONSE_TIMEOUT == result {
-            bfprint("getCapabilities: Timeout occurs during communication with RFID reader")
+            print("getCapabilities: Timeout occurs during communication with RFID reader")
         } else if SRFID_RESULT_READER_NOT_AVAILABLE == result {
-            bfprint("getCapabilities: RFID reader with id = %d is not available \(readerID)")
+            print("getCapabilities: RFID reader with id = %d is not available \(readerID)")
         } else {
-            bfprint("getCapabilities: Request failed")
+            print("getCapabilities: Request failed")
         }
         return nil
     }
@@ -455,7 +450,7 @@ final class ZebraSingleton: NSObject {
                 return profile
             }
         } else {
-            bfprint("getProfile: Request failed")
+            print("getProfile: Request failed")
         }
         return nil
     }
@@ -507,20 +502,20 @@ final class ZebraSingleton: NSObject {
             let linkProfileIdx = antenna_cfg.getLinkProfileIdx()
             let antenaTari = antenna_cfg.getTari()
             let prefilters = antenna_cfg.getDoSelect()
-            bfprint("antenaConfiguration: Antenna power level: \(power/10.0)")
+            print("antenaConfiguration: Antenna power level: \(power/10.0)")
             antenaPower = power/10.0
-            bfprint("antenaConfiguration: Antenna RF mode index: \(linkProfileIdx)")
-            bfprint("antenaConfiguration: Antenna tari: \(antenaTari)")
-            bfprint("antenaConfiguration: Antenna pre-filters application \(prefilters == false ? "No" : "Si")")
+            print("antenaConfiguration: Antenna RF mode index: \(linkProfileIdx)")
+            print("antenaConfiguration: Antenna tari: \(antenaTari)")
+            print("antenaConfiguration: Antenna pre-filters application \(prefilters == false ? "No" : "Si")")
             return antenna_cfg
         } else if SRFID_RESULT_RESPONSE_ERROR == result {
-            bfprint("antenaConfiguration: Error response from RFID reader: \(error_response ?? "")")
+            print("antenaConfiguration: Error response from RFID reader: \(error_response ?? "")")
         } else if SRFID_RESULT_RESPONSE_TIMEOUT == result {
-            bfprint("antenaConfiguration: Timeout occurs during communication with RFID reader")
+            print("antenaConfiguration: Timeout occurs during communication with RFID reader")
         } else if SRFID_RESULT_READER_NOT_AVAILABLE == result {
-            bfprint("antenaConfiguration: RFID reader with id = %d is not available \(readerID)")
+            print("antenaConfiguration: RFID reader with id = %d is not available \(readerID)")
         } else {
-            bfprint("antenaConfiguration: Request failed")
+            print("antenaConfiguration: Request failed")
         }
         return nil
     }
@@ -566,27 +561,27 @@ extension ZebraSingleton: ObservableObject {
 extension ZebraSingleton: srfidISdkApiDelegate {
     func srfidEventReaderAppeared(_ availableReader: srfidReaderInfo!) {
         listDevices.removeAll()
-        bfprint("RFID reader has appeared: ID = \(availableReader.getReaderID()) name = \(availableReader.getReaderName() ?? "")")
+        print("RFID reader has appeared: ID = \(availableReader.getReaderID()) name = \(availableReader.getReaderName() ?? "")")
         apiInstance.srfidGetAvailableReadersList(&available_readers)
         apiInstance.srfidGetActiveReadersList(&active_readers)
-        bfprint("available_readers count: = \(available_readers?.count ?? 0)")
-        bfprint("active_readers count: = \(active_readers?.count ?? 0)")
+        print("available_readers count: = \(available_readers?.count ?? 0)")
+        print("active_readers count: = \(active_readers?.count ?? 0)")
         updateList(readers: available_readers)
         updateList(readers: active_readers)
     }
     
     func srfidEventReaderDisappeared(_ readerID: Int32) {
-        bfprint("RFID reader has disappeared: ID = \(readerID)")
+        print("RFID reader has disappeared: ID = \(readerID)")
     }
     
     func srfidEventCommunicationSessionEstablished(_ activeReader: srfidReaderInfo!) {
         let readerID = activeReader.getReaderID()
-        bfprint("RFID reader has connected: ID = \(readerID) name = \(activeReader.getReaderName() ?? "")")
+        print("RFID reader has connected: ID = \(readerID) name = \(activeReader.getReaderName() ?? "")")
         self.connect(readerID: readerID)
     }
     /// Funcion que notifica el fin de la session.
     func srfidEventCommunicationSessionTerminated(_ readerID: Int32) {
-        bfprint("RFID reader has disconnected: ID = \(readerID)")
+        print("RFID reader has disconnected: ID = \(readerID)")
         self.isDeviceConnectedZebra = false
         serialNumber = ""
         batteryLevel = ""
@@ -640,10 +635,10 @@ extension ZebraSingleton: srfidISdkApiDelegate {
     }
     
     func srfidEventBatteryNotity(_ readerID: Int32, aBatteryEvent batteryEvent: srfidBatteryEvent!) {
-        bfprint("Battery status event received from RFID reader with ID = \(readerID)")
-        bfprint("Battery level: \(batteryEvent.getPowerLevel())")
+        print("Battery status event received from RFID reader with ID = \(readerID)")
+        print("Battery level: \(batteryEvent.getPowerLevel())")
         batteryLevel = "\(batteryEvent.getPowerLevel())"
-        bfprint("Charging: \(batteryEvent.getIsCharging() == false ? "NO" : "SI")")
-        bfprint("Event cause: \(batteryEvent.getCause() ?? "")")
+        print("Charging: \(batteryEvent.getIsCharging() == false ? "NO" : "SI")")
+        print("Event cause: \(batteryEvent.getCause() ?? "")")
     }
 }

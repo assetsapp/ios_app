@@ -22,7 +22,6 @@ struct SettingsView: View {
     @StateObject var zebraSingleton = ZebraSingleton.shared
     @Binding var isUserLoggedOut: Bool
     
-    
     var body: some View {
         VStack {
             let workMode = WorkModeManager().workMode
@@ -345,17 +344,18 @@ struct SettingsViewContent: View {
     private func startOfflineWorkingMode() {
         cslvalues.isLoading = true
         workModeManager.startOfflineMode { result in 
-            cslvalues.isLoading = false
             switch result {
             case .success(let workMode):
                 presentSuccessOfflineAlert = false
                 presentSuccessOfflineAlert = true
                 workingMode = workMode
+                cslvalues.isLoading = false
             case .failure(let error):
                 print("****\n-->startOfflineWorkingMode error\n**** ")
                 workingMode = .online
                 self.error = error
                 self.isToggleForAError = true
+                cslvalues.isLoading = false
             }
         }
     }

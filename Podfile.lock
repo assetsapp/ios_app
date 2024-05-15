@@ -1,5 +1,4 @@
 PODS:
-  - BugfenderSDK (1.13.2)
   - ConnectionLayer (1.0.0)
   - MQTTClient (0.15.3):
     - MQTTClient/Core (= 0.15.3)
@@ -11,21 +10,18 @@ PODS:
   - MQTTClient/Min (0.15.3)
 
 DEPENDENCIES:
-  - BugfenderSDK
   - ConnectionLayer (= 1.0.0)
   - MQTTClient
 
 SPEC REPOS:
   trunk:
-    - BugfenderSDK
     - ConnectionLayer
     - MQTTClient
 
 SPEC CHECKSUMS:
-  BugfenderSDK: 0eb1675df86a1792ec9ab8984369e85464f851cb
   ConnectionLayer: 9f8af1c6893a63af9dfa865b5127ad3037ea1d41
   MQTTClient: 0dfa04e789479c2e461786464969895c1fcb0875
 
-PODFILE CHECKSUM: 3fca17f618ca3280bf719169682945c667912585
+PODFILE CHECKSUM: 033043cb3d05d0a5126826801b64e0e963c52289
 
 COCOAPODS: 1.15.2
