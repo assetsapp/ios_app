@@ -99,10 +99,8 @@ class ApiInventorySessions {
     
     func getInventorySessions(completion: @escaping(Result<[InventoryDataModel], WMError>) -> Void) {
         let urlComponent = URLComponents(string: "\(apiHost)/api/v1/\(apiDB)/inventorySessions/")!
-     
         var request = URLRequest(url: urlComponent.url!)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        
         URLSession.shared.dataTask(with: request) { data, response, error in
             guard let data = data else {
                 completion(.failure(.inventoriesCouldNotBeDownloaded))

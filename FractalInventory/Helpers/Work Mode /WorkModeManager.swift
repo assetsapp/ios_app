@@ -28,67 +28,69 @@ class WorkModeManager {
             dispatchGroup.leave()
         }
         
-//        dispatchGroup.enter()
-//        fetchInventories { result in
-//            switch result {
-//            case .success(let data):
-//                print("Inventories: ", data.count)
-//                inventories = data
-//            case .failure(_ ):
-//                errors.append(WMError.inventoriesCouldNotBeDownloaded)
-//            }
-//            dispatchGroup.leave()
-//        }
+        dispatchGroup.enter()
+        fetchInventories { result in
+            switch result {
+            case .success(let data):
+                print("Inventories: ", data.count)
+                inventories = data
+            case .failure(_ ):
+                errors.append(WMError.inventoriesCouldNotBeDownloaded)
+            }
+            dispatchGroup.leave()
+        }
         
-//        dispatchGroup.enter()
-//        fetchLocations { result in
-//            switch result {
-//            case .success(_ ):
-//                break
-//            case .failure(_ ):
-//                errors.append(WMError.locationsCouldNotBeDownloaded)
-//            }
-//            dispatchGroup.leave()
-//        }
+        dispatchGroup.enter()
+        fetchLocations { result in
+            switch result {
+            case .success(_ ):
+                break
+            case .failure(_ ):
+                errors.append(WMError.locationsCouldNotBeDownloaded)
+            }
+            dispatchGroup.leave()
+        }
         
-//        dispatchGroup.enter()
-//        fetchEmployees { result in
-//            switch result {
-//            case .success(let data):
-//                employees = data
-//            case .failure(_ ):
-//                errors.append(WMError.employeesCouldNotBeDownloaded)
-//            }
-//            dispatchGroup.leave()
-//        }
+        dispatchGroup.enter()
+        fetchEmployees { result in
+            switch result {
+            case .success(let data):
+                employees = data
+            case .failure(_ ):
+                errors.append(WMError.employeesCouldNotBeDownloaded)
+            }
+            dispatchGroup.leave()
+        }
         
-//        dispatchGroup.enter()
-//        fetchEmployeProfiles { result in
-//            switch result {
-//            case .success(_ ):
-//                break
-//            case .failure(_ ):
-//                errors.append(WMError.employeeProfilesCouldNotBeDownloaded)
-//            }
-//            dispatchGroup.leave()
-//        }
+        dispatchGroup.enter()
+        fetchEmployeProfiles { result in
+            switch result {
+            case .success(_ ):
+                break
+            case .failure(_ ):
+                errors.append(WMError.employeeProfilesCouldNotBeDownloaded)
+            }
+            dispatchGroup.leave()
+        }
         
-//        dispatchGroup.enter()
-//        fetchReferences { result in
-//            switch result {
-//            case .success(_ ):
-//                break
-//            case .failure(_ ):
-//                errors.append(WMError.referencesCouldNotBeDownloaded)
-//            }
-//            dispatchGroup.leave()
-//        }
+        dispatchGroup.enter()
+        fetchReferences { result in
+            switch result {
+            case .success(_ ):
+                break
+            case .failure(_ ):
+                errors.append(WMError.referencesCouldNotBeDownloaded)
+            }
+            dispatchGroup.leave()
+        }
         
         dispatchGroup.notify(queue: .main) { [weak self] in
             guard let self = self else {
                 return
             }
             if inventories != nil || employees != nil {
+                // En este punto ya tenemos los assets guardados
+                // Y los Inventories aun no sean guardado
                 self.processSync(inventories: inventories, employees: employees, errors: errors, completion: completion)
             } else {
                 self.processOfflineWorkMode(errors: errors, completion: completion)
@@ -107,7 +109,6 @@ class WorkModeManager {
                 switch result {
                 case .success(let inv):
                     print("<- Termino de Guardar los inventarios en BD:", inv.count)
-                    break
                 case .failure(let error):
                     print("<- Error de Guardar los inventarios en BD:", error.localizedDescription)
                     processSyncErrors.append(.inventoriesCouldNotBeDownloaded)

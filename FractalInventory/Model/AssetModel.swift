@@ -276,7 +276,7 @@ class ApiAssets {
     }
     
     func getAllAssets(completion: @escaping(Result<[AssetRespondeModel], Error>) -> Void) {
-        let connection = ConnectionLayer()
+        let connection = ConnectionLayer(isDebug: false)
         let endPoint = EndPoints.allAssets.replacingOccurrences(of: "{apiDB}", with: apiDB)
         let url = apiHost + endPoint
         let headers: HTTPHeaders = HTTPHeaders([

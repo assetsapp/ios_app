@@ -29,7 +29,7 @@ class DataManager: ObservableObject {
         context.retainsRegisteredObjects = true
         for item in assets {
             let asset = Asset(context: context)
-            print("Guardando serial: \(item.serial ?? "nil")")
+            //print("Guardando serial: \(item.serial ?? "nil")")
             asset.name = item.name
             asset.brand = item.brand
             asset.model = item.model

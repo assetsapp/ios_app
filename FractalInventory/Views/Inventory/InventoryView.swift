@@ -184,6 +184,11 @@ struct InventoryView: View {
             
             VStack {
                 VStack {
+                    Button("Add EPC") {
+                        let epc = Utils.createEpcDummy()
+                        let epcModel = EpcModel(epc: epc, rssi: "", timestamp: Utils.getFullDate())
+                        self.cslvalues.addEpc(reading: epcModel)
+                    }
                     HStack {
                         Text("RFID Antenna")
                             .fontWeight(.semibold)
