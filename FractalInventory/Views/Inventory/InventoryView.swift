@@ -13,7 +13,7 @@ enum InventoryType: String {
 }
 
 struct InventoryView: View {
-    
+    @State var cont: Int = 0
     @ObservedObject var cslvalues: CSLValues
     @State var assets: [AssetModel] = []
     @State var filterStatus: [String] = ["found", "missing", "external"]
@@ -59,9 +59,7 @@ struct InventoryView: View {
                             }
                         }
                         Button("Add EPC") {
-                            let epc = Utils.createEpcDummy()
-                            let epcModel = EpcModel(epc: epc, rssi: "", timestamp: Utils.getFullDate())
-                            self.cslvalues.addEpc(reading: epcModel)
+                            addEPC()
                         }
                         .padding(.top, 2)
                         if showSession {
@@ -185,9 +183,7 @@ struct InventoryView: View {
             VStack {
                 VStack {
                     Button("Add EPC") {
-                        let epc = Utils.createEpcDummy()
-                        let epcModel = EpcModel(epc: epc, rssi: "", timestamp: Utils.getFullDate())
-                        self.cslvalues.addEpc(reading: epcModel)
+                        addEPC()
                     }
                     HStack {
                         Text("RFID Antenna")
@@ -471,6 +467,16 @@ struct InventoryView: View {
                     }
                 }
             }
+        }
+    }
+    
+    func addEPC() {
+        let array = ["057454000000000000006F23", "474D30304B0181021000234F", "057454000000000000007237"]
+        let epc = array[cont]
+        let epcModel = EpcModel(epc: epc, rssi: "", timestamp: Utils.getFullDate())
+        self.cslvalues.addEpc(reading: epcModel)
+        if cont < array.count - 1 {
+            cont += 1
         }
     }
     
