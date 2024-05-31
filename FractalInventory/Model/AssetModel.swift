@@ -217,7 +217,13 @@ struct AssetRespondeModel: Codable {
         self.responsible = try container.decodeIfPresent(String.self, forKey: .responsible)
         self.purchase_date = try container.decodeIfPresent(String.self, forKey: .purchase_date)
         self.purchase_price = try container.decodeIfPresent(String.self, forKey: .purchase_price)
-        self.total_price = try container.decodeIfPresent(String.self, forKey: .total_price)
+        
+        if let total_price = try? container.decodeIfPresent(Int.self, forKey: .total_price) {
+            self.total_price = String(total_price)
+        } else if let total_priceS = try? container.decodeIfPresent(String.self, forKey: .total_price) {
+            self.total_price = total_priceS
+        }
+        
         self.model = try container.decodeIfPresent(String.self, forKey: .model)
         self.labeling_user = try container.decodeIfPresent(String.self, forKey: .labeling_user)
         self.notes = try container.decodeIfPresent(String.self, forKey: .notes)
