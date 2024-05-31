@@ -92,7 +92,7 @@ struct LocationSubview: View {
                                     .default(Text("Quick Inventory")) {
                                         sessionId = ""
                                         inventoryName = ""
-                                        DispatchQueue.main.async {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                             self.isTypeOfInventoryAlertPresented = true
                                         }
                                     },
