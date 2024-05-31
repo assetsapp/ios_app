@@ -232,7 +232,7 @@ class ApiAssets {
     @AppStorage(Settings.userTokenKey) var token = ""
     
     func getInventoryAssets(location: String, locationName: String, sessionId: String, inventoryName: String, type: InventoryType, completion: @escaping(Result<[AssetModel], Error>) -> Void) {
-        let connection = ConnectionLayer()
+        let connection = ConnectionLayer(isDebug: false)
         let endPoint = EndPoints.inventoryAssets.replacingOccurrences(of: "{apiDB}", with: apiDB)
         let url = apiHost + endPoint
         let headers: HTTPHeaders = HTTPHeaders([
@@ -250,7 +250,7 @@ class ApiAssets {
                 completion(.failure(WMError.inventoriesCouldNotBeDownloaded))
                 return
             }
-            if let assets = Utils.decode(AssetsApiModel.self, from: data, serviceName: "AccountListService") {
+            if let assets = Utils.decode(AssetsApiModel.self, from: data, serviceName: "getInventoryAssets") {
                 completion(.success(assets.response))
             } else {
                 completion(.failure(WMError.inventoriesCouldNotBeDownloaded))
@@ -294,8 +294,10 @@ class ApiAssets {
                 completion(.failure(WMError.assetsCouldNotBeDownloaded))
                 return
             }
-            if let assets = Utils.decode(AssetMainRespondeModel.self, from: data, serviceName: "AccountListService") {
+            if let assets = Utils.decode(AssetMainRespondeModel.self, from: data, serviceName: "getAllAssets") {
                 completion(.success(assets.response))
+            } else {
+                completion(.failure(WMError.assetsCouldNotBeDownloaded))
             }
         }
     }
