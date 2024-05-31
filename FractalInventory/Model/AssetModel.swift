@@ -238,30 +238,36 @@ class ApiAssets {
     @AppStorage(Settings.userTokenKey) var token = ""
     
     func getInventoryAssets(location: String, locationName: String, sessionId: String, inventoryName: String, type: InventoryType, completion: @escaping(Result<[AssetModel], Error>) -> Void) {
-        let connection = ConnectionLayer(isDebug: false)
-        let endPoint = EndPoints.inventoryAssets.replacingOccurrences(of: "{apiDB}", with: apiDB)
-        let url = apiHost + endPoint
-        let headers: HTTPHeaders = HTTPHeaders([
-            HTTPHeaders.authorization(bearerToken: token),
-            HTTPHeaders.contentTypeJson,
-            HTTPHeaders.acceptJson
-        ])
-        let body = InventoryAssetsRequest(location: location, children: type.rawValue, locationName: locationName, inventoryName: inventoryName, sessionId: sessionId)
-        connection.connectionRequest(url: url, method: .post, headers: headers, data: body.toData) { data, error in
+        var urlComponent = URLComponents(string: "\(apiHost)/api/v1/app/\(apiDB)/assets/inventory/")!
+        urlComponent.queryItems = [
+            URLQueryItem(name: "location", value: location),
+            URLQueryItem(name: "children", value: type.rawValue),
+            URLQueryItem(name: "locationName", value: locationName),
+            URLQueryItem(name: "inventoryName", value: inventoryName),
+            URLQueryItem(name: "sessionId", value: sessionId)
+        ]
+        var request = URLRequest(url: urlComponent.url!)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpMethod = "POST"
+        request.timeoutInterval = 999.0
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
-                print(error)
-                completion(.failure(WMError.inventoriesCouldNotBeDownloaded))
-            }
-            guard let data = data else {
-                completion(.failure(WMError.inventoriesCouldNotBeDownloaded))
-                return
-            }
-            if let assets = Utils.decode(AssetsApiModel.self, from: data, serviceName: "getInventoryAssets") {
-                completion(.success(assets.response))
+                completion(.failure(error))
             } else {
-                completion(.failure(WMError.inventoriesCouldNotBeDownloaded))
+                guard let data = data else {
+                    completion(.failure(WMError.inventoriesCouldNotBeDownloaded))
+                    return
+                }
+                do {
+                    let assets = try JSONDecoder().decode(AssetsApiModel.self, from: data)
+                    completion(.success(assets.response))
+                } catch {
+                    completion(.failure(error))
+                }
             }
-        }
+        }.resume()
     }
     
     func getAssets(location: String, completion: @escaping([AssetModel]) -> ()) {
