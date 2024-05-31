@@ -74,7 +74,7 @@ class DataManager: ObservableObject {
     }
     
     func save(inventories: [InventoryDataModel] ,completion: @escaping(Result<[InventoryDataModel], Error>) -> Void)  {
-        for item in inventories {
+        for (index, item) in inventories.enumerated() {
             let inventorySession = InventorySession(context: context)
             inventorySession.identifier = item._id
             inventorySession.sessionId = item.sessionId
@@ -83,7 +83,7 @@ class DataManager: ObservableObject {
             inventorySession.locationName = item.locationName
             inventorySession.status = item.status
             inventorySession.creation = item.creation
-            
+            print("Procesando \(index)/\(inventories.count)")
             if let assets = item.assets {
                 for asset in assets {
                     let assetRequest = Asset.fetchRequest()

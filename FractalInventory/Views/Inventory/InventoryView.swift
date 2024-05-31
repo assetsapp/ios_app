@@ -319,7 +319,9 @@ struct InventoryView: View {
         case .online:
             ApiInventorySessions().getInventorySessionAssets(sessionId: inventorySession) { _assets in
                 self.assets = _assets
-                cslvalues.isLoading = false
+                DispatchQueue.main.async {
+                    cslvalues.isLoading = false
+                }
             }
         case .offline:
             DataManager().getInventorySession(by: inventorySession) { result in
@@ -332,7 +334,9 @@ struct InventoryView: View {
                     self.assets = []
                     print("Error: ", error.localizedDescription)
                 }
-                cslvalues.isLoading = false
+                DispatchQueue.main.async {
+                    cslvalues.isLoading = false
+                }
             }
         }
         
@@ -353,7 +357,9 @@ struct InventoryView: View {
                 case .failure(_ ):
                     break
                 }
-                cslvalues.isLoading = false
+                DispatchQueue.main.async {
+                    cslvalues.isLoading = false
+                }
             }
         case .offline:
             DataManager().getInventoryAssets(location: location, locationName: locationName, sessionId: inventorySession, inventoryName: inventoryName, type: type) { result in
@@ -364,9 +370,10 @@ struct InventoryView: View {
                     self.assets = []
                     print("Error: ", error.localizedDescription)
                 }
-                cslvalues.isLoading = false
+                DispatchQueue.main.async {
+                    cslvalues.isLoading = false
+                }
             }
-            break
         }
     }
     
