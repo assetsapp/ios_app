@@ -13,6 +13,7 @@ enum InventoryType: String {
 }
 
 struct InventoryView: View {
+    @State var isDummy: Bool = false
     @State var cont: Int = 0
     @ObservedObject var cslvalues: CSLValues
     @State var assets: [AssetModel] = []
@@ -58,10 +59,12 @@ struct InventoryView: View {
                                 Image(systemName: "chevron.\(showSession ? "up" : "down")")
                             }
                         }
-                        Button("Add EPC") {
-                            addEPC()
+                        if isDummy {
+                            Button("Add EPC") {
+                                addEPC()
+                            }
+                            .padding(.top, 2)
                         }
-                        .padding(.top, 2)
                         if showSession {
                             HStack {
                                 VStack(alignment: .leading) {
@@ -182,8 +185,10 @@ struct InventoryView: View {
             
             VStack {
                 VStack {
-                    Button("Add EPC") {
-                        addEPC()
+                    if isDummy {
+                        Button("Add EPC") {
+                            addEPC()
+                        }
                     }
                     HStack {
                         Text("RFID Antenna")
