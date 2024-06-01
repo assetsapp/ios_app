@@ -691,17 +691,42 @@ class DataManager: ObservableObject {
     }
     
     func getQuickInventory(by locationId: String, locationName: String, type: InventoryType, completion: @escaping(Result<[AssetModel], Error>) -> Void) {
-        let request = Asset.fetchRequest()
-        if type == .root {
+        switch type {
+        case .root:
+            let request = Asset.fetchRequest()
             request.predicate = NSPredicate(format: "location == %@", locationId)
-        }
-        request.returnsObjectsAsFaults = false
-        do {
-            let result = try context.fetch(request)
-            let resultData = result.map({ AssetModel(asset: $0)})
-            completion(.success(resultData))
-        } catch {
-            completion(.failure(error))
+            request.returnsObjectsAsFaults = false
+            do {
+                let result = try context.fetch(request)
+                let resultData = result.map({ AssetModel(asset: $0)})
+                completion(.success(resultData))
+            } catch {
+                completion(.failure(error))
+            }
+        case .subLevels:
+            let rootLocation = Location.fetchRequest()
+            rootLocation.predicate = NSPredicate(format: "id == %@", locationId)
+            rootLocation.returnsObjectsAsFaults = false
+            
+            let parentLocation = Location.fetchRequest()
+            parentLocation.predicate = NSPredicate(format: "parent == %@", locationId)
+            parentLocation.returnsObjectsAsFaults = false
+            do {
+                let rootResult = try context.fetch(rootLocation)
+                let parentResult = try context.fetch(parentLocation)
+                let resultLocation = rootResult + parentResult
+                var arrayAssets: [Asset] = []
+                for location in resultLocation {
+                    let request = Asset.fetchRequest()
+                    request.predicate = NSPredicate(format: "location == %@ and status == 'active'", location.id ?? "")
+                    let result = try context.fetch(request)
+                    arrayAssets.append(contentsOf: result)
+                }
+                let resultData = arrayAssets.map({ AssetModel(asset: $0)})
+                completion(.success(resultData))
+            } catch {
+                completion(.failure(error))
+            }
         }
     }
     
