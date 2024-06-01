@@ -205,7 +205,9 @@ struct InventoryView: View {
                                 Slider(value: $powerLevel, in: 0...maxPowerLevel, step: 1)
                                     .accentColor(Color.green)
                                     .onChange(of: powerLevel, perform: { power in
-                                        Utils.updateAntennaPower(power: power)
+                                        DispatchQueue.main.async {
+                                            Utils.updateAntennaPower(power: power)
+                                        }
                                     })
                                     .disabled(inventoryButton == "Stop")
                                 Text("Power Level: \(powerLevel, specifier: "%.0f")")
@@ -266,7 +268,9 @@ struct InventoryView: View {
             zebraSingleton.startInventory(power: 30)
             zebraSingleton.onTagAdded = { tag in
                 if tag.epc.count == 24 {
-                    self.cslvalues.addEpc(reading: tag)
+                    DispatchQueue.main.async {
+                        self.cslvalues.addEpc(reading: tag)
+                    }
                 }
             }
             let maxPower = zebraSingleton.getMaxPower()
