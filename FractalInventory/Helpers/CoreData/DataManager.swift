@@ -717,24 +717,48 @@ class DataManager: ObservableObject {
         inventorySession.beenCreated = true
         inventorySession.type = type.rawValue
         
-        let request = Asset.fetchRequest()
-        if type == .root {
+        switch type {
+        case .root:
+            let request = Asset.fetchRequest()
             request.predicate = NSPredicate(format: "location == %@", locationId)
-        }
-        request.returnsObjectsAsFaults = false
-        do {
-            let result = try context.fetch(request)
-            for assetResult in result {
-                print("Agregando asst \(assetResult.identifier) a session")
-                inventorySession.addToAssets(assetResult)
+            request.returnsObjectsAsFaults = false
+            do {
+                let result = try context.fetch(request)
+                for assetResult in result {
+                    print("Agregando asst \(assetResult.identifier ?? "") a session")
+                    inventorySession.addToAssets(assetResult)
+                    try context.save()
+                }
                 try context.save()
+                let resultData = result.map({ AssetModel(asset: $0)})
+                completion(.success(resultData))
+            } catch {
+                completion(.failure(error))
             }
-            
-            try context.save()
-            let resultData = result.map({ AssetModel(asset: $0)})
-            completion(.success(resultData))
-        } catch {
-            completion(.failure(error))
+        case .subLevels:
+            let requestLocation = Location.fetchRequest()
+            requestLocation.predicate = NSPredicate(format: "parent == %@", locationId)
+            requestLocation.returnsObjectsAsFaults = false
+            do {
+                let resultLocation = try context.fetch(requestLocation)
+                var arrayAssets: [Asset] = []
+                for location in resultLocation {
+                    let request = Asset.fetchRequest()
+                    request.predicate = NSPredicate(format: "location == %@ and status == 'active'", location.id ?? "")
+                    let result = try context.fetch(request)
+                    for assetResult in result {
+                        print("Agregando asst \(assetResult.identifier ?? "") a session")
+                        inventorySession.addToAssets(assetResult)
+                        try context.save()
+                    }
+                    arrayAssets.append(contentsOf: result)
+                }
+                try context.save()
+                let resultData = arrayAssets.map({ AssetModel(asset: $0)})
+                completion(.success(resultData))
+            } catch {
+                completion(.failure(error))
+            }
         }
     }
     
