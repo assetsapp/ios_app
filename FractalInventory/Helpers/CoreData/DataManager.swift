@@ -385,6 +385,7 @@ class DataManager: ObservableObject {
         asset.assignedTo = "\(employee.name) \(employee.lastName) <\(employee.email)>"
         asset.image = image
         asset.beenUpdated = true
+        asset.beenCreated = true
         
         do {
             try context.save()

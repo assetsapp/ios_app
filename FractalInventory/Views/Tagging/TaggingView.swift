@@ -379,6 +379,8 @@ struct CardView: View {
 }
 
 struct MainView: View {
+    @State var isDummy: Bool = false
+    @State var cont: Int = 0
     @Binding var location: LocationModel
     @ObservedObject var epcs: EpcsArray = EpcsArray()
     @ObservedObject var cslvalues: CSLValues
@@ -487,7 +489,7 @@ struct MainView: View {
             
             VStack(alignment: .leading) {
                 HStack(alignment: .center) {
-                    Text("EPC Readings (\(cslvalues.readings.count):")
+                    Text("EPC Readings (\(cslvalues.readings.count)):")
                         .foregroundColor(.secondary)
                     Spacer()
                     Rectangle()
@@ -536,6 +538,12 @@ struct MainView: View {
                         })
                     }
                     VStack {
+                        if isDummy {
+                            Button("Add EPC") {
+                                addEPC()
+                            }
+                            .padding(.top, 2)
+                        }
                         Slider(value: $powerLevel, in: 0...maxPowerLevel, step: 1)
                             .accentColor(Color.green)
                             .onChange(of: powerLevel, perform: { power in
@@ -588,7 +596,15 @@ struct MainView: View {
             
         }
     }
-    
+    func addEPC() {
+        let array = ["057454000000000000006F23", "474D30304B0181021000234F", "057454000000000000007237"]
+        let epc = array[cont]
+        let epcModel = EpcModel(epc: epc, rssi: "", timestamp: Utils.getFullDate())
+        self.cslvalues.addEpc(reading: epcModel)
+        if cont < array.count - 1 {
+            cont += 1
+        }
+    }
     // MARK: FUNCTIONS
     func getFilteredEpcs(epcarray: [EpcModel]) -> [EpcModel] {
         if (isSingle) {
