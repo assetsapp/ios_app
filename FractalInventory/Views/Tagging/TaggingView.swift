@@ -132,6 +132,8 @@ struct TaggingView: View {
     }
     
     @AppStorage(Settings.userIdKey) var userId = "app"
+    @AppStorage(Settings.userNameKey) var userName = "Guest"
+    @AppStorage(Settings.userLastNameKey) var userLastName = "User"
     
     func onSave(epcsarray: [EpcModel]) {
         switch workModeManager.workMode {
@@ -174,8 +176,8 @@ struct TaggingView: View {
                 "EPC": getEpcs(),
                 "location": location._id,
                 "locationPath": filterOutLocationPath(),
-                "creator": userId,
-                "labeling_user": userId,
+                "creationUserFullName":"\(userName) \(userLastName)",
+                "labeling_user": "\(userName) \(userLastName)",
                 "customFieldsTab": "pending",
                 "referenceId": reference._id,
                 "tabs": getTabsJson(),
