@@ -6,12 +6,8 @@
 //
 import Foundation
 struct Constants {
-//    static let apiHost = "https://apidemo.tagventory.com"
-//    static let apiDB = "assets-app-backup"
-//    static let apiHost = "https://apitasa.tagventory.com"
-//    static let apiDB = "assets-app-tasa"
-    static let apiHost = "https://apigrupomexico.tagventory.com"
-    static let apiDB = "assets-app-grupomexico"
+    static let apiHost = ""
+    static let apiDB = ""
 }
 struct EndPoints {
     static let inventoryAssets = "/api/v1/app/{apiDB}/assets/inventory/"

@@ -26,6 +26,7 @@ class DataManager: ObservableObject {
     
     //MARK: - CoreData
     func save(assets: [AssetRespondeModel], completion: @escaping(Result<[AssetRespondeModel],Error>) -> Void) {
+        context.reset()
         context.retainsRegisteredObjects = true
         for item in assets {
             let asset = Asset(context: context)
@@ -130,6 +131,7 @@ class DataManager: ObservableObject {
     }
     
     func save(employees: [EmployeeModel], completion: @escaping(Result<[EmployeeModel],Error>) -> Void) {
+        context.reset() 
         var test: [Employee] = []
         for item in employees {
             let employee = Employee(context: context)
@@ -305,7 +307,7 @@ class DataManager: ObservableObject {
             let result = try context.fetch(request)
             var employees: [EmployeeModel] = []
             for data in result {
-                print("Empleado \(data.identifier) assets: \(data.assets?.count)")
+                print("Empleado \(data.identifier ?? "N/A") assets: \(data.assets?.count ?? 0)")
                 employees.append(EmployeeModel(from: data))
             }
             completion(.success(employees))
