@@ -32,7 +32,12 @@ struct TaggingView: View {
     @State var savedAssetsCount: Int = 0
     let workModeManager = WorkModeManager()
     @StateObject var zebraSingleton = ZebraSingleton.shared
+  
+    // Estados para manejar la alerta
+    @State private var showAlert = false
+    @State private var alertMessage = ""
     
+
     @State var imageSelected: UIImage = UIImage(systemName: "photo")!
     @State var isNewImageSelected: Bool = false
     
@@ -100,7 +105,11 @@ struct TaggingView: View {
                 }
             })
         }
-        )
+    )
+        // Añadir la alerta aquí
+               .alert(isPresented: $showAlert) {
+                   Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+               }
         .environmentObject(zebraSingleton)
     }
     func onInventory() {
@@ -245,6 +254,8 @@ struct TaggingView: View {
                 isSavedAssetsPresent = true
             case .failure(let error):
                 print(error.localizedDescription)
+                alertMessage = error.localizedDescription
+                showAlert = true
             }
             cslvalues.isLoading = false
         }
