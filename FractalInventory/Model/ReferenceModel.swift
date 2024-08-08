@@ -167,12 +167,15 @@ class ApiReferences {
         request.httpMethod = "POST"
         request.httpBody = jsonData
         
+        print("postAssets params: \(params)") // Log
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 completion(.failure(error))
             } else {
                 do {
                     let savedAssets = try JSONDecoder().decode(SavedAssetApiModel.self, from: data!)
+                    print("postAssets response: \(savedAssets)") // Log
                     completion(.success(savedAssets.response))
                 } catch {
                     completion(.failure(error))

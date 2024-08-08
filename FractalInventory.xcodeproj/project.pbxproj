@@ -813,7 +813,6 @@
 		76F5AB1A26CA2242001B8B89 /* FractalInventory */ = {
 			isa = PBXGroup;
 			children = (
-				F2F539012BC9CAD700078FBF /* Extensions */,
 				F23C778C2B74117D00A1A903 /* Utils */,
 				F203F3CC2AF9DF8D0037D45B /* Zebra */,
 				F2F813552AF3210000FCD753 /* Constants */,
@@ -933,13 +932,6 @@
 				F22090F02BE12F9F00C9BD6E /* InventoryAssetsRequest.swift */,
 			);
 			path = Request;
-			sourceTree = "<group>";
-		};
-		F2F539012BC9CAD700078FBF /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Extensions;
 			sourceTree = "<group>";
 		};
 		F2F813552AF3210000FCD753 /* Constants */ = {

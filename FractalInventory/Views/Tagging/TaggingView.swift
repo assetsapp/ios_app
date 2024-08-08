@@ -94,7 +94,7 @@ struct TaggingView: View {
                     )
                 } else {
                     return Alert(
-                        title: Text("First read at least one EPC"),
+                        title: Text("Error: Empty or Duplicate EPC"),
                         dismissButton: .cancel(Text("OK"), action: { })
                     )
                 }
@@ -265,6 +265,7 @@ struct TaggingView: View {
                 for reading in cslvalues.readings {
                     epcs.append(reading.epc)
                 }
+                print("getEpcs: \(epcs)") // Log
                 return epcs;
             }
         } else {
@@ -381,7 +382,7 @@ struct CardView: View {
 }
 
 struct MainView: View {
-    @State var isDummy: Bool = false
+    @State var isDummy: Bool = true
     @State var cont: Int = 0
     @Binding var location: LocationModel
     @ObservedObject var epcs: EpcsArray = EpcsArray()

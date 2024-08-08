@@ -28,14 +28,20 @@ class DataManager: ObservableObject {
     func save(assets: [AssetRespondeModel], completion: @escaping(Result<[AssetRespondeModel],Error>) -> Void) {
         context.reset()
         context.retainsRegisteredObjects = true
+        
         for item in assets {
+                guard let epc = item.EPC, !epc.isEmpty else {
+                    print("Error: EPC es nulo o vacío")
+                    continue
+                }
+            
             let asset = Asset(context: context)
-            //print("Guardando serial: \(item.serial ?? "nil")")
+            print("Guardando EPC: \(epc)")
             asset.name = item.name
             asset.brand = item.brand
             asset.model = item.model
             asset.serial = item.serial
-            asset.epc = item.EPC
+            asset.epc = epc
             asset.location = item.location
             asset.locationPath = item.locationPath
             asset.creator = item.creator
@@ -64,10 +70,10 @@ class DataManager: ObservableObject {
             asset.price  = item.price
             asset.image = nil // TODO: Descargar imagen por imagen 2455
         }
-        
+
         do {
             try context.save()
-            print("save assets succes \(assets.count)")
+            print("Assets guardados exitosamente: \(assets.count)")
             completion(.success(assets))
         } catch {
             completion(.failure(error))
@@ -366,33 +372,59 @@ class DataManager: ObservableObject {
     }
     
     func tag(asset reference: ReferenceModel, location: LocationModel, locationPath: String, epc: String, userId: String, serialNumber: String, tabs: [[String: Any]], customFields: [[String: Any]], customFieldsValues: [String], employee: EmployeeModel, image: Data?, completion: @escaping(Result<Asset,Error>) -> Void) {
+        print("Iniciando proceso para guardar el activo con EPC: \(epc)")
+
+        // Verificar si el EPC tiene la longitud correcta de 24 caracteres
+        guard epc.count == 24 else {
+            print("EPC no tiene la longitud de 24 caracteres: \(epc)")
+            completion(.failure(NSError(domain: "", code: 400, userInfo: [NSLocalizedDescriptionKey: "EPC no tiene la longitud de 24 caracteres"])))
+            return
+        }
         
-        let asset = Asset(context: context)
-        
-        asset.name = reference.name ?? ""
-        asset.brand = reference.brand ?? ""
-        asset.model = reference.model ?? ""
-        asset.serial = serialNumber
-        asset.epc = epc
-        asset.location = location._id
-        asset.locationPath = locationPath
-        asset.creator = userId
-        asset.identifier = userId
-        asset.customFieldsTab = "pending"
-        asset.referenceId = reference._id
-        asset.tabs = tabs
-        asset.customFields = customFields
-        asset.customFieldsValues = customFieldsValues
-        asset.assigned = employee._id
-        asset.assignedTo = "\(employee.name) \(employee.lastName) <\(employee.email)>"
-        asset.image = image
-        asset.beenUpdated = true
-        asset.beenCreated = true
+        // Verificar si el EPC ya existe
+        let fetchRequest: NSFetchRequest<Asset> = Asset.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "epc == %@", epc)
         
         do {
-            try context.save()
-            completion(.success(asset))
+            let fetchedAssets = try context.fetch(fetchRequest)
+            if fetchedAssets.isEmpty {
+                // Crear y guardar un nuevo Asset
+                print("EPC no encontrado en la base de datos, creando nuevo activo.")
+                let asset = Asset(context: context)
+                asset.name = reference.name ?? ""
+                asset.brand = reference.brand ?? ""
+                asset.model = reference.model ?? ""
+                asset.serial = serialNumber
+                asset.epc = epc
+                asset.location = location._id
+                asset.locationPath = locationPath
+                asset.creator = userId
+                asset.identifier = userId
+                asset.customFieldsTab = "pending"
+                asset.referenceId = reference._id
+                asset.tabs = tabs
+                asset.customFields = customFields
+                asset.customFieldsValues = customFieldsValues
+                asset.assigned = employee._id
+                asset.assignedTo = "\(employee.name) \(employee.lastName) <\(employee.email)>"
+                asset.image = image
+                asset.beenUpdated = true
+                asset.beenCreated = true
+                
+                do {
+                    try context.save()
+                    print("Asset guardado con EPC completo: \(epc)")
+                    completion(.success(asset))
+                } catch {
+                    print("Error al guardar el activo: \(error)")
+                    completion(.failure(error))
+                }
+            } else {
+                print("EPC ya existe: \(epc)")
+                completion(.failure(NSError(domain: "", code: 409, userInfo: [NSLocalizedDescriptionKey: "EPC ya existe"])))
+            }
         } catch {
+            print("Error al verificar la existencia del EPC: \(error)")
             completion(.failure(error))
         }
     }
