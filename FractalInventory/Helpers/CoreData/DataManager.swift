@@ -421,7 +421,7 @@ class DataManager: ObservableObject {
                 }
             } else {
                 print("EPC ya existe: \(epc)")
-                completion(.failure(NSError(domain: "", code: 409, userInfo: [NSLocalizedDescriptionKey: "Error: EPC Already Exists"])))
+                completion(.failure(NSError(domain: "", code: 409, userInfo: [NSLocalizedDescriptionKey: "EPC Already Exists"])))
             }
         } catch {
             print("Error al verificar la existencia del EPC: \(error)")

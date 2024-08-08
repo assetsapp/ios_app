@@ -247,7 +247,7 @@ struct TaggingView: View {
                             customFields: getCustomFieldsJson(),
                             customFieldsValues: customFieldsValues,
                             employee: assignedEmployee,
-                            image: isNewImageSelected ? (imageSelected.jpegData(compressionQuality: 0.2)) : nil) { result in
+                            image: isNewImageSelected ? (imageSelected.jpegData(compressionQuality: 1.0)) : nil) { result in
             switch result {
             case .success(_ ):
                 savedAssetsCount = 1
