@@ -108,7 +108,7 @@ struct TaggingView: View {
     )
         // Añadir la alerta aquí
                .alert(isPresented: $showAlert) {
-                   Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+                   Alert(title: Text("Message:"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
                }
         .environmentObject(zebraSingleton)
     }
@@ -252,6 +252,8 @@ struct TaggingView: View {
             case .success(_ ):
                 savedAssetsCount = 1
                 isSavedAssetsPresent = true
+                alertMessage = "Asset saved successfully"
+                showAlert = true
             case .failure(let error):
                 print(error.localizedDescription)
                 alertMessage = error.localizedDescription
@@ -393,7 +395,7 @@ struct CardView: View {
 }
 
 struct MainView: View {
-    @State var isDummy: Bool = true
+    @State var isDummy: Bool = false
     @State var cont: Int = 0
     @Binding var location: LocationModel
     @ObservedObject var epcs: EpcsArray = EpcsArray()
