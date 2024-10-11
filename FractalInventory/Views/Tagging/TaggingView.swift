@@ -420,7 +420,7 @@ struct CardView: View {
 }
 
 struct MainView: View {
-    @State var isDummy: Bool = true
+    @State var isDummy: Bool = false
     @State var cont: Int = 0
     @Binding var location: LocationModel
     @ObservedObject var epcs: EpcsArray = EpcsArray()

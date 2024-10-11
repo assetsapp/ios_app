@@ -15,47 +15,48 @@ struct AssetPhoto: View {
     @Binding var imageSelected: UIImage
     @Binding var isNewImageSelected: Bool
     @Binding var showAssetPhoto: Bool
-
+    
     var body: some View {
-        VStack {
-            HStack {
-                Button("Clear") {
-                    isNewImageSelected = false
-                    imageSelected = UIImage(systemName: "photo")!
+        GeometryReader { geometry in
+            VStack {
+                HStack {
+                    Button("Delete") {
+                        isNewImageSelected = false
+                        imageSelected = UIImage(systemName: "photo")!
+                    }
+                    Spacer()
+                    Button("Save Image") {
+                        showAssetPhoto = false
+                    }
                 }
+                .padding()
+                HStack {
+                    Picker("Mode", selection: $photoType) {
+                        Text("Camera").tag(0)
+                        Text("Library").tag(1)
+                    }
+                    .onChange(of: photoType, perform: { value in
+                        sourceType = value == 0 ? .camera : .photoLibrary
+                    })
+                    .pickerStyle(SegmentedPickerStyle())
+                    .frame(width: geometry.size.width / 3)
+                    Spacer()
+                    Button(action: { showImagePicker.toggle() } ) {
+                        Text("Get Photo")
+                    }
+                    .sheet(isPresented: $showImagePicker) {
+                        ImagePicker(imageSelected: $imageSelected, sourceType: $sourceType, isNewImageSelected: $isNewImageSelected)
+                    }
+                }
+                .padding()
+                
+                AssetImage(showImage: $showImage, imageSelected: $imageSelected, isNewImageSelected: $isNewImageSelected)
+                    .frame(width: geometry.size.width - 40, height: geometry.size.height * 0.5)
                 Spacer()
-                Button("Close") {
-                    showAssetPhoto = false
-                }
             }
-            .padding()
-            HStack {
-                Picker("Mode", selection: $photoType) {
-                    Text("Camera").tag(0)
-                    Text("Library").tag(1)
-                }
-                .onChange(of: photoType, perform: { value in
-                    sourceType = value == 0 ? .camera : .photoLibrary
-                })
-                .pickerStyle(SegmentedPickerStyle())
-                .frame(width: 130)
-                Spacer()
-                Button(action: { showImagePicker.toggle() } ) {
-                    Text("Get Photo")
-                }
-                .sheet(isPresented: $showImagePicker) {
-                    ImagePicker(imageSelected: $imageSelected, sourceType: $sourceType, isNewImageSelected: $isNewImageSelected)
-                }
-            }
-            .padding()
-            
-            AssetImage(showImage: $showImage, imageSelected: $imageSelected, isNewImageSelected: $isNewImageSelected)
-            
-            Spacer()
         }
     }
 }
-
 
 struct AssetImage: View {
     @Binding var showImage: Bool
@@ -82,3 +83,5 @@ struct AssetPhoto_Previews: PreviewProvider {
         AssetPhoto(imageSelected: $imageSelected, isNewImageSelected: .constant(true), showAssetPhoto: .constant(true))
     }
 }
+
+
