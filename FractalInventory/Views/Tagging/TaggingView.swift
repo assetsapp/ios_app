@@ -32,10 +32,7 @@ struct TaggingView: View {
     @State var savedAssetsCount: Int = 0
     let workModeManager = WorkModeManager()
     @StateObject var zebraSingleton = ZebraSingleton.shared
-  
-    // Estados para manejar la alerta
-    @State private var showAlert = false
-    @State private var alertMessage = ""
+    @State private var errorMessage: String = ""
     
 
     @State var imageSelected: UIImage = UIImage(systemName: "photo")!
@@ -45,9 +42,29 @@ struct TaggingView: View {
     
     var body: some View {
         VStack {
+            if !errorMessage.isEmpty {
+                HStack {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundColor(.white)
+                        .padding(.trailing, 5)
+                    
+                    Text(errorMessage)
+                        .foregroundColor(.white)
+                        .font(.headline)
+                        .lineLimit(nil)
+                        .multilineTextAlignment(.leading)
+                }
+                .padding()
+                .background(Color.red)
+                .cornerRadius(8)
+                .shadow(color: Color.red.opacity(0.6), radius: 5, x: 0, y: 5)
+                .padding(.horizontal, 16)
+            }
             ScrollView(.vertical, showsIndicators: false) {
                 CardView(cslvalues: cslvalues, reference: $reference, location: $location, isSingle: $isSingle, inventoryButton: $inventoryButton, isInventoryStarted: $isInventoryStarted, barcodeMode: $barcodeMode, customFields: $customFields, _onInvetory: onInventory, validateEPC: validateEPC, customFieldsValues: $customFieldsValues, serialNumber: $serialNumber, locationPath: $locationPath, isRemoveExistingModalResult: $isRemoveExistingModalResult, removedExistingCount: $removedExistingCount, isSavedAssetsPresent: $isSavedAssetsPresent, savedAssetsCount: $savedAssetsCount, imageSelected: $imageSelected, isNewImageSelected: $isNewImageSelected, assignedEmployee: $assignedEmployee)
             }
+           
+                
         }
         .onAppear {
             if CSLHelper.isDeviceConnected() {
@@ -86,30 +103,28 @@ struct TaggingView: View {
         .navigationBarTitle("Tagging")
         .navigationViewStyle(StackNavigationViewStyle())
         .navigationBarItems(trailing:
-                                HStack {
-            Button("Save") { isSaveModalPresent = true }
-            .padding(.leading, 10)
-            .alert(isPresented: $isSaveModalPresent, content: {
-                if cslvalues.readings.count > 0 {
-                    return Alert(
-                        title: Text("Save Asset"),
-                        message: Text("Do you want to proceed?"),
-                        primaryButton: .default(Text("OK"), action: { onSave(epcsarray: cslvalues.readings) }),
-                        secondaryButton: .cancel(Text("Cancel"))
-                    )
-                } else {
-                    return Alert(
-                        title: Text("Error: Empty or Duplicate EPC"),
-                        dismissButton: .cancel(Text("OK"), action: { })
-                    )
-                }
-            })
-        }
-    )
-        // Añadir la alerta aquí
-               .alert(isPresented: $showAlert) {
-                   Alert(title: Text("Message:"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
-               }
+            HStack {
+                Button("Save") { isSaveModalPresent = true }
+                .padding(.leading, 10)
+                .alert(isPresented: $isSaveModalPresent, content: {
+                    if cslvalues.readings.count > 0 {
+                        return Alert(
+                            title: Text("Save Asset"),
+                            message: Text("Do you want to proceed?"),
+                            primaryButton: .default(Text("OK"), action: { onSave(epcsarray: cslvalues.readings) }),
+                            secondaryButton: .cancel(Text("Cancel"))
+                        )
+                    } else {
+                        return Alert(
+                            title: Text("Error: Empty or Duplicate EPC"),
+                            dismissButton: .cancel(Text("OK"), action: { })
+                        )
+                    }
+                })
+            }
+        )
+        
+
         .environmentObject(zebraSingleton)
     }
     func onInventory() {
@@ -204,7 +219,7 @@ struct TaggingView: View {
                         savedAssetsCount = savedAssets.count
                         isSavedAssetsPresent = true
                     case .failure(_ ):
-                        break
+                        isSavedAssetsPresent = false
                     }
                     cslvalues.isLoading = false
                 }
@@ -248,18 +263,28 @@ struct TaggingView: View {
                             customFieldsValues: customFieldsValues,
                             employee: assignedEmployee,
                             image: isNewImageSelected ? (imageSelected.jpegData(compressionQuality: 1.0)) : nil) { result in
-            switch result {
-            case .success(_ ):
-                savedAssetsCount = 1
-                isSavedAssetsPresent = true
-                alertMessage = "Asset saved successfully"
-                showAlert = true
-            case .failure(let error):
-                print(error.localizedDescription)
-                alertMessage = error.localizedDescription
-                showAlert = true
+            DispatchQueue.main.async {
+                switch result {
+                case .success(_ ):
+                    savedAssetsCount = epcsarray.count
+                    isSavedAssetsPresent = true
+                    // Limpiamos el mensaje de error si se guarda exitosamente
+                    errorMessage = ""
+                case .failure(let error):
+                    if let nsError = error as NSError?, nsError.code == 409 {
+                        errorMessage = "Error: Duplicate EPC"
+                        // Elimina el EPC duplicado de la lista
+                        if let duplicateEpc = epcsarray.first?.epc {
+                            cslvalues.removeEpc(epc: duplicateEpc)
+                        }
+                    } else {
+                        errorMessage = error.localizedDescription
+                    }
+                    isSavedAssetsPresent = false
+                }
+                // Asegúrate de desactivar el estado de carga en el hilo principal
+                cslvalues.isLoading = false
             }
-            cslvalues.isLoading = false
         }
     }
     
@@ -395,7 +420,7 @@ struct CardView: View {
 }
 
 struct MainView: View {
-    @State var isDummy: Bool = false
+    @State var isDummy: Bool = true
     @State var cont: Int = 0
     @Binding var location: LocationModel
     @ObservedObject var epcs: EpcsArray = EpcsArray()
@@ -613,7 +638,7 @@ struct MainView: View {
         }
     }
     func addEPC() {
-        let array = ["057454000000000000006F23", "474D30304B0181021000234F", "057454000000000000007237"]
+        let array = ["057454000000000000006F23", "474D30304B0181021000234F", "474130304B0181021000234F", "057454000000000000007237"]
         let epc = array[cont]
         let epcModel = EpcModel(epc: epc, rssi: "", timestamp: Utils.getFullDate())
         self.cslvalues.addEpc(reading: epcModel)

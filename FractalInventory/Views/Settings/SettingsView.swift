@@ -78,7 +78,12 @@ struct SettingsViewContent: View {
                 Section(header: Text("CSL RFID Handheld scan")) {
                     Toggle("Start Device Scanning", isOn: $startScanning)
                         .onChange(of: startScanning, perform: { scan in
-                            if (scan) {
+                            if zebraSingleton.isDeviceConnectedZebra {
+                                print("El lector Zebra ya está conectado. No se puede iniciar el escaneo CSL.")
+                                startScanning = false
+                                return
+                            }
+                            if scan {
                                 CSLHelper.deviceScanStart()
                             } else {
                                 CSLHelper.deviceScanStop()
@@ -150,16 +155,22 @@ struct SettingsViewContent: View {
                     }
                 }
                 /// Zebra section
-                Section(header: Text("ZEBRA RFID Handheld scan")) {
-                    Toggle("Start Device Scanning", isOn: $startScanningZebra)
-                        .onChange(of: startScanningZebra, perform: { scan in
-                            if (scan) {
-                                startScannigZebra()
-                            } else {
-                                stopScanningZebra()
-                                zebraSingleton.listDevices = []
-                            }
-                        })
+            Section(header: Text("ZEBRA RFID Handheld scan")) {
+                Toggle("Start Device Scanning", isOn: $startScanningZebra)
+                    .onChange(of: startScanningZebra, perform: { scan in
+                        if isDeviceConnected {
+                            print("El lector CSL ya está conectado. No se puede iniciar el escaneo Zebra.")
+                            startScanningZebra = false
+                            return
+                        }
+                        if scan {
+                            startScannigZebra()
+                        } else {
+                            stopScanningZebra()
+                            zebraSingleton.listDevices = []
+                        }
+                    })
+           
                     if (startScanningZebra) {
                         Text("Bellow will appear available devices")
                         List {

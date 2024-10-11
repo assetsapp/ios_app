@@ -26,59 +26,60 @@ class DataManager: ObservableObject {
     
     //MARK: - CoreData
     func save(assets: [AssetRespondeModel], completion: @escaping(Result<[AssetRespondeModel],Error>) -> Void) {
-        context.reset()
-        context.retainsRegisteredObjects = true
         
-        for item in assets {
+            context.reset()
+            context.retainsRegisteredObjects = true
+            
+            for item in assets {
                 guard let epc = item.EPC, !epc.isEmpty else {
                     print("Error: EPC es nulo o vacío")
                     continue
                 }
+                
+                let asset = Asset(context: context)
+                print("Guardando EPC: \(epc)")
+                asset.name = item.name
+                asset.brand = item.brand
+                asset.model = item.model
+                asset.serial = item.serial
+                asset.epc = epc
+                asset.location = item.location
+                asset.locationPath = item.locationPath
+                asset.creator = item.creator
+                asset.identifier = item._id
+                asset.customFieldsTab = ""
+                asset.referenceId = item.referenceId
+                asset.tabs = [[:]]
+                asset.customFields = [[:]]
+                asset.customFieldsValues = []
+                asset.assigned = item.assigned
+                asset.assignedTo = item.assigned
+                asset.status  = item.status
+                asset.creationDate  = item.creation_date
+                asset.updateDate  = item.updateDate
+                asset.fileExt  = item.fileExt
+                asset.parent  = item.parent
+                asset.imageURL  = item.imageURL
+                asset.quantity  = Int32(item.quantity ?? 0)
+                asset.responsible  = item.responsible
+                asset.purchaseDate  = item.purchase_date
+                asset.purchasePrice  = item.purchase_price
+                asset.totalPrice  = item.total_price
+                asset.labelingUser  = item.labeling_user
+                asset.notes  = item.notes
+                asset.labelingDate  = item.labeling_date
+                asset.price  = item.price
+                asset.image = nil // TODO: Descargar imagen por imagen 2455
+            }
             
-            let asset = Asset(context: context)
-            print("Guardando EPC: \(epc)")
-            asset.name = item.name
-            asset.brand = item.brand
-            asset.model = item.model
-            asset.serial = item.serial
-            asset.epc = epc
-            asset.location = item.location
-            asset.locationPath = item.locationPath
-            asset.creator = item.creator
-            asset.identifier = item._id
-            asset.customFieldsTab = ""
-            asset.referenceId = item.referenceId
-            asset.tabs = [[:]]
-            asset.customFields = [[:]]
-            asset.customFieldsValues = []
-            asset.assigned = item.assigned
-            asset.assignedTo = item.assigned
-            asset.status  = item.status
-            asset.creationDate  = item.creation_date
-            asset.updateDate  = item.updateDate
-            asset.fileExt  = item.fileExt
-            asset.parent  = item.parent
-            asset.imageURL  = item.imageURL
-            asset.quantity  = Int32(item.quantity ?? 0)
-            asset.responsible  = item.responsible
-            asset.purchaseDate  = item.purchase_date
-            asset.purchasePrice  = item.purchase_price
-            asset.totalPrice  = item.total_price
-            asset.labelingUser  = item.labeling_user
-            asset.notes  = item.notes
-            asset.labelingDate  = item.labeling_date
-            asset.price  = item.price
-            asset.image = nil // TODO: Descargar imagen por imagen 2455
+            do {
+                try context.save()
+                print("Assets guardados exitosamente: \(assets.count)")
+                completion(.success(assets))
+            } catch {
+                completion(.failure(error))
+            }
         }
-
-        do {
-            try context.save()
-            print("Assets guardados exitosamente: \(assets.count)")
-            completion(.success(assets))
-        } catch {
-            completion(.failure(error))
-        }
-    }
     
     func save(inventories: [InventoryDataModel] ,completion: @escaping(Result<[InventoryDataModel], Error>) -> Void)  {
         for (index, item) in inventories.enumerated() {
@@ -137,8 +138,35 @@ class DataManager: ObservableObject {
     }
     
     func save(employees: [EmployeeModel], completion: @escaping(Result<[EmployeeModel],Error>) -> Void) {
-        context.reset() 
+        context.reset()
         var test: [Employee] = []
+
+        // Recopilar todos los asset IDs que se necesitarán en una sola consulta
+        var assetIdsSet: Set<String> = []
+        for employee in employees {
+            if let assets = employee.assetsAssigned {
+                for asset in assets {
+                    if let assetId = asset.id {
+                        assetIdsSet.insert(assetId)
+                    }
+                }
+            }
+        }
+
+        // Obtener todos los assets de una sola vez
+        let assetRequest = Asset.fetchRequest()
+        assetRequest.predicate = NSPredicate(format: "identifier IN %@", Array(assetIdsSet))
+        
+        var allAssets: [Asset] = []
+        do {
+            allAssets = try context.fetch(assetRequest)
+        } catch {
+            print("Error al obtener los assets: ", error.localizedDescription)
+            completion(.failure(error))
+            return
+        }
+
+        // Crear empleados y asignar assets
         for item in employees {
             let employee = Employee(context: context)
             employee.identifier = item._id
@@ -148,34 +176,19 @@ class DataManager: ObservableObject {
             employee.profileId = item.profileId
             employee.employeeId = item.employee_id
             
+            // Asignar assets al empleado desde la lista previamente obtenida
             if let assets = item.assetsAssigned {
-                for asset in assets {
-                    if let assetId = asset.id {
-                        let assetRequest = Asset.fetchRequest()
-                        assetRequest.predicate = NSPredicate(format: "identifier == %@", assetId)
-                        do {
-                            let assetResult = try context.fetch(assetRequest)
-                            if let oneAsset = assetResult.first {
-                                employee.addToAssets(NSSet(array: assetResult))
-                                print("Se agrega asset: \(oneAsset.id) a empleado \(item._id)")
-                                try context.save()
-                            }
-                        } catch {
-                            print("NO SE PUDO AGREGAR EL ASSET Al EMPLEADO: ", error.localizedDescription)
-                        }
-                    }
+                let assetsToAssign = allAssets.filter { asset in
+                    assets.contains { $0.id == asset.identifier }
                 }
-            }
-            
-            do {
-                try context.save()
-            } catch {
-                print("NO SE PUDO AGREGAR EL ASSET Al EMPLEADO: ", error.localizedDescription)
+                employee.addToAssets(NSSet(array: assetsToAssign))
+                print("Se asignaron \(assetsToAssign.count) assets a empleado \(item._id)")
             }
             
             test.append(employee)
         }
-        
+
+        // Guardar todos los empleados y assets en una sola operación
         do {
             try context.save()
             completion(.success(employees))
