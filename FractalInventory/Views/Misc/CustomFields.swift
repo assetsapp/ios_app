@@ -28,9 +28,16 @@ struct CustomFields: View {
         VStack {
             HStack {
                 Spacer()
-                Button("Close") {
+                Button("Save data") {
                     showCustomFields.toggle()
-                }
+                }.buttonStyle(PlainButtonStyle())
+                    .buttonStyle(PlainButtonStyle())
+                    .padding(8)
+                    .background(Color.green.opacity(0.8))
+                    .foregroundColor(.white)
+                    .cornerRadius(6)
+                    .shadow(radius: 2)
+                    .font(.system(size: 14))
             }.padding(.trailing)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {

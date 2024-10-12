@@ -35,8 +35,15 @@ struct LogInView: View {
                         HStack {
                             Spacer()
                             Button(action: { showSettings = false }) {
-                                Text("Close")
-                            }
+                                Text(" Save ")
+                            }.buttonStyle(PlainButtonStyle())
+                                .buttonStyle(PlainButtonStyle())
+                                .padding(8)
+                                .background(Color.green.opacity(0.8))
+                                .foregroundColor(.white)
+                                .cornerRadius(6)
+                                .shadow(radius: 2)
+                                .font(.system(size: 14))
                             .padding()
                         }
                         Form {

@@ -36,8 +36,17 @@ struct ConnectionsSubview: View {
                 .frame(width: 130)
                 Spacer()
                 Button(action: { testConnection() } ) {
-                    Text("Test Connection")
-                }
+                    Text("Test connection")
+                }.buttonStyle(PlainButtonStyle())
+                    .buttonStyle(PlainButtonStyle())
+                    .padding(8)
+                    .background(Color.orange.opacity(0.8))
+                    .foregroundColor(.white)
+                    .cornerRadius(6)
+                    .shadow(radius: 2)
+                    .font(.system(size: 14))
+                    .padding(.leading, 20)
+                .padding()
                 .alert(isPresented: $showTestModal, content: {
                     Alert(
                         title: Text("Test \(testTypes[testType]) Connection: \(testResult)"),
