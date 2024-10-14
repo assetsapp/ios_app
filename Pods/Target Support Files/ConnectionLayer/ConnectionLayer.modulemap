@@ -1,0 +1,6 @@
+framework module ConnectionLayer {
+  umbrella header "ConnectionLayer-umbrella.h"
+
+  export *
+  module * { export * }
+}
