@@ -128,8 +128,8 @@
 		F23C778B2B74117300A1A903 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23C778A2B74117300A1A903 /* Utils.swift */; };
 		F2828F132BE926B600121627 /* merge.sh in Resources */ = {isa = PBXBuildFile; fileRef = F2828F0F2BE926B600121627 /* merge.sh */; };
 		F2828F172BE927E300121627 /* libintegratedsdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2828F102BE926B600121627 /* libintegratedsdk.a */; };
-		F2828F182BE9287500121627 /* libsymbolbt-sdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2828F122BE926B600121627 /* libsymbolbt-sdk.a */; };
-		F2828F192BE9287500121627 /* libsymbolrfid-sdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2828F112BE926B600121627 /* libsymbolrfid-sdk.a */; };
+		F2828F182BE9287500121627 /* libsymbolbt-sdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2828F122BE926B600121627 /* libsymbolbt-sdk.a */; settings = {ATTRIBUTES = (Required, ); }; };
+		F2828F192BE9287500121627 /* libsymbolrfid-sdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2828F112BE926B600121627 /* libsymbolrfid-sdk.a */; settings = {ATTRIBUTES = (Required, ); }; };
 		F2F539002BC9BA9D00078FBF /* AssetsRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2F538FF2BC9BA9D00078FBF /* AssetsRequest.swift */; };
 		F2F813572AF3219F00FCD753 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2F813562AF3219F00FCD753 /* Constants.swift */; };
 /* End PBXBuildFile section */
