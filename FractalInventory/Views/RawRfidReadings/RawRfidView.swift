@@ -153,7 +153,11 @@ struct ReadingsInfo: View {
                 HStack {
                     Button(action: { CSLHelper.onClear(cslvalues: cslvalues) }) {
                         Text("Clear")
-                    }
+                    }.foregroundColor(.white) // Color del texto
+                        .padding(8)
+                        .background(Color.red.opacity(0.8))
+                        .cornerRadius(6)
+                        .font(.system(size: 14, weight: .bold))
                     Spacer()
                     Text("Total: \(cslvalues.readings.count)")
                 }

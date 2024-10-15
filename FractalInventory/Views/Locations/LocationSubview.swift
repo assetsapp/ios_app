@@ -45,7 +45,7 @@ struct LocationSubview: View {
                 
                 Spacer()
                 
-            }.padding(.all, 6)
+            }.padding(.all, 10)
             
 
             HStack {
@@ -171,31 +171,46 @@ struct LocationSubview: View {
 
 struct TaggingLabel: View {
     var body: some View {
-        HStack {
-            Image(systemName: "tag")
-                .resizable()
-                .frame(width: 15, height: 15, alignment: .center)
-            Text("Tag")
-                .font(.callout)
-                .fontWeight(.light)
-                .foregroundColor(.blue)
+        VStack {
+            // Espaciador para mover el contenido hacia abajo
+            Spacer(minLength: 8)
+            HStack {
+                Image(systemName: "tag")
+                    .resizable()
+                    .frame(width: 15, height: 15, alignment: .center)
+                    .foregroundColor(.white)
+                Text("Tagging")
+                    .font(.callout)
+                    .fontWeight(.light)
+                    .foregroundColor(.white)
+            }.padding(4)
+                .background(Color.orange.opacity(0.7))
+                .cornerRadius(8)
+                .shadow(radius: 2)
         }
     }
 }
 
 struct InventoryLabel: View {
     var body: some View {
-        HStack {
-            Image(systemName: "wave.3.right")
-                .resizable()
-                .frame(width: 13, height: 15, alignment: .center)
-                .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
-            Text("Inventory")
-                .font(.callout)
-                .fontWeight(.light)
-                .foregroundColor(.blue)
+        VStack {
+            // Espaciador para mover el contenido hacia abajo
+            Spacer(minLength: 8)
+            HStack {
+                Image(systemName: "wave.3.right")
+                    .resizable()
+                    .frame(width: 13, height: 15, alignment: .center)
+                    .foregroundColor(.white)
+                Text("Inventory")
+                    .font(.callout)
+                    .fontWeight(.light)
+                    .foregroundColor(.white)
+            }.padding(4)
+                .background(Color.green.opacity(0.7))  // Fondo verde
+                .cornerRadius(8)          // Bordes redondeados
+                .shadow(radius: 2)
+            
         }
-        .padding(.trailing, 10)
     }
 }
 
@@ -221,18 +236,24 @@ struct AssetsLabel: View {
     @State var assetsNumber: Int
     
     var body: some View {
-        HStack {
-            Image(systemName: "laptopcomputer")
-                .resizable()
-                .frame(width: 15, height: 10, alignment: .center)
-                .foregroundColor(assetsNumber > 0 ? .blue : .primary)
-            
-            Text("Assets: \(assetsNumber)")
-                .font(.callout)
-                .fontWeight(.light)
-                .foregroundColor(assetsNumber > 0 ? .blue : .primary)
+        VStack {
+            // Espaciador para mover el contenido hacia abajo
+            Spacer(minLength: 8)
+            HStack {
+                Image(systemName: "laptopcomputer")
+                    .resizable()
+                    .frame(width: 15, height: 10, alignment: .center)
+                    .foregroundColor(assetsNumber > 0 ? .white : .white)
+                
+                Text("Assets: \(assetsNumber)")
+                    .font(.callout)
+                    .fontWeight(.light)
+                    .foregroundColor(assetsNumber > 0 ? .white : .white)
+            }.padding(4)
+                .background(assetsNumber > 0 ? Color.blue.opacity(0.7) : Color.red.opacity(0.7))
+                .cornerRadius(8)
+                .shadow(radius: 2)
         }
-        .padding(.leading, 10)
     }
 }
 

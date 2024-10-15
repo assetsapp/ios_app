@@ -398,14 +398,22 @@ struct CardView: View {
             HStack {
                 Button("Asset Photo") {
                     showAssetPhoto.toggle()
-                }
+                }.foregroundColor(.white) // Color del texto
+                    .padding(8)
+                    .background(Color.blue.opacity(0.8)) // Fondo azul del botón
+                    .cornerRadius(6)
+                    .font(.system(size: 14, weight: .bold))
                 .sheet(isPresented: $showAssetPhoto) {
                     AssetPhoto(imageSelected: $imageSelected, isNewImageSelected: $isNewImageSelected, showAssetPhoto: $showAssetPhoto)
                 }
                 Spacer()
                 Button("Custom Fields") {
                     showCustomFields.toggle()
-                }
+                }.foregroundColor(.white)
+                    .padding(8)
+                    .background(Color.blue.opacity(0.8))
+                    .cornerRadius(6)
+                    .font(.system(size: 14, weight: .bold))
                 .sheet(isPresented: $showCustomFields) {
                     CustomFields(customFields: $customFields, customFieldsValues: $customFieldsValues, showCustomFields: $showCustomFields, customFieldsImages: $customFieldsImages, customFieldsImagesData: $customFieldsImagesData)
                 }
@@ -482,14 +490,22 @@ struct MainView: View {
                             .foregroundColor(.secondary)
                         Button("Assign") {
                             showEmployeesModal.toggle()
-                        }
+                        }.foregroundColor(.white)
+                            .padding(8)
+                            .background(Color.black.opacity(0.4))
+                            .cornerRadius(6)
+                            .font(.system(size: 14, weight: .bold))
                         .sheet(isPresented: $showEmployeesModal) {
                             EmployeeView(cslvalues: cslvalues, isModal: true, showModal: $showEmployeesModal, selectedEmployee: $assignedEmployee)
                         }
                         Spacer()
                         Button("Clear") {
                             assignedEmployee = EmployeeModel(_id: "", name: "", lastName: "", email: "", employee_id: "")
-                        }
+                        }.foregroundColor(.white)
+                            .padding(8)
+                            .background(Color.red.opacity(0.8))
+                            .cornerRadius(6)
+                            .font(.system(size: 14, weight: .bold))
                     }
                     Text(getEmployeeAssignedText())
                         .foregroundColor(.secondary)
@@ -545,9 +561,13 @@ struct MainView: View {
                         Button(action: {
                             isRemoveExistingModalPresent.toggle()
                         }) {
-                            Text("Remove Existing")
-                                .padding(.trailing, 20)
-                        }
+                            Text("Remove EPCs")
+                               
+                        }.foregroundColor(.white)
+                            .padding(8)
+                            .background(Color.red.opacity(0.8))
+                            .cornerRadius(6)
+                            .font(.system(size: 14, weight: .bold))
                         .alert(isPresented: $isRemoveExistingModalPresent, content: {
                             Alert(
                                 title: Text("Remove Existing"),
@@ -559,9 +579,12 @@ struct MainView: View {
                         Button(action:{
                             self.presentationMode.wrappedValue.dismiss()
                         }) {
-                            Text("Clear")
-                                .padding(.trailing, 10)
-                        }
+                            Text("Exit")
+                        }.foregroundColor(.white)
+                            .padding(8)
+                            .background(Color.red.opacity(0.8))
+                            .cornerRadius(6)
+                            .font(.system(size: 14, weight: .bold))
                         .alert(isPresented: $isSavedAssetsPresent, content: {
                             Alert(
                                 title: Text(getSavedMessage()),

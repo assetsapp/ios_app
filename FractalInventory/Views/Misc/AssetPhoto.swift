@@ -31,7 +31,7 @@ struct AssetPhoto: View {
                         .foregroundColor(.white)
                         .cornerRadius(6)
                         .shadow(radius: 2)
-                        .font(.system(size: 14))
+                        .font(.system(size: 14, weight: .bold))
                         Spacer()
                         Button("Save Image") {
                             showAssetPhoto = false
@@ -42,7 +42,7 @@ struct AssetPhoto: View {
                         .foregroundColor(.white)
                         .cornerRadius(6)
                         .shadow(radius: 2)
-                        .font(.system(size: 14))
+                        .font(.system(size: 14, weight: .bold))
                     }
                     .padding()
                     HStack {

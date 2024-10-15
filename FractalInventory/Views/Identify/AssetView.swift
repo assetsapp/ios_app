@@ -49,7 +49,16 @@ struct AssetView: View {
         })
         .navigationBarItems(trailing:
                                 HStack {
-            Button("Update") { validateEPC() }
+            Button(action: {
+                    validateEPC()
+                }) {
+                    Text("Update")
+                        .foregroundColor(.white) // Color del texto
+                            .padding(8)
+                            .background(Color.orange.opacity(0.8))
+                            .cornerRadius(6)
+                            .font(.system(size: 14, weight: .bold))
+                }
                 .alert(isPresented: $showDuplicatedEPCModal, content: {
                     Alert(
                         title: Text("New EPC already exists, please read a different one"),
@@ -79,7 +88,9 @@ struct AssetView: View {
                         customFieldsImagesData.append(imageObj)
                         
                     }
-                    cslvalues.isLoading = false
+                    DispatchQueue.main.async {
+                        cslvalues.isLoading = false
+                    }
                 }
             case .offline:
                 break 
@@ -151,7 +162,9 @@ struct AssetView: View {
                 } else {
                     showUpdateModal.toggle()
                 }
-                cslvalues.isLoading = false
+                DispatchQueue.main.async {
+                    cslvalues.isLoading = false
+                }
             }
         } else {
             showAssetPhoto = false
@@ -170,7 +183,9 @@ struct AssetView: View {
                         showUpdateModal.toggle()
                     }
                 }
-                cslvalues.isLoading = false
+                DispatchQueue.main.async {
+                    cslvalues.isLoading = false
+                }
             }
         }
     }
@@ -185,12 +200,16 @@ struct AssetView: View {
             case .failure(let error):
                 print("Error: ", error.localizedDescription)
             }
-            cslvalues.isLoading = false
+            DispatchQueue.main.async {
+                cslvalues.isLoading = false
+            }
         }
     }
     
     func validateEPC() {
-        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        DispatchQueue.main.async {
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        }
         if EPC != originalEPC {
             switch workModeManager.workMode {
             case .online:
@@ -325,14 +344,22 @@ struct AssetActions: View {
         HStack {
             Button("Asset Photo") {
                 showAssetPhoto.toggle()
-            }
+            }.foregroundColor(.white) // Color del texto
+                .padding(8)
+                .background(Color.blue.opacity(0.8)) // Fondo azul del botón
+                .cornerRadius(6)
+                .font(.system(size: 14, weight: .bold))
             .sheet(isPresented: $showAssetPhoto) {
                 AssetPhoto(imageSelected: $imageSelected, isNewImageSelected: $isNewImageSelected, showAssetPhoto: $showAssetPhoto)
             }
             Spacer()
             Button("Custom Fields") {
                 showCustomFields.toggle()
-            }
+            }.foregroundColor(.white) // Color del texto
+                .padding(8)
+                .background(Color.blue.opacity(0.8)) // Fondo azul del botón
+                .cornerRadius(6)
+                .font(.system(size: 14, weight: .bold))
             .sheet(isPresented: $showCustomFields) {
                 CustomFields(customFields: $customFields, customFieldsValues: $customFieldsValues, showCustomFields: $showCustomFields, fromModule: "assets", customFieldsImages: $customFieldsImages, customFieldsImagesData: $customFieldsImagesData)
             }
