@@ -40,9 +40,13 @@ struct Main: View {
                     Button(action: { sideMenuOpen.toggle() }) {
                         Image(systemName: "line.horizontal.3")
                             .imageScale(.large)
-                            .foregroundColor(.primary)
-                    }
-                }
+                            .padding(9)
+                            .background(Color.black.opacity(0.6))
+                                .foregroundColor(.white)
+                                .cornerRadius(6)
+                                .shadow(radius: 2)
+                    }.padding(.top, 20)
+                }  .padding(.trailing)
                 Spacer()
                 ScrollView(.vertical, showsIndicators: false) {
                     Dashboard(cslvalues: cslvalues, sideMenuOpen: $sideMenuOpen, isUserLoggedOut: $isUserLoggedOut)
@@ -71,17 +75,20 @@ struct Dashboard: View {
         VStack {
             HStack {
                 VStack(alignment: .leading) {
-                    Text("Inventory App")
+                    Text("TAGVENTORY APP")
                         .font(.title)
                         .fontWeight(.bold)
+                      
                         
-                    Text("DASHBOARD")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                    
-                    Text(cslvalues.appVersion)
-                        .foregroundColor(Color(.systemGray5))
-                        .padding(.trailing)
+                    HStack {
+                        Text("DASHBOARD")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+
+                        Text(cslvalues.appVersion)
+                            .foregroundColor(Color.gray.opacity(0.6))
+                            .padding(.trailing)
+                    }
                 }
                 Spacer()
             }

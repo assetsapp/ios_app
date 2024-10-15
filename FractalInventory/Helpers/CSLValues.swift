@@ -45,7 +45,7 @@ class CSLValues: ObservableObject {
         self.geigerValue = 0
         self.isLoading = false
         self.showNonConnected = false
-        self.appVersion = "v0.310322"
+        self.appVersion = "v1.6"
     }
     
     // Note: For RawRFID readings, this function/array is also used to store barcodes
