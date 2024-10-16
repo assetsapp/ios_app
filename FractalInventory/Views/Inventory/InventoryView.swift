@@ -13,7 +13,8 @@ enum InventoryType: String {
 }
 
 struct InventoryView: View {
-    
+    @State var isDummy: Bool = false
+    @State var cont: Int = 0
     @ObservedObject var cslvalues: CSLValues
     @State var assets: [AssetModel] = []
     @State var filterStatus: [String] = ["found", "missing", "external"]
@@ -40,6 +41,8 @@ struct InventoryView: View {
     @State var showResetModal: Bool = false
     @State var type: InventoryType = .root
     let workModeManager = WorkModeManager()
+    @StateObject var zebraSingleton: ZebraSingleton = ZebraSingleton.shared
+    @State var maxPowerLevel: Double = 30
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
     var body: some View {
@@ -56,7 +59,12 @@ struct InventoryView: View {
                                 Image(systemName: "chevron.\(showSession ? "up" : "down")")
                             }
                         }
-                        .padding(.top, 2)
+                        if isDummy {
+                            Button("Add EPC") {
+                                addEPC()
+                            }
+                            .padding(.top, 2)
+                        }
                         if showSession {
                             HStack {
                                 VStack(alignment: .leading) {
@@ -177,6 +185,11 @@ struct InventoryView: View {
             
             VStack {
                 VStack {
+                    if isDummy {
+                        Button("Add EPC") {
+                            addEPC()
+                        }
+                    }
                     HStack {
                         Text("RFID Antenna")
                             .fontWeight(.semibold)
@@ -189,14 +202,20 @@ struct InventoryView: View {
                     if showRFIDSection {
                         VStack {
                             VStack {
-                                Slider(value: $powerLevel, in: 0...30, step: 1)
+                                Slider(value: $powerLevel, in: 0...maxPowerLevel, step: 1)
                                     .accentColor(Color.green)
                                     .onChange(of: powerLevel, perform: { power in
-                                        CSLRfidAppEngine.shared().reader.selectAntennaPort(0)
-                                        CSLRfidAppEngine.shared().reader.setPower(power)
+                                        DispatchQueue.main.async {
+                                            Utils.updateAntennaPower(power: power)
+                                        }
                                     })
                                     .disabled(inventoryButton == "Stop")
                                 Text("Power Level: \(powerLevel, specifier: "%.0f")")
+                                Button(action: {
+                                    zebraSingleton.restartInventory(power: Int16(powerLevel))
+                                }) {
+                                    Text("Update Power")
+                                }
                             }
                             Toggle("\(inventoryButton) RFID:", isOn: $isInventoryStarted)
                                 .toggleStyle(SwitchToggleStyle(tint: .blue))
@@ -245,6 +264,17 @@ struct InventoryView: View {
         .onAppear {
             resetInventory()
             fetchInitialData()
+            cslvalues.readings = []
+            zebraSingleton.startInventory(power: 30)
+            zebraSingleton.onTagAdded = { tag in
+                if tag.epc.count == 24 {
+                    DispatchQueue.main.async {
+                        self.cslvalues.addEpc(reading: tag)
+                    }
+                }
+            }
+            let maxPower = zebraSingleton.getMaxPower()
+            maxPowerLevel = maxPower
         }
         .onDisappear {
             if inventorySession != "" {
@@ -294,7 +324,9 @@ struct InventoryView: View {
         case .online:
             ApiInventorySessions().getInventorySessionAssets(sessionId: inventorySession) { _assets in
                 self.assets = _assets
-                cslvalues.isLoading = false
+                DispatchQueue.main.async {
+                    cslvalues.isLoading = false
+                }
             }
         case .offline:
             DataManager().getInventorySession(by: inventorySession) { result in
@@ -307,7 +339,9 @@ struct InventoryView: View {
                     self.assets = []
                     print("Error: ", error.localizedDescription)
                 }
-                cslvalues.isLoading = false
+                DispatchQueue.main.async {
+                    cslvalues.isLoading = false
+                }
             }
         }
         
@@ -328,7 +362,9 @@ struct InventoryView: View {
                 case .failure(_ ):
                     break
                 }
-                cslvalues.isLoading = false
+                DispatchQueue.main.async {
+                    cslvalues.isLoading = false
+                }
             }
         case .offline:
             DataManager().getInventoryAssets(location: location, locationName: locationName, sessionId: inventorySession, inventoryName: inventoryName, type: type) { result in
@@ -339,9 +375,10 @@ struct InventoryView: View {
                     self.assets = []
                     print("Error: ", error.localizedDescription)
                 }
-                cslvalues.isLoading = false
+                DispatchQueue.main.async {
+                    cslvalues.isLoading = false
+                }
             }
-            break
         }
     }
     
@@ -439,6 +476,16 @@ struct InventoryView: View {
                     }
                 }
             }
+        }
+    }
+    
+    func addEPC() {
+        let array = ["057454000000000000006F23", "474D30304B0181021000234F", "057454000000000000007237"]
+        let epc = array[cont]
+        let epcModel = EpcModel(epc: epc, rssi: "", timestamp: Utils.getFullDate())
+        self.cslvalues.addEpc(reading: epcModel)
+        if cont < array.count - 1 {
+            cont += 1
         }
     }
     

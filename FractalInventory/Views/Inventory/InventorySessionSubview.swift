@@ -102,7 +102,9 @@ struct InventorySessionSubview: View {
                     case .failure(let error):
                         print(error.localizedDescription)
                     }
-                    cslvalues.isLoading = false
+                    DispatchQueue.main.async {
+                        cslvalues.isLoading = false
+                    }
                 }
             }
             isClosedSessionsFilter = false

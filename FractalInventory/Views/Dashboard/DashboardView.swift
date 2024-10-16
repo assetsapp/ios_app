@@ -8,13 +8,11 @@
 import SwiftUI
 
 struct DashboardView: View {
-    @ObservedObject var cslvalues: CSLValues
     @Binding var isUserLoggedOut: Bool
     
     var body: some View {
         NavigationView {
-            
-            Main(cslvalues: cslvalues, isUserLoggedOut: $isUserLoggedOut)
+            Main(isUserLoggedOut: $isUserLoggedOut)
                 .navigationBarTitle("Home")
                 .navigationBarHidden(true)
         }
@@ -30,8 +28,7 @@ struct DashboardView: View {
 }
 
 struct Main: View {
-    
-    @ObservedObject var cslvalues: CSLValues
+    @EnvironmentObject var cslvalues: CSLValues
     @State var sideMenuOpen: Bool = false
     @Binding var isUserLoggedOut: Bool
     
@@ -43,9 +40,13 @@ struct Main: View {
                     Button(action: { sideMenuOpen.toggle() }) {
                         Image(systemName: "line.horizontal.3")
                             .imageScale(.large)
-                            .foregroundColor(.primary)
-                    }
-                }
+                            .padding(9)
+                            .background(Color.black.opacity(0.6))
+                                .foregroundColor(.white)
+                                .cornerRadius(6)
+                                .shadow(radius: 2)
+                    }.padding(.top, 20)
+                }  .padding(.trailing)
                 Spacer()
                 ScrollView(.vertical, showsIndicators: false) {
                     Dashboard(cslvalues: cslvalues, sideMenuOpen: $sideMenuOpen, isUserLoggedOut: $isUserLoggedOut)
@@ -74,17 +75,20 @@ struct Dashboard: View {
         VStack {
             HStack {
                 VStack(alignment: .leading) {
-                    Text("Inventory App")
+                    Text("TAGVENTORY APP")
                         .font(.title)
                         .fontWeight(.bold)
+                      
                         
-                    Text("DASHBOARD")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                    
-                    Text(cslvalues.appVersion)
-                        .foregroundColor(Color(.systemGray5))
-                        .padding(.trailing)
+                    HStack {
+                        Text("DASHBOARD")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+
+                        Text(cslvalues.appVersion)
+                            .foregroundColor(Color.gray.opacity(0.6))
+                            .padding(.trailing)
+                    }
                 }
                 Spacer()
             }
@@ -138,7 +142,7 @@ struct Dashboard: View {
                     sideMenuOpen = false
                 })
                 
-                NavigationLink(destination: SettingsView(cslvalues: cslvalues, isUserLoggedOut: $isUserLoggedOut)) {
+                NavigationLink(destination: SettingsView(cslvalues: cslvalues,  isUserLoggedOut: $isUserLoggedOut)) {
                     Card(caption: "6", title: "Settings", subTitle: "Configurations", icon: "slider.horizontal.3", colors: [Color.pink, Color.purple])
                 }
                 .simultaneousGesture(TapGesture().onEnded{
@@ -208,7 +212,7 @@ struct Menu: View {
     @AppStorage(Settings.userNameKey) var userName = "Guest"
     @AppStorage(Settings.userLastNameKey) var userLastName = "User"
     @AppStorage(Settings.userFileExt) var userFileExt = ""
-    @AppStorage(Settings.apiHostKey) var apiHost = "http://159.203.41.87:3001"
+    @AppStorage(Settings.apiHostKey) var apiHost = Constants.apiHost
     
     var body: some View {
         VStack {
@@ -369,6 +373,6 @@ struct Row: View {
 
 struct SideMenu_Previews: PreviewProvider {
     static var previews: some View {
-        DashboardView(cslvalues: CSLValues(), isUserLoggedOut: .constant(false))
+        DashboardView(isUserLoggedOut: .constant(false))
     }
 }

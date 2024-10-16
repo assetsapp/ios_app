@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "inventory.png",
+      "filename" : "logo-htk.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "logo-htk 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "logo-htk 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

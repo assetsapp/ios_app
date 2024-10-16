@@ -21,16 +21,23 @@ struct CustomFields: View {
     @Binding var customFieldsImages: [AssetPhoto]
     @Binding var customFieldsImagesData: [ImageCustomField]
     @ObservedObject var webViewStateModel: WebViewStateModel = WebViewStateModel()
-    @AppStorage(Settings.apiHostKey) var apiHost = "http://159.203.41.87:3001"
+    @AppStorage(Settings.apiHostKey) var apiHost = Constants.apiHost
     @State var fieldSelectedIndex = -1
     
     var body: some View {
         VStack {
             HStack {
                 Spacer()
-                Button("Close") {
+                Button("Save data") {
                     showCustomFields.toggle()
-                }
+                }.buttonStyle(PlainButtonStyle())
+                    .buttonStyle(PlainButtonStyle())
+                    .padding(8)
+                    .background(Color.green.opacity(0.8))
+                    .foregroundColor(.white)
+                    .cornerRadius(6)
+                    .shadow(radius: 2)
+                    .font(.system(size: 14, weight: .bold))
             }.padding(.trailing)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {

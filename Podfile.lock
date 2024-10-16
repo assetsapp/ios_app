@@ -1,4 +1,5 @@
 PODS:
+  - ConnectionLayer (1.0.0)
   - MQTTClient (0.15.3):
     - MQTTClient/Core (= 0.15.3)
   - MQTTClient/Core (0.15.3):
@@ -9,15 +10,18 @@ PODS:
   - MQTTClient/Min (0.15.3)
 
 DEPENDENCIES:
+  - ConnectionLayer
   - MQTTClient
 
 SPEC REPOS:
   trunk:
+    - ConnectionLayer
     - MQTTClient
 
 SPEC CHECKSUMS:
+  ConnectionLayer: 9f8af1c6893a63af9dfa865b5127ad3037ea1d41
   MQTTClient: 0dfa04e789479c2e461786464969895c1fcb0875
 
-PODFILE CHECKSUM: 75e24e301a10a529756b5d45765502e11efcc040
+PODFILE CHECKSUM: 05cf38b0e5cdf66a416ffec76dcedb1a4b03ccb8
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.15.2

@@ -23,11 +23,21 @@ struct LogInView: View {
                     .foregroundColor(Color.white.opacity(0.2))
                     .padding(.leading)
                 Spacer()
-                Image(systemName: "slider.horizontal.3")
-                    .foregroundColor(.white)
                 Button(action: { showSettings.toggle() }) {
-                    Text("Settings")
-                }
+                    HStack {
+                        Image(systemName: "slider.horizontal.3")
+                            .font(.system(size: 14))
+                        Text("Settings")
+                    }
+                            .buttonStyle(PlainButtonStyle())
+                            .buttonStyle(PlainButtonStyle())
+                            .padding(8)
+                            .background(Color.black.opacity(0.5))
+                            .foregroundColor(.white)
+                            .cornerRadius(6)
+                            .shadow(radius: 2)
+                            .font(.system(size: 14))
+                    }
                 .foregroundColor(.white)
                 .padding(.trailing)
                 .sheet(isPresented: $showSettings) {
@@ -35,8 +45,15 @@ struct LogInView: View {
                         HStack {
                             Spacer()
                             Button(action: { showSettings = false }) {
-                                Text("Close")
-                            }
+                                Text(" Save ")
+                            }.buttonStyle(PlainButtonStyle())
+                                .buttonStyle(PlainButtonStyle())
+                                .padding(8)
+                                .background(Color.green.opacity(0.8))
+                                .foregroundColor(.white)
+                                .cornerRadius(6)
+                                .shadow(radius: 2)
+                                .font(.system(size: 14))
                             .padding()
                         }
                         Form {
@@ -65,7 +82,7 @@ struct LogoLogIn: View {
     var body: some View {
         Image("inventory")
             .resizable()
-            .cornerRadius(35)
+            .cornerRadius(0)
             .aspectRatio(contentMode: .fit)
             .frame(width: 250)
             .padding(.horizontal, 35)

@@ -79,9 +79,13 @@ struct EmployeeView: View {
             .navigationBarTitle("Employees (\(getFilteredEmployees().count))")
             .navigationBarItems(trailing:
                                     HStack {
-                Button("Add") {
+                Button("Create") {
                     showAddEmployee.toggle()
-                }
+                }.foregroundColor(.white) // Color del texto
+                    .padding(6)
+                    .background(Color.blue.opacity(0.8))
+                    .cornerRadius(6)
+                    .font(.system(size: 14, weight: .bold))
                 .sheet(isPresented: $showAddEmployee) {
                     NewEmployee(cslvalues: cslvalues, showModal: $showAddEmployee)
                 }
@@ -189,6 +193,10 @@ struct EmployeeSearchBox: View {
                     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 }) {
                     Text("Cancel")
+                        .foregroundColor(.white) // Color del texto
+                            .padding(7)
+                            .background(Color.red.opacity(0.8))
+                            .cornerRadius(6)
                         .padding(.trailing)
                         .padding(.leading, 0)
                 }

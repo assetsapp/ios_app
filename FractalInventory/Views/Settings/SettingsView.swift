@@ -19,8 +19,8 @@ struct Settings {
 
 struct SettingsView: View {
     @ObservedObject var cslvalues: CSLValues
+    @StateObject var zebraSingleton = ZebraSingleton.shared
     @Binding var isUserLoggedOut: Bool
-    
     
     var body: some View {
         VStack {
@@ -29,10 +29,12 @@ struct SettingsView: View {
         }
         .navigationBarTitle("Settings", displayMode: .inline)
         .navigationViewStyle(StackNavigationViewStyle())
+        .environmentObject(zebraSingleton)
     }
 }
 
 struct SettingsViewContent: View {
+    @EnvironmentObject var zebraSingleton: ZebraSingleton
     @ObservedObject var cslvalues: CSLValues
     @State var deviceFoundCount: Int = -1
     @State var deviceListName: [String] = []
@@ -42,7 +44,7 @@ struct SettingsViewContent: View {
     @State var startScanning: Bool = false
     @State var isDeviceConnected: Bool = false
     @State var connectedDeviceName: String = ""
-    @State var batteryLevel: String = ""
+    @State var batteryLevel: String = "" //rename rfid device
     @State var deviceSerialNumber: String = ""
     @State var disconnectDevice: Bool = false
     @State var presentSuccessOfflineAlert = false
@@ -58,7 +60,9 @@ struct SettingsViewContent: View {
             workingModeIsOffline = workingMode == .offline
         }
     }
-    
+    @State var startScanningZebra: Bool = false
+    @State var connectZebraToReader: Bool = false
+    @State var disconnectZebraDevice: Bool = false
     
     let timer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
     let devName = "CS108ReaderF76D81"
@@ -74,7 +78,12 @@ struct SettingsViewContent: View {
                 Section(header: Text("CSL RFID Handheld scan")) {
                     Toggle("Start Device Scanning", isOn: $startScanning)
                         .onChange(of: startScanning, perform: { scan in
-                            if (scan) {
+                            if zebraSingleton.isDeviceConnectedZebra {
+                                print("El lector Zebra ya está conectado. No se puede iniciar el escaneo CSL.")
+                                startScanning = false
+                                return
+                            }
+                            if scan {
                                 CSLHelper.deviceScanStart()
                             } else {
                                 CSLHelper.deviceScanStop()
@@ -145,6 +154,88 @@ struct SettingsViewContent: View {
                         )
                     }
                 }
+                /// Zebra section
+            Section(header: Text("ZEBRA RFID Handheld scan")) {
+                Toggle("Start Device Scanning", isOn: $startScanningZebra)
+                    .onChange(of: startScanningZebra, perform: { scan in
+                        if isDeviceConnected {
+                            print("El lector CSL ya está conectado. No se puede iniciar el escaneo Zebra.")
+                            startScanningZebra = false
+                            return
+                        }
+                        if scan {
+                            startScannigZebra()
+                        } else {
+                            stopScanningZebra()
+                            zebraSingleton.listDevices = []
+                        }
+                    })
+           
+                    if (startScanningZebra) {
+                        Text("Bellow will appear available devices")
+                        List {
+                            ForEach(Array(zebraSingleton.listDevices.enumerated()), id: \.offset) { index, device in
+                                Button(action: {
+                                    zebraSingleton.selectedZebraDevice = device
+                                    // if device.type == .available {
+                                        connectZebraToReader = true
+                                    // }
+                                }) {
+                                    Text("Device Name: \(device.name) - \(device.type.toString)")
+                                        .padding()
+                                }
+                            }
+                        }
+                    }
+                }
+                .disabled(zebraSingleton.isDeviceConnectedZebra)
+                .alert(isPresented: $connectZebraToReader ) {
+                    Alert(
+                        title: Text("Connect to reader"),
+                        message: Text("You'll connect to \(zebraSingleton.selectedZebraDevice.id)"),
+                        primaryButton: .default(Text("OK")) {
+                            startScanningZebra = false
+                            zebraSingleton.establishCommunication(readerID: zebraSingleton.selectedZebraDevice.id)
+                        },
+                        secondaryButton: .default(Text("Cancel")) {
+                            startScanningZebra = false
+                            zebraSingleton.selectedZebraDevice = .empty
+                            connectZebraToReader = false
+                        }
+                    )
+                }
+                .onChange(of: zebraSingleton.isDeviceConnectedZebra, perform: { value in
+                    if value {
+                       
+                    }
+                })
+                
+                if (zebraSingleton.isDeviceConnectedZebra) {
+                    Section(header: Text("Zebra RFID Handle connected")) {
+                        Text("Device: \(ZebraSingleton.shared.selectedZebraDevice.name)")
+                        Text("SN: \(ZebraSingleton.shared.serialNumber)")
+                        Text("Battery: \(ZebraSingleton.shared.batteryLevel)")
+                        HStack {
+                            Spacer()
+                            Button(action: { disconnectZebraDevice = true }) {
+                                Text("Disconnect Device")
+                                    .foregroundColor(.red)
+                            }
+                        }
+                    }
+                    .alert(isPresented: $disconnectZebraDevice) {
+                        Alert(
+                            title: Text("Disconnect from reader"),
+                            message: Text("You'll disconnect from \(ZebraSingleton.shared.selectedZebraDevice.name) "),
+                            primaryButton: .default(Text("OK")) {
+                                ZebraSingleton.shared.endCommunication(readerID: ZebraSingleton.shared.selectedZebraDevice.id)
+                            },
+                            secondaryButton: .default(Text("Cancel")) {
+                                disconnectDevice = false
+                            }
+                        )
+                    }
+                }
                 
                 // Work mode section
                 Section(header: Text("working mode")) {
@@ -168,7 +259,6 @@ struct SettingsViewContent: View {
                     if workingModeIsOffline {
                         Text("Last update:  \(workModeManager.offlineStartDateFormatted)")
                         Text("Saved assets:  \(assetsSaved)")
-                        
                     }
                 }            }
         }.alert(item: $error, content: { error in
@@ -229,7 +319,11 @@ struct SettingsViewContent: View {
                 getAssetsCount()
             }
     }
-    
+    func startScannigZebra() {
+        ZebraSingleton.shared.setupSDK()
+    }
+    func stopScanningZebra() {
+    }
     func getDeviceInfo() {
         deviceFoundCount = CSLHelper.getDeviceCount()
         deviceListName = CSLHelper.getDeviceListNames()
@@ -260,18 +354,19 @@ struct SettingsViewContent: View {
     
     private func startOfflineWorkingMode() {
         cslvalues.isLoading = true
-        workModeManager.startOfflineMode { result in
-            cslvalues.isLoading = false
+        workModeManager.startOfflineMode { result in 
             switch result {
             case .success(let workMode):
                 presentSuccessOfflineAlert = false
                 presentSuccessOfflineAlert = true
                 workingMode = workMode
+                cslvalues.isLoading = false
             case .failure(let error):
                 print("****\n-->startOfflineWorkingMode error\n**** ")
                 workingMode = .online
                 self.error = error
                 self.isToggleForAError = true
+                cslvalues.isLoading = false
             }
         }
     }

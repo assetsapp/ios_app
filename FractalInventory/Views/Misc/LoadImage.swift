@@ -14,7 +14,7 @@ struct LoadImage: View {
     var sizeFraction: CGFloat = 5
     var applyFrame: Bool = true
     var placeHolderImage: Image = Image(systemName: "photo")
-    @AppStorage(Settings.apiHostKey) var apiHost = "http://159.203.41.87:3001"
+    @AppStorage(Settings.apiHostKey) var apiHost = Constants.apiHost
 
     var body: some View {
         if applyFrame {

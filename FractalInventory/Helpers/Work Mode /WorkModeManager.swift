@@ -10,14 +10,11 @@ import CloudKit
 import WebKit
 
 class WorkModeManager {
-    
-    init() { }
-    
     func startOfflineMode(completion: @escaping(Result<WorkMode, WMError>) -> Void) {
         let dispatchGroup = DispatchGroup()
         var errors: [WMError] = []
         
-        var inventories: [InventoryDataModel]?
+        //var inventories: [InventoryDataModel]?
         var employees: [EmployeeModel]?
         
         dispatchGroup.enter()
@@ -30,7 +27,7 @@ class WorkModeManager {
             }
             dispatchGroup.leave()
         }
-        
+        /*
         dispatchGroup.enter()
         fetchInventories { result in
             switch result {
@@ -41,7 +38,7 @@ class WorkModeManager {
                 errors.append(WMError.inventoriesCouldNotBeDownloaded)
             }
             dispatchGroup.leave()
-        }
+        } */
         
         dispatchGroup.enter()
         fetchLocations { result in
@@ -87,9 +84,16 @@ class WorkModeManager {
             dispatchGroup.leave()
         }
         
-        dispatchGroup.notify(queue: .main) {
-            if inventories != nil || employees != nil {
-                self.processSync(inventories: inventories, employees: employees, errors: errors, completion: completion)
+        dispatchGroup.notify(queue: .main) { [weak self] in
+            guard let self = self else {
+                return
+            }
+            //if inventories != nil || employees != nil {
+            if employees != nil {
+                // En este punto ya tenemos los assets guardados
+                // Y los Inventories aun no sean guardado
+                //self.processSync(inventories: inventories, employees: employees, errors: errors, completion: completion)
+                self.processSync(inventories: nil, employees: employees, errors: errors, completion: completion)
             } else {
                 self.processOfflineWorkMode(errors: errors, completion: completion)
             }
@@ -107,7 +111,6 @@ class WorkModeManager {
                 switch result {
                 case .success(let inv):
                     print("<- Termino de Guardar los inventarios en BD:", inv.count)
-                    break
                 case .failure(let error):
                     print("<- Error de Guardar los inventarios en BD:", error.localizedDescription)
                     processSyncErrors.append(.inventoriesCouldNotBeDownloaded)
@@ -155,10 +158,16 @@ class WorkModeManager {
         var errors: [WMError] = []
         
         dispatchGroup.enter()
-        DataManager().getAssetsToSync { result in
+        DataManager().getAssetsToSync { [weak self] result in
+            guard let self = self else {
+                return
+            }
             switch result {
             case .success(let assets):
-                self.starSync(assets: assets) { result in
+                self.startSync(assets: assets) { [weak self] result in
+                    guard let self = self else {
+                        return
+                    }
                     switch result {
                     case.success(let savedAssetsR):
                         print("Termino de sincronizar los Assets:", savedAssetsR.count)
@@ -181,17 +190,23 @@ class WorkModeManager {
         }
         
         dispatchGroup.enter()
-        DataManager().getAssetsToUpdate { result in
+        DataManager().getAssetsToUpdate { [weak self] result in
+            guard let self = self else {
+                return
+            }
             switch result {
             case .success(let assets):
                 print("Asses para actualizar \(assets.count)")
-                self.starUpdate(assets: assets) { result in
+                self.startUpdate(assets: assets) { [weak self] result in
+                    guard let self = self else {
+                        return
+                    }
                     switch result {
                     case.success(let updatedAssets):
                         print("Termino de actualizar los Assets:", updatedAssets.count)
                     case .failure(let error):
                         switch error {
-                        case .failedToSyncAssets(_ ,let  savedAssets):
+                        case .failedToSyncAssets(_ ,let savedAssets):
                             self.deleteAssets(savedAssets)
                         default:
                             break
@@ -205,27 +220,26 @@ class WorkModeManager {
                 dispatchGroup.leave()
             }
         }
-        
-        dispatchGroup.notify(queue: .main) {
-            self.continueStartOnlineMode(savedAssets, and: errors, completion: completion)
+
+        dispatchGroup.notify(queue: .main) { [weak self] in
+            self?.continueStartOnlineMode(savedAssets, and: errors, completion: completion)
         }
     }
     
     private func continueStartOnlineMode(_ savedAssets: [Asset], and lastErrors: [WMError] ,completion: @escaping(Result<(workMode: WorkMode, savedAssets: [Asset]), WMError>) -> Void) {
         let dispatchGroup = DispatchGroup()
         var errors: [WMError] = lastErrors
-        var savedEmployees: [EmployeeModel] = []
-    
+        //var savedEmployees: [EmployeeModel] = []
         // empleados
         dispatchGroup.enter()
-        DataManager().getEmployeesToSync { result in
+        DataManager().getEmployeesToSync { [weak self] result in
             switch result {
             case .success(let employees):
-                self.starSync(employees: employees) { result in
+                self?.startSync(employees: employees) { result in
                     switch result {
                     case .success(let _savedEmployees):
                         print("Termino de actualizar los Empleados:", _savedEmployees.count)
-                        savedEmployees = _savedEmployees
+                        //savedEmployees = _savedEmployees
                     case .failure(let error):
                         switch error {
                         case .failedToSyncEmployees(_ , _):
@@ -245,10 +259,10 @@ class WorkModeManager {
         
         // empleados
         dispatchGroup.enter()
-        DataManager().getEmployeesToUpdate { result in
+        DataManager().getEmployeesToUpdate { [weak self] result in
             switch result {
             case .success(let employees):
-                self.startUpdateSync(employees: employees) { result in
+                self?.startUpdateSync(employees: employees) { result in
                     switch result {
                     case .success(let savedEmployees):
                         print("Termino de actualizar los Empleados asignados:", savedEmployees.count)
@@ -271,10 +285,10 @@ class WorkModeManager {
         
         //inventarios
         dispatchGroup.enter()
-        DataManager().getInventorySessionToSync { result in
+        DataManager().getInventorySessionToSync { [weak self] result in
             switch result {
             case .success(let inventorySessions):
-                self.starSync(inventorySessions: inventorySessions) { result in
+                self?.starSync(inventorySessions: inventorySessions) { result in
                     switch result {
                     case .success(let savedInventories):
                         print("Termino de actualizar los Inventarios:", savedInventories.count)
@@ -295,7 +309,10 @@ class WorkModeManager {
             }
         }
         
-        dispatchGroup.notify(queue: .main) {
+        dispatchGroup.notify(queue: .main) { [weak self] in
+            guard let self = self else {
+                return
+            }
             if errors.isEmpty {
                 self.deleteAllData()
                 self.workMode = .online
@@ -324,10 +341,14 @@ class WorkModeManager {
     }
     
     func tag(asset reference: ReferenceModel, location: LocationModel, locationPath: String, epc: [String], userId: String, serialNumber: String, tabs: [[String: Any]], customFields: [[String: Any]], customFieldsValues: [String], employee: EmployeeModel, image: Data?, completion: @escaping(Result<Asset, Error>) -> Void) {
+        // Concatenar los elementos del array EPC en una sola cadena
+        let epcString = epc.joined()
+        print("tag EPC: \(epcString)") // Log
+        // Llamar a la función tag de DataManager para guardar el activo
         DataManager().tag(asset: reference,
                           location: location,
                           locationPath: locationPath,
-                          epc: epc.first ?? "",
+                          epc: epcString,
                           userId: userId,
                           serialNumber: serialNumber,
                           tabs: tabs,
@@ -336,7 +357,6 @@ class WorkModeManager {
                           employee: employee,
                           image: image,
                           completion: completion)
-        
     }
 }
 
@@ -422,13 +442,14 @@ extension WorkModeManager {
 }
 
 extension WorkModeManager {
-    private func starSync(assets: [Asset], completion: @escaping(Result<[Asset], WMError>) -> Void) {
+    private func startSync(assets: [Asset], completion: @escaping(Result<[Asset], WMError>) -> Void) {
         let dispatchGroup = DispatchGroup()
         var savedAssets: [Asset] = []
         var errors:[WMError] = []
         
         for asset in assets {
             dispatchGroup.enter()
+            print("Sincronizando asset con EPC: \(asset.epc ?? "nil")") // Agrega este log
             if let imageData = asset.image {
                 let image = UIImage(data: imageData)!
                 sync(image: image, asset: asset) { result in
@@ -473,7 +494,7 @@ extension WorkModeManager {
         }
     }
     
-    private func starUpdate(assets: [Asset], completion: @escaping(Result<[Asset], WMError>) -> Void) {
+    private func startUpdate(assets: [Asset], completion: @escaping(Result<[Asset], WMError>) -> Void) {
         let dispatchGroup = DispatchGroup()
         var savedAssets: [Asset] = []
         var errors:[WMError] = []
@@ -526,7 +547,7 @@ extension WorkModeManager {
         }
     }
     
-    private func starSync(employees: [EmployeeModel], completion: @escaping(Result<[EmployeeModel], WMError>) -> Void) {
+    private func startSync(employees: [EmployeeModel], completion: @escaping(Result<[EmployeeModel], WMError>) -> Void) {
         let dispatchGroup = DispatchGroup()
         var savedEmployees: [EmployeeModel] = []
         var errors:[WMError] = []
@@ -607,7 +628,7 @@ extension WorkModeManager {
         
         for session in inventorySessions {
             dispatchGroup.enter()
-            print("starSync inventorySession: \(session.identifier), count: \(session.assets?.count)")
+            print("starSync inventorySession: \(session.identifier ?? ""), count: \(session.assets?.count ?? -1)")
             let inventorySessionFiltered = InventoryDataModel(inventorySession: session)
             sync(inventorySession: session) { result in
                 switch result {
@@ -667,7 +688,18 @@ extension WorkModeManager {
     }
     
     private func sync(asset: Asset, completion: @escaping(Result<[SavedAsset], Error>) -> Void) {
-        ApiReferences().postAssets(params: convert(asset: asset), completion: completion)
+        let params = convert(asset: asset)
+        print("sync params: \(params)") // Log
+        ApiReferences().postAssets(params: params) { result in
+            switch result {
+            case .success(let savedAssets):
+                print("sync success: \(savedAssets)") // Log
+                completion(.success(savedAssets))
+            case .failure(let error):
+                print("sync error: \(error)") // Log
+                completion(.failure(error))
+            }
+        }
     }
     
     private func sync(employee: EmployeeModel, completion: @escaping(Result<EmployeeModel, Error>) -> Void) {
@@ -820,6 +852,7 @@ extension WorkModeManager {
             "assigned": asset.assigned ?? "",
             "assignedTo": asset.assignedTo ?? ""
         ]
+        print("convert params: \(params)") // Log
         return params
     }
     

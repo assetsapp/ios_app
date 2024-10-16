@@ -9,6 +9,7 @@ import SwiftUI
 
 struct IdentifyView: View {
     @ObservedObject var cslvalues: CSLValues
+    @StateObject var zebraSingleton: ZebraSingleton = ZebraSingleton.shared
     @State private var inventoryButton: String = "Start"
     @State private var isInventoryStarted: Bool = false
     @State private var barcodeMode: Bool = false
@@ -16,9 +17,18 @@ struct IdentifyView: View {
     @State var showFirstReadModal: Bool = false
     
     var body: some View {
-        
         VStack {
-            IdentifyReadings(cslvalues: cslvalues, isInventoryStarted: $isInventoryStarted, inventoryButton: $inventoryButton, barcodeMode: $barcodeMode, _onInvetory: onInventory)
+            IdentifyReadings(
+                cslvalues: cslvalues,
+                isTriggerApplied: cslvalues.isTriggerApplied,
+                isInventoryStarted: $isInventoryStarted,
+                inventoryButton: $inventoryButton,
+                barcodeMode: $barcodeMode,
+                _onInvetory: onInventory,
+                onClear: {
+                    CSLHelper.onClear(cslvalues: cslvalues)
+                }
+            )
             
             NavigationLink(destination: ValidatedView(cslvalues: cslvalues), isActive: $navigateToValidateView) {
                 EmptyView()
@@ -27,6 +37,11 @@ struct IdentifyView: View {
             Spacer()
         }
         .onAppear {
+            zebraSingleton.onTagAdded = { tag in
+                if tag.epc.count == 24 {
+                    self.cslvalues.addEpc(reading: tag)
+                }
+            }
         }
         .onChange(of: cslvalues.isTriggerApplied) { isTriggerApplied in
             print("TRIGGER IN INVENTORY!!!!! \(String(isTriggerApplied))")
@@ -52,8 +67,13 @@ struct IdentifyView: View {
                     dismissButton: .cancel(Text("OK"), action: {})
                 )
             })
-        }
+        }.foregroundColor(.white) // Color del texto
+            .padding(8)
+            .background(Color.orange.opacity(0.8))
+            .cornerRadius(6)
+            .font(.system(size: 14, weight: .bold))
         )
+        .environmentObject(zebraSingleton)
         
     }
     
@@ -85,15 +105,18 @@ struct IdentifyView: View {
         }
     }
 }
-
 struct IdentifyReadings: View {
+    @EnvironmentObject var zebraSingleton: ZebraSingleton
     @ObservedObject var cslvalues: CSLValues
+    let isTriggerApplied: Bool
     @Binding var isInventoryStarted: Bool
     @Binding var inventoryButton: String
     @Binding var barcodeMode: Bool
     @State var powerLevel: Double = 30
+    @State var maxPowerLevel: Double = 30
     var _onInvetory: () -> Void
-    var epclist: EpcsArray = EpcsArray()
+    // var epclist: EpcsArray = EpcsArray()
+    let onClear: (() -> Void)
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -113,30 +136,42 @@ struct IdentifyReadings: View {
                     .onChange(of: isInventoryStarted, perform: { scan in
                         _onInvetory()
                     })
-                    .disabled(cslvalues.isTriggerApplied)
+                    .disabled(isTriggerApplied)
                 VStack {
-                    Slider(value: $powerLevel, in: 0...30, step: 1)
+                    Slider(value: $powerLevel, in: 0...maxPowerLevel, step: 1)
                         .accentColor(Color.green)
                         .onChange(of: powerLevel, perform: { power in
-                            CSLRfidAppEngine.shared().reader.selectAntennaPort(0)
-                            CSLRfidAppEngine.shared().reader.setPower(power)
+                            Utils.updateAntennaPower(power: power)
                         })
                         .disabled(inventoryButton == "Stop")
                     Text("Power Level: \(powerLevel, specifier: "%.0f")")
+                    Button(action: {
+                        zebraSingleton.restartInventory(power: Int16(powerLevel))
+                    }) {
+                        Text("Update Power")
+                    }
                 }
                 HStack {
-                    Button(action: { CSLHelper.onClear(cslvalues: cslvalues) }) {
+                    Button(action: onClear) {
                         Text("Clear")
-                    }
+                    }.foregroundColor(.white) // Color del texto
+                        .padding(8)
+                        .background(Color.red.opacity(0.8))
+                        .cornerRadius(6)
+                        .font(.system(size: 14, weight: .bold))
                     Spacer()
                     Text("Total: \(cslvalues.readings.count)")
                 }
                 .padding(.top)
                 ScrollView {
-                    ForEach(cslvalues.readings, id: \.self) { tag in
-                        HStack {
-                            IdentifyReadingSubview(cslvalues: cslvalues, reading: EpcModel(epc: tag.epc, rssi: tag.rssi, timestamp: tag.timestamp))
-                            Spacer()
+                    LazyVStack {
+                        ForEach(cslvalues.readings, id: \.self) { tag in
+                            HStack {
+                                IdentifyReadingSubview(reading: tag, remove: {
+                                    cslvalues.removeEpc(epc: tag.epc)
+                                })
+                                Spacer()
+                            }
                         }
                     }
                 }
@@ -149,12 +184,16 @@ struct IdentifyReadings: View {
             .background(Color(.systemGray6))
             .cornerRadius(10)
         }
+        .onAppear {
+            let maxPower = zebraSingleton.getMaxPower()
+            powerLevel = maxPower
+            maxPowerLevel = maxPower
+            zebraSingleton.startInventory(power: Int16(maxPower))
+        }
         .padding(.horizontal, 40)
         .padding(.top)
     }
 }
-
-
 struct IdentifyView_Previews: PreviewProvider {
     static var previews: some View {
         IdentifyView(cslvalues: CSLValues())

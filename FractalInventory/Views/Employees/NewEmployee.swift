@@ -28,11 +28,20 @@ struct NewEmployee: View {
             HStack {
                 Button("Save") {
                     onSave()
-                }
+                }.foregroundColor(.white) // Color del texto
+                    .padding(8)
+                    .background(Color.green.opacity(0.8))
+                    .cornerRadius(6)
+                    .font(.system(size: 14, weight: .bold))
                 Spacer()
-                Button("Close") {
+                Button("Cancel") {
                     showModal.toggle()
                 }
+                .foregroundColor(.white) // Color del texto
+                    .padding(8)
+                    .background(Color.red.opacity(0.8))
+                    .cornerRadius(6)
+                    .font(.system(size: 14, weight: .bold))
             }.padding()
             
             ScrollView {

@@ -31,7 +31,10 @@ struct TaggingView: View {
     @State var isTryingSaveEmptyPresent: Bool = false
     @State var savedAssetsCount: Int = 0
     let workModeManager = WorkModeManager()
+    @StateObject var zebraSingleton = ZebraSingleton.shared
+    @State private var errorMessage: String = ""
     
+
     @State var imageSelected: UIImage = UIImage(systemName: "photo")!
     @State var isNewImageSelected: Bool = false
     
@@ -39,9 +42,29 @@ struct TaggingView: View {
     
     var body: some View {
         VStack {
+            if !errorMessage.isEmpty {
+                HStack {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundColor(.white)
+                        .padding(.trailing, 5)
+                    
+                    Text(errorMessage)
+                        .foregroundColor(.white)
+                        .font(.headline)
+                        .lineLimit(nil)
+                        .multilineTextAlignment(.leading)
+                }
+                .padding()
+                .background(Color.red)
+                .cornerRadius(8)
+                .shadow(color: Color.red.opacity(0.6), radius: 5, x: 0, y: 5)
+                .padding(.horizontal, 16)
+            }
             ScrollView(.vertical, showsIndicators: false) {
                 CardView(cslvalues: cslvalues, reference: $reference, location: $location, isSingle: $isSingle, inventoryButton: $inventoryButton, isInventoryStarted: $isInventoryStarted, barcodeMode: $barcodeMode, customFields: $customFields, _onInvetory: onInventory, validateEPC: validateEPC, customFieldsValues: $customFieldsValues, serialNumber: $serialNumber, locationPath: $locationPath, isRemoveExistingModalResult: $isRemoveExistingModalResult, removedExistingCount: $removedExistingCount, isSavedAssetsPresent: $isSavedAssetsPresent, savedAssetsCount: $savedAssetsCount, imageSelected: $imageSelected, isNewImageSelected: $isNewImageSelected, assignedEmployee: $assignedEmployee)
             }
+           
+                
         }
         .onAppear {
             if CSLHelper.isDeviceConnected() {
@@ -60,6 +83,13 @@ struct TaggingView: View {
             case .offline:
                 break
             }
+            cslvalues.readings = []
+            zebraSingleton.startInventory(power: 10)
+            zebraSingleton.onTagAdded = { tag in
+                if tag.epc.count == 24 {
+                    self.cslvalues.addEpc(reading: tag)
+                }
+            }
         }
         .onDisappear {
             CSLHelper.onExitInventory()
@@ -73,28 +103,30 @@ struct TaggingView: View {
         .navigationBarTitle("Tagging")
         .navigationViewStyle(StackNavigationViewStyle())
         .navigationBarItems(trailing:
-                                HStack {
-            Button("Save") { isSaveModalPresent = true }
-            .padding(.leading, 10)
-            .alert(isPresented: $isSaveModalPresent, content: {
-                if cslvalues.readings.count > 0 {
-                    return Alert(
-                        title: Text("Save Asset"),
-                        message: Text("Do you want to proceed?"),
-                        primaryButton: .default(Text("OK"), action: { onSave(epcsarray: cslvalues.readings) }),
-                        secondaryButton: .cancel(Text("Cancel"))
-                    )
-                } else {
-                    return Alert(
-                        title: Text("First read at least one EPC"),
-                        dismissButton: .cancel(Text("OK"), action: { })
-                    )
-                }
-            })
-        }
+            HStack {
+                Button("Save") { isSaveModalPresent = true }
+                .padding(.leading, 10)
+                .alert(isPresented: $isSaveModalPresent, content: {
+                    if cslvalues.readings.count > 0 {
+                        return Alert(
+                            title: Text("Save Asset"),
+                            message: Text("Do you want to proceed?"),
+                            primaryButton: .default(Text("OK"), action: { onSave(epcsarray: cslvalues.readings) }),
+                            secondaryButton: .cancel(Text("Cancel"))
+                        )
+                    } else {
+                        return Alert(
+                            title: Text("Error: Empty or Duplicate EPC"),
+                            dismissButton: .cancel(Text("OK"), action: { })
+                        )
+                    }
+                })
+            }
         )
+        
+
+        .environmentObject(zebraSingleton)
     }
-    
     func onInventory() {
         if inventoryButton == "Start" {
             if !CSLHelper.isDeviceConnected() {
@@ -187,7 +219,7 @@ struct TaggingView: View {
                         savedAssetsCount = savedAssets.count
                         isSavedAssetsPresent = true
                     case .failure(_ ):
-                        break
+                        isSavedAssetsPresent = false
                     }
                     cslvalues.isLoading = false
                 }
@@ -208,13 +240,13 @@ struct TaggingView: View {
                             case .failure(_ ):
                                 break
                             }
-                            cslvalues.isLoading = false
                         }
                     case .failure(_ ):
                         print("error")
+                        
                     }
+                    cslvalues.isLoading = false
                 }
-                // in case of error this never close loader
             }
         }
     }
@@ -230,14 +262,28 @@ struct TaggingView: View {
                             customFields: getCustomFieldsJson(),
                             customFieldsValues: customFieldsValues,
                             employee: assignedEmployee,
-                            image: isNewImageSelected ? (imageSelected.jpegData(compressionQuality: 0.2)) : nil) { result in
-            switch result {
-            case .success(_ ):
-                savedAssetsCount = 1
-                isSavedAssetsPresent = true
+                            image: isNewImageSelected ? (imageSelected.jpegData(compressionQuality: 1.0)) : nil) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(_ ):
+                    savedAssetsCount = epcsarray.count
+                    isSavedAssetsPresent = true
+                    // Limpiamos el mensaje de error si se guarda exitosamente
+                    errorMessage = ""
+                case .failure(let error):
+                    if let nsError = error as NSError?, nsError.code == 409 {
+                        errorMessage = "Error: Duplicate EPC"
+                        // Elimina el EPC duplicado de la lista
+                        if let duplicateEpc = epcsarray.first?.epc {
+                            cslvalues.removeEpc(epc: duplicateEpc)
+                        }
+                    } else {
+                        errorMessage = error.localizedDescription
+                    }
+                    isSavedAssetsPresent = false
+                }
+                // Asegúrate de desactivar el estado de carga en el hilo principal
                 cslvalues.isLoading = false
-            case .failure(let error):
-                print(error.localizedDescription)
             }
         }
     }
@@ -257,6 +303,7 @@ struct TaggingView: View {
                 for reading in cslvalues.readings {
                     epcs.append(reading.epc)
                 }
+                print("getEpcs: \(epcs)") // Log
                 return epcs;
             }
         } else {
@@ -351,14 +398,22 @@ struct CardView: View {
             HStack {
                 Button("Asset Photo") {
                     showAssetPhoto.toggle()
-                }
+                }.foregroundColor(.white) // Color del texto
+                    .padding(8)
+                    .background(Color.blue.opacity(0.8)) // Fondo azul del botón
+                    .cornerRadius(6)
+                    .font(.system(size: 14, weight: .bold))
                 .sheet(isPresented: $showAssetPhoto) {
                     AssetPhoto(imageSelected: $imageSelected, isNewImageSelected: $isNewImageSelected, showAssetPhoto: $showAssetPhoto)
                 }
                 Spacer()
                 Button("Custom Fields") {
                     showCustomFields.toggle()
-                }
+                }.foregroundColor(.white)
+                    .padding(8)
+                    .background(Color.blue.opacity(0.8))
+                    .cornerRadius(6)
+                    .font(.system(size: 14, weight: .bold))
                 .sheet(isPresented: $showCustomFields) {
                     CustomFields(customFields: $customFields, customFieldsValues: $customFieldsValues, showCustomFields: $showCustomFields, customFieldsImages: $customFieldsImages, customFieldsImagesData: $customFieldsImagesData)
                 }
@@ -373,6 +428,8 @@ struct CardView: View {
 }
 
 struct MainView: View {
+    @State var isDummy: Bool = false
+    @State var cont: Int = 0
     @Binding var location: LocationModel
     @ObservedObject var epcs: EpcsArray = EpcsArray()
     @ObservedObject var cslvalues: CSLValues
@@ -383,6 +440,7 @@ struct MainView: View {
     @State var isKeeping: Bool = false
     @Binding var serialNumber: String
     @State var powerLevel: Double = 10
+    @State var maxPowerLevel: Double = 30
     @Binding var locationPath: String
     @State var isRemoveExistingModalPresent: Bool = false
     @Binding var isRemoveExistingModalResult: Bool
@@ -394,10 +452,10 @@ struct MainView: View {
     var validateEPC: ([EpcModel]) -> Void
     @Binding var assignedEmployee: EmployeeModel
     @State var showEmployeesModal: Bool = false
+    @EnvironmentObject var zebraSingleton: ZebraSingleton
     
     var body: some View {
         VStack {
-            
             VStack(alignment: .leading) {
                 Text("Asset will be created in:")
                     .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
@@ -432,20 +490,31 @@ struct MainView: View {
                             .foregroundColor(.secondary)
                         Button("Assign") {
                             showEmployeesModal.toggle()
-                        }
+                        }.foregroundColor(.white)
+                            .padding(8)
+                            .background(Color.black.opacity(0.4))
+                            .cornerRadius(6)
+                            .font(.system(size: 14, weight: .bold))
                         .sheet(isPresented: $showEmployeesModal) {
                             EmployeeView(cslvalues: cslvalues, isModal: true, showModal: $showEmployeesModal, selectedEmployee: $assignedEmployee)
                         }
                         Spacer()
                         Button("Clear") {
                             assignedEmployee = EmployeeModel(_id: "", name: "", lastName: "", email: "", employee_id: "")
-                        }
+                        }.foregroundColor(.white)
+                            .padding(8)
+                            .background(Color.red.opacity(0.8))
+                            .cornerRadius(6)
+                            .font(.system(size: 14, weight: .bold))
                     }
                     Text(getEmployeeAssignedText())
                         .foregroundColor(.secondary)
                         .padding(.top, -3)
                 }
                 .padding(.top)
+            }
+            .onAppear() {
+                maxPowerLevel = zebraSingleton.getMaxPower()
             }
             .onChange(of: cslvalues.singleBarcode) { barcode in
                 serialNumber += barcode
@@ -492,9 +561,13 @@ struct MainView: View {
                         Button(action: {
                             isRemoveExistingModalPresent.toggle()
                         }) {
-                            Text("Remove Existing")
-                                .padding(.trailing, 20)
-                        }
+                            Text("Remove EPCs")
+                               
+                        }.foregroundColor(.white)
+                            .padding(8)
+                            .background(Color.red.opacity(0.8))
+                            .cornerRadius(6)
+                            .font(.system(size: 14, weight: .bold))
                         .alert(isPresented: $isRemoveExistingModalPresent, content: {
                             Alert(
                                 title: Text("Remove Existing"),
@@ -506,9 +579,12 @@ struct MainView: View {
                         Button(action:{
                             self.presentationMode.wrappedValue.dismiss()
                         }) {
-                            Text("Clear")
-                                .padding(.trailing, 10)
-                        }
+                            Text("Exit")
+                        }.foregroundColor(.white)
+                            .padding(8)
+                            .background(Color.red.opacity(0.8))
+                            .cornerRadius(6)
+                            .font(.system(size: 14, weight: .bold))
                         .alert(isPresented: $isSavedAssetsPresent, content: {
                             Alert(
                                 title: Text(getSavedMessage()),
@@ -526,14 +602,24 @@ struct MainView: View {
                         })
                     }
                     VStack {
-                        Slider(value: $powerLevel, in: 0...30, step: 1)
+                        if isDummy {
+                            Button("Add EPC") {
+                                addEPC()
+                            }
+                            .padding(.top, 2)
+                        }
+                        Slider(value: $powerLevel, in: 0...maxPowerLevel, step: 1)
                             .accentColor(Color.green)
                             .onChange(of: powerLevel, perform: { power in
-                                CSLRfidAppEngine.shared().reader.selectAntennaPort(0)
-                                CSLRfidAppEngine.shared().reader.setPower(power)
+                                Utils.updateAntennaPower(power: power)
                             })
                             .disabled(inventoryButton == "Stop")
                         Text("Power Level: \(powerLevel, specifier: "%.0f")")
+                        Button(action: {
+                            zebraSingleton.restartInventory(power: Int16(powerLevel))
+                        }) {
+                            Text("Update Power")
+                        }
                     }
                     .padding(.top)
                     .padding(.bottom)
@@ -574,7 +660,15 @@ struct MainView: View {
             
         }
     }
-    
+    func addEPC() {
+        let array = ["057454000000000000006F23", "474D30304B0181021000234F", "474130304B0181021000234F", "057454000000000000007237"]
+        let epc = array[cont]
+        let epcModel = EpcModel(epc: epc, rssi: "", timestamp: Utils.getFullDate())
+        self.cslvalues.addEpc(reading: epcModel)
+        if cont < array.count - 1 {
+            cont += 1
+        }
+    }
     // MARK: FUNCTIONS
     func getFilteredEpcs(epcarray: [EpcModel]) -> [EpcModel] {
         if (isSingle) {

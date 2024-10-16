@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -120,6 +120,18 @@
 		76F5AB2026CA2245001B8B89 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 76F5AB1F26CA2245001B8B89 /* Assets.xcassets */; };
 		76F5AB2326CA2245001B8B89 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 76F5AB2226CA2245001B8B89 /* Preview Assets.xcassets */; };
 		76F5AB2B26CB2C79001B8B89 /* LogInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F5AB2A26CB2C79001B8B89 /* LogInView.swift */; };
+		F203F3CE2AF9DFCD0037D45B /* ZebraProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = F203F3CD2AF9DFCD0037D45B /* ZebraProtocols.swift */; };
+		F203F3D02AF9E2280037D45B /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F203F3CF2AF9E2280037D45B /* ExternalAccessory.framework */; };
+		F21691BD2B28CD3D00BB64AD /* ZebraSingleton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F21691BC2B28CD3D00BB64AD /* ZebraSingleton.swift */; };
+		F21691BF2B28CDE200BB64AD /* ZebraModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F21691BE2B28CDE200BB64AD /* ZebraModel.swift */; };
+		F22090F12BE12F9F00C9BD6E /* InventoryAssetsRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F22090F02BE12F9F00C9BD6E /* InventoryAssetsRequest.swift */; };
+		F23C778B2B74117300A1A903 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23C778A2B74117300A1A903 /* Utils.swift */; };
+		F2828F132BE926B600121627 /* merge.sh in Resources */ = {isa = PBXBuildFile; fileRef = F2828F0F2BE926B600121627 /* merge.sh */; };
+		F2828F172BE927E300121627 /* libintegratedsdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2828F102BE926B600121627 /* libintegratedsdk.a */; };
+		F2828F182BE9287500121627 /* libsymbolbt-sdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2828F122BE926B600121627 /* libsymbolbt-sdk.a */; settings = {ATTRIBUTES = (Required, ); }; };
+		F2828F192BE9287500121627 /* libsymbolrfid-sdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2828F112BE926B600121627 /* libsymbolrfid-sdk.a */; settings = {ATTRIBUTES = (Required, ); }; };
+		F2F539002BC9BA9D00078FBF /* AssetsRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2F538FF2BC9BA9D00078FBF /* AssetsRequest.swift */; };
+		F2F813572AF3219F00FCD753 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2F813562AF3219F00FCD753 /* Constants.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -280,6 +292,107 @@
 		76F5AB2426CA2245001B8B89 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		76F5AB2A26CB2C79001B8B89 /* LogInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInView.swift; sourceTree = "<group>"; };
 		A6100A6A96CC0C8F133CC38C /* Pods_FractalInventory.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FractalInventory.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F203F3CD2AF9DFCD0037D45B /* ZebraProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZebraProtocols.swift; sourceTree = "<group>"; };
+		F203F3CF2AF9E2280037D45B /* ExternalAccessory.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExternalAccessory.framework; path = System/Library/Frameworks/ExternalAccessory.framework; sourceTree = SDKROOT; };
+		F21691BC2B28CD3D00BB64AD /* ZebraSingleton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZebraSingleton.swift; sourceTree = "<group>"; };
+		F21691BE2B28CDE200BB64AD /* ZebraModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZebraModel.swift; sourceTree = "<group>"; };
+		F22090F02BE12F9F00C9BD6E /* InventoryAssetsRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryAssetsRequest.swift; sourceTree = "<group>"; };
+		F23C778A2B74117300A1A903 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		F2828EE52BE926B600121627 /* RfidAccessConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidAccessConfig.h; sourceTree = "<group>"; };
+		F2828EE62BE926B600121627 /* RfidSdkDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidSdkDefs.h; sourceTree = "<group>"; };
+		F2828EE72BE926B600121627 /* RfidSingulationConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidSingulationConfig.h; sourceTree = "<group>"; };
+		F2828EE82BE926B600121627 /* RMDAttributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RMDAttributes.h; sourceTree = "<group>"; };
+		F2828EE92BE926B600121627 /* RfidDatabaseEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidDatabaseEvent.h; sourceTree = "<group>"; };
+		F2828EEA2BE926B600121627 /* RfidSdkApiDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidSdkApiDelegate.h; sourceTree = "<group>"; };
+		F2828EEB2BE926B600121627 /* RfidRegulatoryConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidRegulatoryConfig.h; sourceTree = "<group>"; };
+		F2828EEC2BE926B600121627 /* AccessOperationCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AccessOperationCode.h; sourceTree = "<group>"; };
+		F2828EED2BE926B600121627 /* RfidTemperatureEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidTemperatureEvent.h; sourceTree = "<group>"; };
+		F2828EEE2BE926B600121627 /* RfidRadioErrorEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidRadioErrorEvent.h; sourceTree = "<group>"; };
+		F2828EEF2BE926B600121627 /* RfidTagFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidTagFilter.h; sourceTree = "<group>"; };
+		F2828EF02BE926B600121627 /* RfidAttribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidAttribute.h; sourceTree = "<group>"; };
+		F2828EF12BE926B600121627 /* RfidAccessCriteria.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidAccessCriteria.h; sourceTree = "<group>"; };
+		F2828EF22BE926B600121627 /* RfidTagReportConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidTagReportConfig.h; sourceTree = "<group>"; };
+		F2828EF32BE926B600121627 /* RfidBatteryEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidBatteryEvent.h; sourceTree = "<group>"; };
+		F2828EF42BE926B600121627 /* SbtScannerInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SbtScannerInfo.h; sourceTree = "<group>"; };
+		F2828EF52BE926B600121627 /* RfidSdkFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidSdkFactory.h; sourceTree = "<group>"; };
+		F2828EF62BE926B600121627 /* RfidAccessParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidAccessParameters.h; sourceTree = "<group>"; };
+		F2828EF72BE926B600121627 /* RfidBatteryStatusInformation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidBatteryStatusInformation.h; sourceTree = "<group>"; };
+		F2828EF82BE926B600121627 /* RfidReaderVersionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidReaderVersionInfo.h; sourceTree = "<group>"; };
+		F2828EF92BE926B600121627 /* RfidStartTriggerConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidStartTriggerConfig.h; sourceTree = "<group>"; };
+		F2828EFA2BE926B600121627 /* RfidReaderInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidReaderInfo.h; sourceTree = "<group>"; };
+		F2828EFB2BE926B600121627 /* RfidMultipleTagsConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidMultipleTagsConfig.h; sourceTree = "<group>"; };
+		F2828EFC2BE926B600121627 /* ISbtSdkApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ISbtSdkApi.h; sourceTree = "<group>"; };
+		F2828EFD2BE926B600121627 /* SbtSdkDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SbtSdkDefs.h; sourceTree = "<group>"; };
+		F2828EFE2BE926B600121627 /* RfidReaderCapabilitiesInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidReaderCapabilitiesInfo.h; sourceTree = "<group>"; };
+		F2828EFF2BE926B600121627 /* FirmwareUpdateEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FirmwareUpdateEvent.h; sourceTree = "<group>"; };
+		F2828F002BE926B600121627 /* RfidUntraceableConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidUntraceableConfig.h; sourceTree = "<group>"; };
+		F2828F012BE926B600121627 /* RfidOperEndSummaryEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidOperEndSummaryEvent.h; sourceTree = "<group>"; };
+		F2828F022BE926B600121627 /* ISbtSdkApiDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ISbtSdkApiDelegate.h; sourceTree = "<group>"; };
+		F2828F032BE926B600121627 /* RfidSdkApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidSdkApi.h; sourceTree = "<group>"; };
+		F2828F042BE926B600121627 /* RfidLinkProfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidLinkProfile.h; sourceTree = "<group>"; };
+		F2828F052BE926B600121627 /* RfidPreFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidPreFilter.h; sourceTree = "<group>"; };
+		F2828F062BE926B600121627 /* RfidDynamicPowerConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidDynamicPowerConfig.h; sourceTree = "<group>"; };
+		F2828F072BE926B600121627 /* RfidAntennaConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidAntennaConfiguration.h; sourceTree = "<group>"; };
+		F2828F082BE926B600121627 /* RfidPowerEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidPowerEvent.h; sourceTree = "<group>"; };
+		F2828F092BE926B600121627 /* RfidTagData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidTagData.h; sourceTree = "<group>"; };
+		F2828F0A2BE926B600121627 /* RfidRegionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidRegionInfo.h; sourceTree = "<group>"; };
+		F2828F0B2BE926B600121627 /* RfidReportConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidReportConfig.h; sourceTree = "<group>"; };
+		F2828F0C2BE926B600121627 /* RfidStopTriggerConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidStopTriggerConfig.h; sourceTree = "<group>"; };
+		F2828F0D2BE926B600121627 /* SbtSdkFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SbtSdkFactory.h; sourceTree = "<group>"; };
+		F2828F0E2BE926B600121627 /* RfidUniqueTagsReport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RfidUniqueTagsReport.h; sourceTree = "<group>"; };
+		F2828F0F2BE926B600121627 /* merge.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = merge.sh; sourceTree = "<group>"; };
+		F2828F102BE926B600121627 /* libintegratedsdk.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libintegratedsdk.a; sourceTree = "<group>"; };
+		F2828F112BE926B600121627 /* libsymbolrfid-sdk.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libsymbolrfid-sdk.a"; sourceTree = "<group>"; };
+		F2828F122BE926B600121627 /* libsymbolbt-sdk.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libsymbolbt-sdk.a"; sourceTree = "<group>"; };
+		F2F538FF2BC9BA9D00078FBF /* AssetsRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetsRequest.swift; sourceTree = "<group>"; };
+		F2F813562AF3219F00FCD753 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		F2F8138C2AF3493C00FCD753 /* libsymbolrfid-sdk.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libsymbolrfid-sdk.a"; path = "symbolrfid-sdk/libsymbolrfid-sdk.a"; sourceTree = "<group>"; };
+		F2F8138F2AF3496200FCD753 /* RfidAccessConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidAccessConfig.h; sourceTree = "<group>"; };
+		F2F813902AF3496200FCD753 /* RfidSdkDefs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidSdkDefs.h; sourceTree = "<group>"; };
+		F2F813912AF3496200FCD753 /* RfidSingulationConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidSingulationConfig.h; sourceTree = "<group>"; };
+		F2F813922AF3496200FCD753 /* RMDAttributes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RMDAttributes.h; sourceTree = "<group>"; };
+		F2F813932AF3496200FCD753 /* RfidDatabaseEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidDatabaseEvent.h; sourceTree = "<group>"; };
+		F2F813942AF3496200FCD753 /* RfidSdkApiDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidSdkApiDelegate.h; sourceTree = "<group>"; };
+		F2F813952AF3496200FCD753 /* RfidRegulatoryConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidRegulatoryConfig.h; sourceTree = "<group>"; };
+		F2F813962AF3496200FCD753 /* AccessOperationCode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AccessOperationCode.h; sourceTree = "<group>"; };
+		F2F813972AF3496200FCD753 /* RfidTemperatureEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidTemperatureEvent.h; sourceTree = "<group>"; };
+		F2F813982AF3496200FCD753 /* RfidRadioErrorEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidRadioErrorEvent.h; sourceTree = "<group>"; };
+		F2F813992AF3496200FCD753 /* RfidTagFilter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidTagFilter.h; sourceTree = "<group>"; };
+		F2F8139A2AF3496200FCD753 /* RfidAttribute.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidAttribute.h; sourceTree = "<group>"; };
+		F2F8139B2AF3496200FCD753 /* RfidAccessCriteria.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidAccessCriteria.h; sourceTree = "<group>"; };
+		F2F8139C2AF3496200FCD753 /* RfidTagReportConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidTagReportConfig.h; sourceTree = "<group>"; };
+		F2F8139D2AF3496200FCD753 /* RfidBatteryEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidBatteryEvent.h; sourceTree = "<group>"; };
+		F2F8139E2AF3496200FCD753 /* SbtScannerInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SbtScannerInfo.h; sourceTree = "<group>"; };
+		F2F8139F2AF3496200FCD753 /* RfidSdkFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidSdkFactory.h; sourceTree = "<group>"; };
+		F2F813A02AF3496200FCD753 /* RfidAccessParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidAccessParameters.h; sourceTree = "<group>"; };
+		F2F813A12AF3496200FCD753 /* RfidBatteryStatusInformation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidBatteryStatusInformation.h; sourceTree = "<group>"; };
+		F2F813A22AF3496200FCD753 /* RfidReaderVersionInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidReaderVersionInfo.h; sourceTree = "<group>"; };
+		F2F813A32AF3496200FCD753 /* RfidStartTriggerConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidStartTriggerConfig.h; sourceTree = "<group>"; };
+		F2F813A42AF3496200FCD753 /* RfidReaderInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidReaderInfo.h; sourceTree = "<group>"; };
+		F2F813A52AF3496200FCD753 /* RfidMultipleTagsConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidMultipleTagsConfig.h; sourceTree = "<group>"; };
+		F2F813A62AF3496200FCD753 /* ISbtSdkApi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ISbtSdkApi.h; sourceTree = "<group>"; };
+		F2F813A72AF3496200FCD753 /* SbtSdkDefs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SbtSdkDefs.h; sourceTree = "<group>"; };
+		F2F813A82AF3496200FCD753 /* RfidReaderCapabilitiesInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidReaderCapabilitiesInfo.h; sourceTree = "<group>"; };
+		F2F813A92AF3496200FCD753 /* FirmwareUpdateEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FirmwareUpdateEvent.h; sourceTree = "<group>"; };
+		F2F813AA2AF3496200FCD753 /* RfidUntraceableConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidUntraceableConfig.h; sourceTree = "<group>"; };
+		F2F813AB2AF3496200FCD753 /* RfidOperEndSummaryEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidOperEndSummaryEvent.h; sourceTree = "<group>"; };
+		F2F813AC2AF3496200FCD753 /* ISbtSdkApiDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ISbtSdkApiDelegate.h; sourceTree = "<group>"; };
+		F2F813AD2AF3496200FCD753 /* RfidSdkApi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidSdkApi.h; sourceTree = "<group>"; };
+		F2F813AE2AF3496200FCD753 /* RfidLinkProfile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidLinkProfile.h; sourceTree = "<group>"; };
+		F2F813AF2AF3496200FCD753 /* RfidPreFilter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidPreFilter.h; sourceTree = "<group>"; };
+		F2F813B02AF3496200FCD753 /* RfidDynamicPowerConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidDynamicPowerConfig.h; sourceTree = "<group>"; };
+		F2F813B12AF3496200FCD753 /* RfidAntennaConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidAntennaConfiguration.h; sourceTree = "<group>"; };
+		F2F813B22AF3496200FCD753 /* RfidPowerEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidPowerEvent.h; sourceTree = "<group>"; };
+		F2F813B32AF3496200FCD753 /* RfidTagData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidTagData.h; sourceTree = "<group>"; };
+		F2F813B42AF3496200FCD753 /* RfidRegionInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidRegionInfo.h; sourceTree = "<group>"; };
+		F2F813B52AF3496200FCD753 /* RfidReportConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidReportConfig.h; sourceTree = "<group>"; };
+		F2F813B62AF3496200FCD753 /* RfidStopTriggerConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidStopTriggerConfig.h; sourceTree = "<group>"; };
+		F2F813B72AF3496200FCD753 /* SbtSdkFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SbtSdkFactory.h; sourceTree = "<group>"; };
+		F2F813B82AF3496200FCD753 /* RfidUniqueTagsReport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RfidUniqueTagsReport.h; sourceTree = "<group>"; };
+		F2F813B92AF3496200FCD753 /* merge.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = merge.sh; sourceTree = "<group>"; };
+		F2F813BA2AF3496200FCD753 /* libintegratedsdk.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libintegratedsdk.a; sourceTree = "<group>"; };
+		F2F813BB2AF3496200FCD753 /* libsymbolrfid-sdk.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libsymbolrfid-sdk.a"; sourceTree = "<group>"; };
+		F2F813BC2AF3496200FCD753 /* libsymbolbt-sdk.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libsymbolbt-sdk.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -287,7 +400,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F203F3D02AF9E2280037D45B /* ExternalAccessory.framework in Frameworks */,
+				F2828F172BE927E300121627 /* libintegratedsdk.a in Frameworks */,
 				765581BF26DC715F00F6C973 /* CoreBluetooth.framework in Frameworks */,
+				F2828F192BE9287500121627 /* libsymbolrfid-sdk.a in Frameworks */,
+				F2828F182BE9287500121627 /* libsymbolbt-sdk.a in Frameworks */,
 				51912303D9BAD715244BA88E /* Pods_FractalInventory.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -346,6 +463,7 @@
 		7601038626D33B91003C39BA /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				F2F538FE2BC9BA8800078FBF /* Request */,
 				7601038726D33BBC003C39BA /* LocationModel.swift */,
 				76D1EAED276D5F3800EE85B8 /* EmployeeModel.swift */,
 				76546C8326DB006D00336C10 /* ReferenceModel.swift */,
@@ -415,6 +533,9 @@
 		765581BD26DC715F00F6C973 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F203F3CF2AF9E2280037D45B /* ExternalAccessory.framework */,
+				F2F8138D2AF3496200FCD753 /* symbolrfid-sdk */,
+				F2F8138C2AF3493C00FCD753 /* libsymbolrfid-sdk.a */,
 				765581BE26DC715F00F6C973 /* CoreBluetooth.framework */,
 				A6100A6A96CC0C8F133CC38C /* Pods_FractalInventory.framework */,
 			);
@@ -672,6 +793,7 @@
 		76F5AB0F26CA2242001B8B89 = {
 			isa = PBXGroup;
 			children = (
+				F2828EE32BE926B600121627 /* symbolrfid-sdk */,
 				76F5AB1A26CA2242001B8B89 /* FractalInventory */,
 				76F5AB1926CA2242001B8B89 /* Products */,
 				765581BD26DC715F00F6C973 /* Frameworks */,
@@ -691,6 +813,9 @@
 		76F5AB1A26CA2242001B8B89 /* FractalInventory */ = {
 			isa = PBXGroup;
 			children = (
+				F23C778C2B74117D00A1A903 /* Utils */,
+				F203F3CC2AF9DF8D0037D45B /* Zebra */,
+				F2F813552AF3210000FCD753 /* Constants */,
 				765581C426DC805B00F6C973 /* Hardware */,
 				764E264126DC02DF00D7742B /* Helpers */,
 				7601038626D33B91003C39BA /* Model */,
@@ -719,6 +844,163 @@
 				6A581ACFB2E21DBDE129DD82 /* Pods-FractalInventory.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		F203F3CC2AF9DF8D0037D45B /* Zebra */ = {
+			isa = PBXGroup;
+			children = (
+				F203F3CD2AF9DFCD0037D45B /* ZebraProtocols.swift */,
+				F21691BC2B28CD3D00BB64AD /* ZebraSingleton.swift */,
+				F21691BE2B28CDE200BB64AD /* ZebraModel.swift */,
+			);
+			path = Zebra;
+			sourceTree = "<group>";
+		};
+		F23C778C2B74117D00A1A903 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				F23C778A2B74117300A1A903 /* Utils.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		F2828EE32BE926B600121627 /* symbolrfid-sdk */ = {
+			isa = PBXGroup;
+			children = (
+				F2828EE42BE926B600121627 /* include */,
+				F2828F0F2BE926B600121627 /* merge.sh */,
+				F2828F102BE926B600121627 /* libintegratedsdk.a */,
+				F2828F112BE926B600121627 /* libsymbolrfid-sdk.a */,
+				F2828F122BE926B600121627 /* libsymbolbt-sdk.a */,
+			);
+			path = "symbolrfid-sdk";
+			sourceTree = "<group>";
+		};
+		F2828EE42BE926B600121627 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				F2828EE52BE926B600121627 /* RfidAccessConfig.h */,
+				F2828EE62BE926B600121627 /* RfidSdkDefs.h */,
+				F2828EE72BE926B600121627 /* RfidSingulationConfig.h */,
+				F2828EE82BE926B600121627 /* RMDAttributes.h */,
+				F2828EE92BE926B600121627 /* RfidDatabaseEvent.h */,
+				F2828EEA2BE926B600121627 /* RfidSdkApiDelegate.h */,
+				F2828EEB2BE926B600121627 /* RfidRegulatoryConfig.h */,
+				F2828EEC2BE926B600121627 /* AccessOperationCode.h */,
+				F2828EED2BE926B600121627 /* RfidTemperatureEvent.h */,
+				F2828EEE2BE926B600121627 /* RfidRadioErrorEvent.h */,
+				F2828EEF2BE926B600121627 /* RfidTagFilter.h */,
+				F2828EF02BE926B600121627 /* RfidAttribute.h */,
+				F2828EF12BE926B600121627 /* RfidAccessCriteria.h */,
+				F2828EF22BE926B600121627 /* RfidTagReportConfig.h */,
+				F2828EF32BE926B600121627 /* RfidBatteryEvent.h */,
+				F2828EF42BE926B600121627 /* SbtScannerInfo.h */,
+				F2828EF52BE926B600121627 /* RfidSdkFactory.h */,
+				F2828EF62BE926B600121627 /* RfidAccessParameters.h */,
+				F2828EF72BE926B600121627 /* RfidBatteryStatusInformation.h */,
+				F2828EF82BE926B600121627 /* RfidReaderVersionInfo.h */,
+				F2828EF92BE926B600121627 /* RfidStartTriggerConfig.h */,
+				F2828EFA2BE926B600121627 /* RfidReaderInfo.h */,
+				F2828EFB2BE926B600121627 /* RfidMultipleTagsConfig.h */,
+				F2828EFC2BE926B600121627 /* ISbtSdkApi.h */,
+				F2828EFD2BE926B600121627 /* SbtSdkDefs.h */,
+				F2828EFE2BE926B600121627 /* RfidReaderCapabilitiesInfo.h */,
+				F2828EFF2BE926B600121627 /* FirmwareUpdateEvent.h */,
+				F2828F002BE926B600121627 /* RfidUntraceableConfig.h */,
+				F2828F012BE926B600121627 /* RfidOperEndSummaryEvent.h */,
+				F2828F022BE926B600121627 /* ISbtSdkApiDelegate.h */,
+				F2828F032BE926B600121627 /* RfidSdkApi.h */,
+				F2828F042BE926B600121627 /* RfidLinkProfile.h */,
+				F2828F052BE926B600121627 /* RfidPreFilter.h */,
+				F2828F062BE926B600121627 /* RfidDynamicPowerConfig.h */,
+				F2828F072BE926B600121627 /* RfidAntennaConfiguration.h */,
+				F2828F082BE926B600121627 /* RfidPowerEvent.h */,
+				F2828F092BE926B600121627 /* RfidTagData.h */,
+				F2828F0A2BE926B600121627 /* RfidRegionInfo.h */,
+				F2828F0B2BE926B600121627 /* RfidReportConfig.h */,
+				F2828F0C2BE926B600121627 /* RfidStopTriggerConfig.h */,
+				F2828F0D2BE926B600121627 /* SbtSdkFactory.h */,
+				F2828F0E2BE926B600121627 /* RfidUniqueTagsReport.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		F2F538FE2BC9BA8800078FBF /* Request */ = {
+			isa = PBXGroup;
+			children = (
+				F2F538FF2BC9BA9D00078FBF /* AssetsRequest.swift */,
+				F22090F02BE12F9F00C9BD6E /* InventoryAssetsRequest.swift */,
+			);
+			path = Request;
+			sourceTree = "<group>";
+		};
+		F2F813552AF3210000FCD753 /* Constants */ = {
+			isa = PBXGroup;
+			children = (
+				F2F813562AF3219F00FCD753 /* Constants.swift */,
+			);
+			path = Constants;
+			sourceTree = "<group>";
+		};
+		F2F8138D2AF3496200FCD753 /* symbolrfid-sdk */ = {
+			isa = PBXGroup;
+			children = (
+				F2F8138E2AF3496200FCD753 /* include */,
+				F2F813B92AF3496200FCD753 /* merge.sh */,
+				F2F813BA2AF3496200FCD753 /* libintegratedsdk.a */,
+				F2F813BB2AF3496200FCD753 /* libsymbolrfid-sdk.a */,
+				F2F813BC2AF3496200FCD753 /* libsymbolbt-sdk.a */,
+			);
+			path = "symbolrfid-sdk";
+			sourceTree = "<group>";
+		};
+		F2F8138E2AF3496200FCD753 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				F2F8138F2AF3496200FCD753 /* RfidAccessConfig.h */,
+				F2F813902AF3496200FCD753 /* RfidSdkDefs.h */,
+				F2F813912AF3496200FCD753 /* RfidSingulationConfig.h */,
+				F2F813922AF3496200FCD753 /* RMDAttributes.h */,
+				F2F813932AF3496200FCD753 /* RfidDatabaseEvent.h */,
+				F2F813942AF3496200FCD753 /* RfidSdkApiDelegate.h */,
+				F2F813952AF3496200FCD753 /* RfidRegulatoryConfig.h */,
+				F2F813962AF3496200FCD753 /* AccessOperationCode.h */,
+				F2F813972AF3496200FCD753 /* RfidTemperatureEvent.h */,
+				F2F813982AF3496200FCD753 /* RfidRadioErrorEvent.h */,
+				F2F813992AF3496200FCD753 /* RfidTagFilter.h */,
+				F2F8139A2AF3496200FCD753 /* RfidAttribute.h */,
+				F2F8139B2AF3496200FCD753 /* RfidAccessCriteria.h */,
+				F2F8139C2AF3496200FCD753 /* RfidTagReportConfig.h */,
+				F2F8139D2AF3496200FCD753 /* RfidBatteryEvent.h */,
+				F2F8139E2AF3496200FCD753 /* SbtScannerInfo.h */,
+				F2F8139F2AF3496200FCD753 /* RfidSdkFactory.h */,
+				F2F813A02AF3496200FCD753 /* RfidAccessParameters.h */,
+				F2F813A12AF3496200FCD753 /* RfidBatteryStatusInformation.h */,
+				F2F813A22AF3496200FCD753 /* RfidReaderVersionInfo.h */,
+				F2F813A32AF3496200FCD753 /* RfidStartTriggerConfig.h */,
+				F2F813A42AF3496200FCD753 /* RfidReaderInfo.h */,
+				F2F813A52AF3496200FCD753 /* RfidMultipleTagsConfig.h */,
+				F2F813A62AF3496200FCD753 /* ISbtSdkApi.h */,
+				F2F813A72AF3496200FCD753 /* SbtSdkDefs.h */,
+				F2F813A82AF3496200FCD753 /* RfidReaderCapabilitiesInfo.h */,
+				F2F813A92AF3496200FCD753 /* FirmwareUpdateEvent.h */,
+				F2F813AA2AF3496200FCD753 /* RfidUntraceableConfig.h */,
+				F2F813AB2AF3496200FCD753 /* RfidOperEndSummaryEvent.h */,
+				F2F813AC2AF3496200FCD753 /* ISbtSdkApiDelegate.h */,
+				F2F813AD2AF3496200FCD753 /* RfidSdkApi.h */,
+				F2F813AE2AF3496200FCD753 /* RfidLinkProfile.h */,
+				F2F813AF2AF3496200FCD753 /* RfidPreFilter.h */,
+				F2F813B02AF3496200FCD753 /* RfidDynamicPowerConfig.h */,
+				F2F813B12AF3496200FCD753 /* RfidAntennaConfiguration.h */,
+				F2F813B22AF3496200FCD753 /* RfidPowerEvent.h */,
+				F2F813B32AF3496200FCD753 /* RfidTagData.h */,
+				F2F813B42AF3496200FCD753 /* RfidRegionInfo.h */,
+				F2F813B52AF3496200FCD753 /* RfidReportConfig.h */,
+				F2F813B62AF3496200FCD753 /* RfidStopTriggerConfig.h */,
+				F2F813B72AF3496200FCD753 /* SbtSdkFactory.h */,
+				F2F813B82AF3496200FCD753 /* RfidUniqueTagsReport.h */,
+			);
+			path = include;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -781,6 +1063,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				76F5AB2326CA2245001B8B89 /* Preview Assets.xcassets in Resources */,
+				F2828F132BE926B600121627 /* merge.sh in Resources */,
 				76F5AB2026CA2245001B8B89 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -843,13 +1126,16 @@
 				7655821F26DC808100F6C973 /* CSLReaderFrequency.m in Sources */,
 				76546C7F26D7325400336C10 /* LocationsArray.swift in Sources */,
 				767C671727545EB200A5AA3E /* ValidatedView.swift in Sources */,
+				F22090F12BE12F9F00C9BD6E /* InventoryAssetsRequest.swift in Sources */,
 				7655820D26DC808100F6C973 /* MQTTMessage.m in Sources */,
 				76190AF52725151900AD0EE0 /* UserModel.swift in Sources */,
 				36E2880E28AE09C8009FCA60 /* Asset+CoreDataClass.swift in Sources */,
 				767C671C2755FF7C00A5AA3E /* SearchView.swift in Sources */,
 				76D1EAEE276D5F3900EE85B8 /* EmployeeModel.swift in Sources */,
+				F21691BD2B28CD3D00BB64AD /* ZebraSingleton.swift in Sources */,
 				36AA9E142806A66B00434A98 /* WMConstants.swift in Sources */,
 				767C671E2756F4E100A5AA3E /* AssetView.swift in Sources */,
+				F23C778B2B74117300A1A903 /* Utils.swift in Sources */,
 				7655823526DC80C600F6C973 /* CSLBleReader.m in Sources */,
 				7655822226DC808100F6C973 /* CSLRfidAppEngine.m in Sources */,
 				76D1EAEC27620EF100EE85B8 /* Loading.swift in Sources */,
@@ -879,8 +1165,10 @@
 				7655823326DC80C600F6C973 /* CSLBleInterface.m in Sources */,
 				7655820E26DC808100F6C973 /* MQTTDecoder.m in Sources */,
 				36E2881828AE09C8009FCA60 /* EmployeeProfile+CoreDataClass.swift in Sources */,
+				F2F813572AF3219F00FCD753 /* Constants.swift in Sources */,
 				76546C8B26DB3A4A00336C10 /* TaggingView.swift in Sources */,
 				7655825726DF285100F6C973 /* CSL.swift in Sources */,
+				F2F539002BC9BA9D00078FBF /* AssetsRequest.swift in Sources */,
 				7655821B26DC808100F6C973 /* MQTTSessionSynchron.m in Sources */,
 				76838D0126FFF60500B0EDF8 /* InventoryView.swift in Sources */,
 				76D1EAF12771586200EE85B8 /* EmployeeView.swift in Sources */,
@@ -905,6 +1193,7 @@
 				7655821A26DC808100F6C973 /* MQTTSessionLegacy.m in Sources */,
 				7655824D26DC937400F6C973 /* FractalInventory-Bridging-Header.h in Sources */,
 				7655820926DC808100F6C973 /* MQTTCFSocketEncoder.m in Sources */,
+				F203F3CE2AF9DFCD0037D45B /* ZebraProtocols.swift in Sources */,
 				7655821326DC808100F6C973 /* MQTTCoreDataPersistence.m in Sources */,
 				7655822026DC808100F6C973 /* CSLReaderBattery.m in Sources */,
 				765581B726DC1FA600F6C973 /* EpcModel.swift in Sources */,
@@ -923,6 +1212,7 @@
 				767C67192755EAC400A5AA3E /* ValidatedItemSubview.swift in Sources */,
 				76B39964272637F4000A363A /* AssetPhoto.swift in Sources */,
 				7663FE2327617D1E001C1578 /* LoadImage.swift in Sources */,
+				F21691BF2B28CDE200BB64AD /* ZebraModel.swift in Sources */,
 				7655820726DC808100F6C973 /* MQTTLog.m in Sources */,
 				7655820A26DC808100F6C973 /* MQTTSessionManager.m in Sources */,
 				767F77B92761626400FD905B /* WebViewStateModel.swift in Sources */,
@@ -1073,23 +1363,33 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"FractalInventory/Preview Content\"";
-				DEVELOPMENT_TEAM = 6SJ9C8L83A;
+				DEVELOPMENT_TEAM = RGSJ4N94B8;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = FractalInventory/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.moobile.FractalInventory;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/zebra-sdk",
+					"$(PROJECT_DIR)/symbolrfid-sdk",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tagventory.zebra;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = "FractalInventory/Hardware/CSL/Bridge/FractalInventory-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/symbolrfid-sdk/include/";
 			};
 			name = Debug;
 		};
@@ -1101,23 +1401,33 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"FractalInventory/Preview Content\"";
-				DEVELOPMENT_TEAM = 9JH5UXS3ZM;
+				DEVELOPMENT_TEAM = RGSJ4N94B8;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = FractalInventory/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.moobile.FractalInventory;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/zebra-sdk",
+					"$(PROJECT_DIR)/symbolrfid-sdk",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tagventory.zebra;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = "FractalInventory/Hardware/CSL/Bridge/FractalInventory-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/symbolrfid-sdk/include/";
 			};
 			name = Release;
 		};

@@ -9,8 +9,8 @@ import SwiftUI
 
 struct ConnectionsSubview: View {
     @ObservedObject var cslvalues: CSLValues
-    @AppStorage(Settings.apiHostKey) var apiHost = "http://159.203.41.87:3001"
-    @AppStorage(Settings.apiDBKey) var apiDB = "notes-db-app"
+    @AppStorage(Settings.apiHostKey) var apiHost = Constants.apiHost
+    @AppStorage(Settings.apiDBKey) var apiDB = Constants.apiDB
     @State var testType: Int = 0
     @State var testResult: String = ""
     @State var showTestModal: Bool = false
@@ -36,8 +36,17 @@ struct ConnectionsSubview: View {
                 .frame(width: 130)
                 Spacer()
                 Button(action: { testConnection() } ) {
-                    Text("Test Connection")
-                }
+                    Text("Test connection")
+                }.buttonStyle(PlainButtonStyle())
+                    .buttonStyle(PlainButtonStyle())
+                    .padding(8)
+                    .background(Color.orange.opacity(0.8))
+                    .foregroundColor(.white)
+                    .cornerRadius(6)
+                    .shadow(radius: 2)
+                    .font(.system(size: 14))
+                    .padding(.leading, 20)
+                .padding()
                 .alert(isPresented: $showTestModal, content: {
                     Alert(
                         title: Text("Test \(testTypes[testType]) Connection: \(testResult)"),

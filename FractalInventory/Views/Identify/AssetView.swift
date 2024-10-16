@@ -26,6 +26,7 @@ struct AssetView: View {
     @State var showDuplicatedEPCModal: Bool = false
     @State var customFieldsImages: [AssetPhoto] = []
     @State var customFieldsImagesData: [ImageCustomField] = []
+    @StateObject var zebraSingleton = ZebraSingleton.shared
     let workModeManager = WorkModeManager()
     
     var body: some View {
@@ -48,7 +49,16 @@ struct AssetView: View {
         })
         .navigationBarItems(trailing:
                                 HStack {
-            Button("Update") { validateEPC() }
+            Button(action: {
+                    validateEPC()
+                }) {
+                    Text("Update")
+                        .foregroundColor(.white) // Color del texto
+                            .padding(8)
+                            .background(Color.orange.opacity(0.8))
+                            .cornerRadius(6)
+                            .font(.system(size: 14, weight: .bold))
+                }
                 .alert(isPresented: $showDuplicatedEPCModal, content: {
                     Alert(
                         title: Text("New EPC already exists, please read a different one"),
@@ -78,10 +88,22 @@ struct AssetView: View {
                         customFieldsImagesData.append(imageObj)
                         
                     }
-                    cslvalues.isLoading = false
+                    DispatchQueue.main.async {
+                        cslvalues.isLoading = false
+                    }
                 }
             case .offline:
                 break 
+            }
+            cslvalues.readings = []
+            zebraSingleton.startInventory(power: 30)
+            zebraSingleton.onTagAdded = { tag in
+                print("ZebraTag: \(tag)")
+                if updateEPC {
+                    if tag.epc.count == 24 {
+                        self.cslvalues.addEpc(reading: tag)
+                    }
+                }
             }
         }
         .onChange(of: cslvalues.isTriggerApplied) { isTriggerApplied in
@@ -89,6 +111,7 @@ struct AssetView: View {
                 onInventory()
             }
         }
+        .environmentObject(zebraSingleton)
     }
     
     func onInventory() {
@@ -139,7 +162,9 @@ struct AssetView: View {
                 } else {
                     showUpdateModal.toggle()
                 }
-                cslvalues.isLoading = false
+                DispatchQueue.main.async {
+                    cslvalues.isLoading = false
+                }
             }
         } else {
             showAssetPhoto = false
@@ -158,7 +183,9 @@ struct AssetView: View {
                         showUpdateModal.toggle()
                     }
                 }
-                cslvalues.isLoading = false
+                DispatchQueue.main.async {
+                    cslvalues.isLoading = false
+                }
             }
         }
     }
@@ -173,12 +200,16 @@ struct AssetView: View {
             case .failure(let error):
                 print("Error: ", error.localizedDescription)
             }
-            cslvalues.isLoading = false
+            DispatchQueue.main.async {
+                cslvalues.isLoading = false
+            }
         }
     }
     
     func validateEPC() {
-        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        DispatchQueue.main.async {
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        }
         if EPC != originalEPC {
             switch workModeManager.workMode {
             case .online:
@@ -313,14 +344,22 @@ struct AssetActions: View {
         HStack {
             Button("Asset Photo") {
                 showAssetPhoto.toggle()
-            }
+            }.foregroundColor(.white) // Color del texto
+                .padding(8)
+                .background(Color.blue.opacity(0.8)) // Fondo azul del botón
+                .cornerRadius(6)
+                .font(.system(size: 14, weight: .bold))
             .sheet(isPresented: $showAssetPhoto) {
                 AssetPhoto(imageSelected: $imageSelected, isNewImageSelected: $isNewImageSelected, showAssetPhoto: $showAssetPhoto)
             }
             Spacer()
             Button("Custom Fields") {
                 showCustomFields.toggle()
-            }
+            }.foregroundColor(.white) // Color del texto
+                .padding(8)
+                .background(Color.blue.opacity(0.8)) // Fondo azul del botón
+                .cornerRadius(6)
+                .font(.system(size: 14, weight: .bold))
             .sheet(isPresented: $showCustomFields) {
                 CustomFields(customFields: $customFields, customFieldsValues: $customFieldsValues, showCustomFields: $showCustomFields, fromModule: "assets", customFieldsImages: $customFieldsImages, customFieldsImagesData: $customFieldsImagesData)
             }
@@ -342,7 +381,9 @@ struct AssetOtherFields: View {
     @Binding var inventoryButton: String
     @Binding var isInventoryStarted: Bool
     @State var powerLevel: Double = 10
+    @State var maxPowerLevel: Double = 30
     @State var geigerLevel: Double = 0
+    @EnvironmentObject var zebraSingleton: ZebraSingleton
     var _onInvetory: () -> Void
     
     var body: some View {
@@ -421,11 +462,10 @@ struct AssetOtherFields: View {
                             .padding()
                         
                         VStack {
-                            Slider(value: $powerLevel, in: 0...30, step: 1)
+                            Slider(value: $powerLevel, in: 0...maxPowerLevel, step: 1)
                                 .accentColor(Color.green)
                                 .onChange(of: powerLevel, perform: { power in
-                                    CSLRfidAppEngine.shared().reader.selectAntennaPort(0)
-                                    CSLRfidAppEngine.shared().reader.setPower(power)
+                                    Utils.updateAntennaPower(power: power)
                                 })
                                 .disabled(inventoryButton == "Stop")
                             Text("Power Level: \(powerLevel, specifier: "%.0f")")
@@ -482,14 +522,18 @@ struct AssetOtherFields: View {
                         }
                     }
                 VStack {
-                    Slider(value: $powerLevel, in: 0...30, step: 1)
+                    Slider(value: $powerLevel, in: 0...maxPowerLevel, step: 1)
                         .accentColor(Color.green)
                         .onChange(of: powerLevel, perform: { power in
-                            CSLRfidAppEngine.shared().reader.selectAntennaPort(0)
-                            CSLRfidAppEngine.shared().reader.setPower(power)
+                            Utils.updateAntennaPower(power: power)
                         })
                         .disabled(inventoryButton == "Stop")
                     Text("Power Level: \(powerLevel, specifier: "%.0f")")
+                    Button(action: {
+                        zebraSingleton.restartInventory(power: Int16(powerLevel))
+                    }) {
+                        Text("Update Power")
+                    }
                 }
                 .padding(.vertical)
             }
@@ -500,6 +544,9 @@ struct AssetOtherFields: View {
         }
         .onChange(of: cslvalues.singleBarcode) { barcode in
             serialNumber += barcode
+        }
+        .onAppear {
+            maxPowerLevel = zebraSingleton.getMaxPower()
         }
         .padding(.horizontal, 40)
     }

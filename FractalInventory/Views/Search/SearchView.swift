@@ -144,6 +144,11 @@ struct SearchView: View {
                                         }
 
                                     }
+                                    .foregroundColor(.white) // Color del texto
+                                        .padding(7)
+                                        .background(Color.orange.opacity(0.8))
+                                        .cornerRadius(6)
+                                        .font(.system(size: 14, weight: .bold))
                                     .disabled(searchText.count < 2)
                                 }
         )
@@ -237,6 +242,10 @@ struct AssetSearchBox: View {
                     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 }) {
                     Text("Cancel")
+                        .foregroundColor(.white) // Color del texto
+                            .padding(7)
+                            .background(Color.red.opacity(0.8))
+                            .cornerRadius(6)
                         .padding(.trailing)
                         .padding(.leading, 0)
                 }
